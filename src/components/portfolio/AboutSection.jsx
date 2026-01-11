@@ -60,7 +60,7 @@ const AboutSection = () => {
           teamRef.current.scrollBy({ left: 200, behavior: 'smooth' });
         }
       }
-    }, 1000);
+    }, 5000);
 
     return () => clearInterval(scrollInterval);
   }, [certificates, team]);
