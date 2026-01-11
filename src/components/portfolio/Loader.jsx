@@ -2,34 +2,36 @@ import LaravelReactLoader from './LaravelReactLoader';
 
 const Loader = () => { 
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#0a0a0a] backdrop-blur-lg">
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#050505] backdrop-blur-xl">
       <div className="relative flex flex-col items-center">
-        {/* The Hybrid Logo - 3D Isometric Laravel with Clear React Orbits */}
-        <LaravelReactLoader size="w-56 h-56" />
+        {/* The Hybrid Logo - Red Laravel x Blue React as in the image */}
+        <LaravelReactLoader size="w-64 h-64" />
         
-        {/* Professional Loading Text with enhanced visibility */}
-        <div className="mt-10 flex flex-col items-center gap-4">
-          <h2 className="text-[#ffdb70] text-2xl font-black tracking-[0.4em] uppercase drop-shadow-[0_0_10px_rgba(255,219,112,0.3)]">
+        {/* Professional Loading Text matching the image exactly */}
+        <div className="mt-4 flex flex-col items-center gap-4">
+          <h2 className="text-[#61DAFB] text-3xl font-black tracking-[0.3em] uppercase drop-shadow-[0_0_15px_rgba(97,218,251,0.4)]">
             Loading
           </h2>
           
-          {/* Animated dots matching the premium feel */}
-          <div className="flex gap-3">
-            <span className="w-2 h-2 bg-[#ffdb70] rounded-full animate-bounce [animation-delay:-0.3s] shadow-[0_0_8px_#ffdb70]"></span>
-            <span className="w-2 h-2 bg-[#ffdb70] rounded-full animate-bounce [animation-delay:-0.15s] shadow-[0_0_8px_#ffdb70]"></span>
-            <span className="w-2 h-2 bg-[#ffdb70] rounded-full animate-bounce shadow-[0_0_8px_#ffdb70]"></span>
+          {/* Animated dots */}
+          <div className="flex gap-2">
+            <span className="w-1.5 h-1.5 bg-[#61DAFB] rounded-full animate-bounce [animation-delay:-0.3s] shadow-[0_0_10px_#61DAFB]"></span>
+            <span className="w-1.5 h-1.5 bg-[#61DAFB] rounded-full animate-bounce [animation-delay:-0.15s] shadow-[0_0_10px_#61DAFB]"></span>
+            <span className="w-1.5 h-1.5 bg-[#61DAFB] rounded-full animate-bounce shadow-[0_0_10px_#61DAFB]"></span>
           </div>
           
-          <p className="text-light-gray/30 text-xs mt-6 font-bold tracking-[0.5em] uppercase border-t border-[#ffdb70]/10 pt-4">
-            Laravel x React
-          </p>
+          {/* Colored Text: Laravel (Red) x React (Blue) */}
+          <div className="mt-6 flex items-center gap-3 font-bold text-xl tracking-widest uppercase">
+            <span className="text-[#FF2D20] drop-shadow-[0_0_8px_rgba(255,45,32,0.5)]">Laravel</span>
+            <span className="text-white/20">x</span>
+            <span className="text-[#61DAFB] drop-shadow-[0_0_8px_rgba(97,218,251,0.5)]">React</span>
+          </div>
         </div>
       </div>
       
-      {/* Background Decorative Elements */}
-      <div className="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none opacity-20">
-        <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-[#ffdb70]/5 rounded-full blur-[120px]"></div>
-        <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-[#ffdb70]/5 rounded-full blur-[120px]"></div>
+      {/* Background Circuit-like Decorative Elements (Subtle) */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none opacity-10">
+        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(#61DAFB_1px,transparent_1px)] [background-size:40px_40px]"></div>
       </div>
     </div>
   );
