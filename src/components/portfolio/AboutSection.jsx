@@ -44,20 +44,32 @@ const AboutSection = () => {
       // Auto-scroll Certificates
       if (certificatesRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = certificatesRef.current;
-        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+        const itemWidth = certificatesRef.current.querySelector('li')?.offsetWidth || 200;
+        const gap = 20; // gap-[20px]
+        const scrollStep = itemWidth + gap;
+
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
           certificatesRef.current.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-          certificatesRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+          // Calculate next snap position
+          const nextScroll = Math.ceil((scrollLeft + 1) / scrollStep) * scrollStep;
+          certificatesRef.current.scrollTo({ left: nextScroll, behavior: 'smooth' });
         }
       }
 
       // Auto-scroll Team
       if (teamRef.current) {
         const { scrollLeft, scrollWidth, clientWidth } = teamRef.current;
-        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+        const itemWidth = teamRef.current.querySelector('li')?.offsetWidth || 200;
+        const gap = 30; // gap-[30px]
+        const scrollStep = itemWidth + gap;
+
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
           teamRef.current.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-          teamRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+          // Calculate next snap position
+          const nextScroll = Math.ceil((scrollLeft + 1) / scrollStep) * scrollStep;
+          teamRef.current.scrollTo({ left: nextScroll, behavior: 'smooth' });
         }
       }
     }, 5000);
@@ -127,12 +139,12 @@ const AboutSection = () => {
         <div className="-mx-[15px] px-[15px]">
           <ul 
             ref={certificatesRef}
-            className="flex gap-[20px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x"
+            className="flex gap-[20px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x snap-mandatory"
           >
             {certificates?.certificates?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((certificate) => (
               <li 
                 key={certificate.id} 
-                className="min-w-[100px] md:min-w-[120px] flex-shrink-0 snap-start relative group cursor-pointer"
+                className="min-w-[75%] md:min-w-[120px] flex-shrink-0 snap-start relative group cursor-pointer"
                 onClick={() => setSelectedCertificate(certificate)}
               >
                 <div className="relative bg-border-gradient-onyx rounded-[14px] shadow-portfolio-2 overflow-hidden z-10 h-full">
@@ -234,10 +246,10 @@ const AboutSection = () => {
         <div className="-mx-[15px] px-[15px]">
             <ul 
               ref={teamRef}
-              className="flex gap-[30px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x"
+              className="flex gap-[30px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x snap-mandatory"
             >
             {team?.team?.map((member) => (
-                <li key={member.id} className="min-w-[160px] md:min-w-[190px] flex-shrink-0 snap-start">
+                <li key={member.id} className="min-w-[75%] md:min-w-[190px] flex-shrink-0 snap-start">
                 <a href={member.url} target="_blank" rel="noopener noreferrer" className="block group text-center">
                     <div className="relative w-full h-[150px] md:h-[170px] overflow-hidden bg-onyx">
                       <img 
