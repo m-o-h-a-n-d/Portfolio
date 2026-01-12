@@ -97,9 +97,9 @@ export const API_SERVICES_UPDATE = (id) => `${BASE_URL}/services/${id}`;
 export const API_SERVICES_DELETE = (id) => `${BASE_URL}/services/${id}`;
 
 // [GET] List team
-export const API_TEAM_LIST = `${BASE_URL}/team`;
+export const API_TEAM_LIST = `${BASE_URL}/team`; 
 // [POST] Add team member
-export const API_TEAM_CREATE = `${BASE_URL}/team`;
+export const API_TEAM_CREATE = `${BASE_URL}/team` ;
 // [DELETE] Delete team member
 export const API_TEAM_DELETE = `${BASE_URL}/team`;
 
