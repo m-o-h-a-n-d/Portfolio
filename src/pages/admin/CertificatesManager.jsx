@@ -214,7 +214,12 @@ const CertificatesManager = () => {
         timer: 1500,
         showConfirmButton: false,
         toast: true,
-        position: 'top-end'
+        position: 'top-end',
+        customClass: {
+          popup: 'swal-popup-custom swal-toast-custom',
+          title: 'swal-title-custom',
+          htmlContainer: 'swal-text-custom'
+        }
       });
     } catch (error) {
       console.error('Error saving order:', error);

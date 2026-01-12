@@ -1,5 +1,5 @@
 import { useProfile, useServices, useCertificates, useTeam } from '../../context/DataContext';
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   Monitor, 
@@ -35,6 +35,35 @@ const AboutSection = () => {
   const team = useTeam();
   const [selectedCertificate, setSelectedCertificate] = useState(null);
   const [isExpanded, setIsExpanded] = useState(false);
+
+  const certificatesRef = useRef(null);
+  const teamRef = useRef(null);
+
+  useEffect(() => {
+    const scrollInterval = setInterval(() => {
+      // Auto-scroll Certificates
+      if (certificatesRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = certificatesRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+          certificatesRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          certificatesRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+        }
+      }
+
+      // Auto-scroll Team
+      if (teamRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = teamRef.current;
+        if (scrollLeft + clientWidth >= scrollWidth - 5) {
+          teamRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          teamRef.current.scrollBy({ left: 200, behavior: 'smooth' });
+        }
+      }
+    }, 5000);
+
+    return () => clearInterval(scrollInterval);
+  }, [certificates, team]);
 
   if (!profile) return null;
 
@@ -96,7 +125,10 @@ const AboutSection = () => {
         <h3 className="h3 mb-5">Certificates</h3>
         
         <div className="-mx-[15px] px-[15px]">
-          <ul className="flex gap-[20px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x">
+          <ul 
+            ref={certificatesRef}
+            className="flex gap-[20px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x"
+          >
             {certificates?.certificates?.sort((a, b) => (a.order || 0) - (b.order || 0)).map((certificate) => (
               <li 
                 key={certificate.id} 
@@ -200,7 +232,10 @@ const AboutSection = () => {
       <section className="mb-4">
         <h3 className="h3 mb-5">team</h3>
         <div className="-mx-[15px] px-[15px]">
-            <ul className="flex gap-[30px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x">
+            <ul 
+              ref={teamRef}
+              className="flex gap-[30px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x"
+            >
             {team?.team?.map((member) => (
                 <li key={member.id} className="min-w-[160px] md:min-w-[190px] flex-shrink-0 snap-start">
                 <a href={member.url} target="_blank" rel="noopener noreferrer" className="block group text-center">

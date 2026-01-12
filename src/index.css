@@ -825,6 +825,22 @@
   padding: 2rem !important;
 }
 
+/* Smaller Toast Style */
+.swal-toast-custom {
+  padding: 1rem !important;
+  width: auto !important;
+  min-width: 250px !important;
+}
+
+.swal-toast-custom .swal-title-custom {
+  font-size: var(--fs-4) !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.swal-toast-custom .swal-text-custom {
+  font-size: var(--fs-7) !important;
+}
+
 .swal-title-custom {
   color: hsl(var(--foreground)) !important;
   font-family: var(--ff-poppins) !important;
