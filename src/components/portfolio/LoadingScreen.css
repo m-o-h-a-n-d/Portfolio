@@ -54,12 +54,12 @@
   position: relative;
   z-index: 20;
   color: #ffcc33;
-  filter: drop-shadow(0 0 15px rgba(255, 204, 51, 0.5));
+  filter: drop-shadow(0 0 20px rgba(255, 204, 51, 0.8));
   animation: logoPulse 2s ease-in-out infinite;
 }
 
 @keyframes logoPulse {
-  0%, 100% { transform: scale(1); opacity: 0.8; }
+  0%, 100% { transform: scale(1); opacity: 0.9; }
   50% { transform: scale(1.1); opacity: 1; }
 }
 
@@ -77,33 +77,39 @@
 .orbit-2 { transform: rotate(60deg); }
 .orbit-3 { transform: rotate(120deg); }
 
-/* Orbit Paths - Thick CSS Borders */
+/* Orbit Paths - Glowing Neon Gold */
 .orbit-path-css {
   position: absolute;
   width: 100%;
   height: 100%;
-  border: 8px solid #4d3d00; /* Dark Yellow/Gold path */
+  border: 4px solid #ffcc33; /* Thinner but brighter border */
   border-radius: 50%;
-  opacity: 0.9;
+  opacity: 1;
   box-sizing: border-box;
+  /* Intense Glow Effect matching the image */
   box-shadow: 
-    inset 0 0 15px rgba(255, 204, 51, 0.1),
-    0 0 10px rgba(255, 204, 51, 0.2); /* Golden shine effect */
-  border-color: #665200; /* Darker gold border */
-  border-top-color: #997a00; /* Brighter gold highlight for shine */
+    0 0 10px #ffcc33,
+    0 0 20px #ffcc33,
+    inset 0 0 10px #ffcc33;
+  filter: blur(0.5px); /* Slight blur for neon effect */
 }
 
-/* Electron Balls - Elliptical CSS Motion */
+/* Electron Balls - Glowing like the paths */
 .electron-ball-css {
   position: absolute;
-  width: 16px;
-  height: 16px;
-  background: #ffcc33;
+  width: 14px;
+  height: 14px;
+  background: #ffffff; /* White core for intense light */
   border-radius: 50%;
-  box-shadow: 0 0 20px #ffcc33, 0 0 10px #ffffff; /* Increased glow and shine */
+  /* Stronger glow for the balls */
+  box-shadow: 
+    0 0 10px #ffffff,
+    0 0 20px #ffcc33,
+    0 0 40px #ffcc33;
   will-change: transform;
-  margin-top: -8px; /* Center the ball on the path */
-  margin-left: -8px; /* Center the ball on the path */
+  margin-top: -7px; /* Center the ball on the path */
+  margin-left: -7px; /* Center the ball on the path */
+  z-index: 25;
 }
 
 /* 
@@ -139,7 +145,7 @@
   font-weight: 800;
   letter-spacing: 6px;
   color: #ffcc33;
-  text-shadow: 0 0 15px rgba(255, 204, 51, 0.5);
+  text-shadow: 0 0 20px rgba(255, 204, 51, 0.8);
   margin: 0;
   text-transform: uppercase;
 }
@@ -155,13 +161,13 @@
 .loading-bar-progress {
   height: 100%;
   background: #ffcc33;
-  box-shadow: 0 0 12px #ffcc33;
+  box-shadow: 0 0 15px #ffcc33;
   transition: width 0.4s ease-out;
 }
 
 .loading-subtitle {
   font-size: 13px;
-  color: rgba(255, 204, 51, 0.5);
+  color: rgba(255, 204, 51, 0.7);
   letter-spacing: 1.5px;
   margin: 0;
 }
@@ -180,13 +186,13 @@
     height: 80px;
   }
   .orbit-path-css {
-    border-width: 6px;
+    border-width: 3px;
   }
   .electron-ball-css {
-    width: 12px;
-    height: 12px;
-    margin-top: -6px;
-    margin-left: -6px;
+    width: 10px;
+    height: 10px;
+    margin-top: -5px;
+    margin-left: -5px;
   }
   
   /* Elliptical path for mobile (width: 180px, height: 80px) */
