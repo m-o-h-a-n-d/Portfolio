@@ -37,9 +37,6 @@ const Navbar = ({ activePage, onPageChange }) => {
                 `}
               >
               {page}
-              {activePage === page.toLowerCase() && (
-                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-primary rounded-full shadow-[0_0_8px_#ffcc33]"></span>
-              )}
             </button>
           </li>
         ))}

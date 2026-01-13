@@ -11,13 +11,28 @@ import LoadingScreen from './LoadingScreen';
 
 const PortfolioLayout = () => {
   const [activePage, setActivePage] = useState('about');
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
   const handlePageChange = (page) => {
     if (page === activePage) return;
-    setActivePage(page);
+    setIsTransitioning(true);
+    
+    // Simulate a short loading time for the transition effect
+    setTimeout(() => {
+      setActivePage(page);
+      setIsTransitioning(false);
+    }, 400);
   };
 
   const renderPage = () => {
+    if (isTransitioning) {
+      return (
+        <div className="flex items-center justify-center w-full h-[400px]">
+          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      );
+    }
+
     switch (activePage) {
       case 'about':
         return <AboutSection />;
