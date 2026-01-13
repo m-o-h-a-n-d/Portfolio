@@ -33,37 +33,22 @@ const LoadingScreen = () => {
             <use href="#orbit-path-2" className="orbit-path" />
             <use href="#orbit-path-3" className="orbit-path" />
 
-            {/* Orbit 1 Electrons */}
-            <circle r="4" className="electron-ball">
+            {/* Orbit 1 - One Electron */}
+            <circle r="5" className="electron-ball">
               <animateMotion dur="3s" repeatCount="indefinite">
                 <mpath href="#orbit-path-1" />
               </animateMotion>
             </circle>
-            <circle r="4" className="electron-ball">
-              <animateMotion dur="3s" repeatCount="indefinite" begin="-1.5s">
-                <mpath href="#orbit-path-1" />
-              </animateMotion>
-            </circle>
 
-            {/* Orbit 2 Electrons */}
-            <circle r="4" className="electron-ball">
-              <animateMotion dur="3.5s" repeatCount="indefinite">
-                <mpath href="#orbit-path-2" />
-              </animateMotion>
-            </circle>
-            <circle r="4" className="electron-ball">
-              <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1.75s">
+            {/* Orbit 2 - One Electron */}
+            <circle r="5" className="electron-ball">
+              <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1s">
                 <mpath href="#orbit-path-2" />
               </animateMotion>
             </circle>
 
-            {/* Orbit 3 Electrons */}
-            <circle r="4" className="electron-ball">
-              <animateMotion dur="4s" repeatCount="indefinite">
-                <mpath href="#orbit-path-3" />
-              </animateMotion>
-            </circle>
-            <circle r="4" className="electron-ball">
+            {/* Orbit 3 - One Electron */}
+            <circle r="5" className="electron-ball">
               <animateMotion dur="4s" repeatCount="indefinite" begin="-2s">
                 <mpath href="#orbit-path-3" />
               </animateMotion>
