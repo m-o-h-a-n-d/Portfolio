@@ -54,12 +54,12 @@
   position: relative;
   z-index: 20;
   color: #ffcc33;
-  filter: drop-shadow(0 0 20px rgba(255, 204, 51, 0.8));
+  filter: drop-shadow(0 0 15px rgba(255, 204, 51, 0.5));
   animation: logoPulse 2s ease-in-out infinite;
 }
 
 @keyframes logoPulse {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
+  0%, 100% { transform: scale(1); opacity: 0.8; }
   50% { transform: scale(1.1); opacity: 1; }
 }
 
@@ -77,36 +77,29 @@
 .orbit-2 { transform: rotate(60deg); }
 .orbit-3 { transform: rotate(120deg); }
 
-/* Orbit Paths - Glowing Neon Gold with 8px thickness */
+/* Orbit Paths - Original CSS Borders */
 .orbit-path-css {
   position: absolute;
   width: 100%;
   height: 100%;
-  border: 8px solid #ffcc33; /* Restored thickness to 8px */
+  border: 8px solid #ffcc33;
   border-radius: 50%;
-  opacity: 1;
+  opacity: 0.4;
   box-sizing: border-box;
-  /* Intense Glow Effect */
-  box-shadow: 
-    0 0 10px #ffcc33,
-    0 0 20px #ffcc33,
-    inset 0 0 10px #ffcc33;
 }
 
-/* Electron Balls - Black color with subtle glow to stay visible */
+/* Electron Balls - Original Style with Fixed Centering */
 .electron-ball-css {
   position: absolute;
   width: 16px;
   height: 16px;
-  background: #000000; /* Black color */
+  background: #ffcc33;
   border-radius: 50%;
-  /* Subtle glow to maintain visibility on dark background if needed, or just black */
-  box-shadow: 0 0 5px rgba(255, 204, 51, 0.5); 
+  box-shadow: 0 0 15px #ffcc33;
   will-change: transform;
-  margin-top: -8px; /* Center the ball on the path */
-  margin-left: -8px; /* Center the ball on the path */
-  z-index: 25;
-  border: 1px solid #ffcc33; /* Optional: thin gold border to define the black ball better */
+  /* Centering fix */
+  margin-top: -8px;
+  margin-left: -8px;
 }
 
 /* 
@@ -142,7 +135,7 @@
   font-weight: 800;
   letter-spacing: 6px;
   color: #ffcc33;
-  text-shadow: 0 0 20px rgba(255, 204, 51, 0.8);
+  text-shadow: 0 0 15px rgba(255, 204, 51, 0.5);
   margin: 0;
   text-transform: uppercase;
 }
@@ -158,13 +151,13 @@
 .loading-bar-progress {
   height: 100%;
   background: #ffcc33;
-  box-shadow: 0 0 15px #ffcc33;
+  box-shadow: 0 0 12px #ffcc33;
   transition: width 0.4s ease-out;
 }
 
 .loading-subtitle {
   font-size: 13px;
-  color: rgba(255, 204, 51, 0.7);
+  color: rgba(255, 204, 51, 0.5);
   letter-spacing: 1.5px;
   margin: 0;
 }
@@ -188,6 +181,7 @@
   .electron-ball-css {
     width: 12px;
     height: 12px;
+    /* Centering fix for mobile */
     margin-top: -6px;
     margin-left: -6px;
   }
