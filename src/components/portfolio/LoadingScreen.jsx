@@ -22,51 +22,51 @@ const LoadingScreen = () => {
         <div className="atom-container">
           <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              {/* Further Reduced Radius Elliptical Paths - Very close to the logo */}
-              <path id="orbit-1" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" />
-              <path id="orbit-2" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(60 200 200)" />
-              <path id="orbit-3" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(120 200 200)" />
+              {/* Define three distinct paths for the orbits */}
+              <path id="orbit-path-1" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" />
+              <path id="orbit-path-2" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(60 200 200)" />
+              <path id="orbit-path-3" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(120 200 200)" />
             </defs>
 
             {/* Visual Orbit Paths */}
-            <use href="#orbit-1" className="orbit-path" />
-            <use href="#orbit-2" className="orbit-path" />
-            <use href="#orbit-3" className="orbit-path" />
+            <use href="#orbit-path-1" className="orbit-path" />
+            <use href="#orbit-path-2" className="orbit-path" />
+            <use href="#orbit-path-3" className="orbit-path" />
 
-            {/* Animated Arrows on Paths - One for each orbit */}
+            {/* Animated Arrows - One for each distinct orbit */}
             <g>
               <animateMotion dur="3.5s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#orbit-1" />
+                <mpath href="#orbit-path-1" />
               </animateMotion>
               <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
             </g>
             <g>
               <animateMotion dur="4.2s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#orbit-2" />
+                <mpath href="#orbit-path-2" />
               </animateMotion>
               <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
             </g>
             <g>
               <animateMotion dur="3.8s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#orbit-3" />
+                <mpath href="#orbit-path-3" />
               </animateMotion>
               <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
             </g>
 
-            {/* Animated Electrons (Balls) - One for each orbit */}
+            {/* Animated Electrons (Balls) - Correctly linked to each distinct orbit */}
             <circle r="7" className="electron-ball">
               <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1.75s">
-                <mpath href="#orbit-1" />
+                <mpath href="#orbit-path-1" />
               </animateMotion>
             </circle>
             <circle r="7" className="electron-ball">
               <animateMotion dur="4.2s" repeatCount="indefinite" begin="-2.1s">
-                <mpath href="#orbit-2" />
+                <mpath href="#orbit-path-2" />
               </animateMotion>
             </circle>
             <circle r="7" className="electron-ball">
               <animateMotion dur="3.8s" repeatCount="indefinite" begin="-1.9s">
-                <mpath href="#orbit-3" />
+                <mpath href="#orbit-path-3" />
               </animateMotion>
             </circle>
 
