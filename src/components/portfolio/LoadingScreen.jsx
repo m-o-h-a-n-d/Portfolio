@@ -1,5 +1,6 @@
 import React from 'react';
 import './LoadingScreen.css';
+import LaravelIcon from '../ui/LaravelIcon';
 
 const LoadingScreen = () => {
   return (
@@ -9,12 +10,6 @@ const LoadingScreen = () => {
       <div className="loading-content">
         <div className="atom-container">
           <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-            {/* 
-                To ensure each electron follows its own orbit, we define the paths directly.
-                We use unique IDs and ensure the transform is applied to the path itself 
-                or the animateMotion correctly references the transformed path.
-            */}
-            
             {/* Orbit 1 - Horizontal */}
             <path 
               id="path1" 
@@ -28,7 +23,6 @@ const LoadingScreen = () => {
             </circle>
 
             {/* Orbit 2 - Rotated 60deg */}
-            {/* We define the path with the rotation baked into the 'd' attribute or use a group */}
             <g transform="rotate(60 200 200)">
               <path 
                 id="path2" 
@@ -56,12 +50,12 @@ const LoadingScreen = () => {
               </circle>
             </g>
 
-            {/* Center Logo */}
+            {/* Center Logo - Using the new LaravelIcon component */}
             <foreignObject x="150" y="150" width="100" height="100">
               <div className="center-logo-wrapper" style={{ 
                 width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffcc33'
               }}>
-                <i className="fab fa-laravel" style={{ fontSize: '55px' }}></i>
+                <LaravelIcon size={55} />
               </div>
             </foreignObject>
           </svg>

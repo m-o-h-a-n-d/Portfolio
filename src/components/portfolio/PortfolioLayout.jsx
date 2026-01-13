@@ -13,6 +13,7 @@ import LoadingScreen from './LoadingScreen';
 const PortfolioLayout = () => {
   const [activePage, setActivePage] = useState('about');
   const [isPageLoading, setIsPageLoading] = useState(false);
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   const handlePageChange = (page) => {
     if (page === activePage) return;
@@ -21,16 +22,25 @@ const PortfolioLayout = () => {
   };
 
   useEffect(() => {
+    // Initial loading for refresh or first visit
+    const initialTimer = setTimeout(() => {
+      setIsInitialLoading(false);
+    }, 2000); // Show atom loader for 2 seconds on initial load
+
+    return () => clearTimeout(initialTimer);
+  }, []);
+
+  useEffect(() => {
     if (isPageLoading) {
       const timer = setTimeout(() => {
         setIsPageLoading(false);
-      }, 500); // Simulate loading time like in Dashboard
+      }, 500); // Show simple circle loader for 0.5s on page change
       return () => clearTimeout(timer);
     }
   }, [isPageLoading]);
 
   const renderPage = () => {
-    if (isPageLoading) return <LoadingScreen />;
+    if (isPageLoading) return <Loader />;
     
     switch (activePage) {
       case 'about':
@@ -48,12 +58,13 @@ const PortfolioLayout = () => {
     }
   };
 
+  if (isInitialLoading) {
+    return <LoadingScreen />;
+  }
+
   return (
     <DataProvider>
       <main className="m-[15px_12px_75px] md:my-[60px] md:mb-[100px] min-w-[259px]">
-        {/* تم استخدام lg:flex لتطابق نقطة التوقف 1250px في الـ CSS الأصلي 
-           تقريباً (xl في tailwind)
-        */}
         <div className="max-w-[1200px] mx-auto xl:flex xl:items-stretch xl:gap-[25px]">
           
           {/* Sidebar Area */}
@@ -64,7 +75,7 @@ const PortfolioLayout = () => {
           {/* Main Content Area */}
           <div className="flex-1 min-w-0 bg-card border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative">
             
-            {/* Navbar أصبح الآن داخل الكارد ليكون فوقه مباشرة */}
+            {/* Navbar */}
             <Navbar activePage={activePage} onPageChange={handlePageChange} />
 
             {/* Content Pages */}
