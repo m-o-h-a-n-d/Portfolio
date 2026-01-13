@@ -1,6 +1,6 @@
 /* ============================================
-   LOADING SCREEN STYLES - STABLE CSS VERSION
-   Fixed jumping balls and lag
+   LOADING SCREEN STYLES - ELLIPTICAL CSS VERSION
+   Fixed balls staying on elliptical tracks
 ============================================ */
 
 .loading-screen-container {
@@ -82,13 +82,13 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  border: 8px solid #ffcc33; /* Thick paths as requested */
+  border: 8px solid #ffcc33;
   border-radius: 50%;
   opacity: 0.4;
   box-sizing: border-box;
 }
 
-/* Electron Balls - Stable CSS Motion */
+/* Electron Balls - Elliptical CSS Motion */
 .electron-ball-css {
   position: absolute;
   width: 16px;
@@ -96,23 +96,40 @@
   background: #ffcc33;
   border-radius: 50%;
   box-shadow: 0 0 15px #ffcc33;
-  /* Start at the top center of the ellipse */
-  top: -8px;
-  left: 50%;
-  margin-left: -8px;
   will-change: transform;
 }
 
-/* Stable Rotation Animation */
-.orbit-1 .electron-ball-css { animation: stableOrbit 3s linear infinite; }
-.orbit-2 .electron-ball-css { animation: stableOrbit 3.5s linear infinite; animation-delay: -1.2s; }
-.orbit-3 .electron-ball-css { animation: stableOrbit 4s linear infinite; animation-delay: -2.4s; }
-
-@keyframes stableOrbit {
-  /* This creates a perfect elliptical path by rotating the container's coordinate system */
-  from { transform: rotate(0deg) translateX(110px) rotate(0deg); }
-  to { transform: rotate(360deg) translateX(110px) rotate(-360deg); }
+/* 
+   To follow an elliptical path (width: 220px, height: 100px):
+   Radius X = 110px, Radius Y = 50px
+*/
+@keyframes ellipticalOrbit {
+  0% { transform: translate(110px, 0px); }
+  5% { transform: translate(104.6px, 15.5px); }
+  10% { transform: translate(89px, 29.4px); }
+  15% { transform: translate(64.7px, 40.5px); }
+  20% { transform: translate(34px, 47.6px); }
+  25% { transform: translate(0px, 50px); }
+  30% { transform: translate(-34px, 47.6px); }
+  35% { transform: translate(-64.7px, 40.5px); }
+  40% { transform: translate(-89px, 29.4px); }
+  45% { transform: translate(-104.6px, 15.5px); }
+  50% { transform: translate(-110px, 0px); }
+  55% { transform: translate(-104.6px, -15.5px); }
+  60% { transform: translate(-89px, -29.4px); }
+  65% { transform: translate(-64.7px, -40.5px); }
+  70% { transform: translate(-34px, -47.6px); }
+  75% { transform: translate(0px, -50px); }
+  80% { transform: translate(34px, -47.6px); }
+  85% { transform: translate(64.7px, -40.5px); }
+  90% { transform: translate(89px, -29.4px); }
+  95% { transform: translate(104.6px, -15.5px); }
+  100% { transform: translate(110px, 0px); }
 }
+
+.orbit-1 .electron-ball-css { animation: ellipticalOrbit 3s linear infinite; }
+.orbit-2 .electron-ball-css { animation: ellipticalOrbit 3.5s linear infinite; animation-delay: -1.2s; }
+.orbit-3 .electron-ball-css { animation: ellipticalOrbit 4s linear infinite; animation-delay: -2.4s; }
 
 /* ============================================
    LOADING TEXT
@@ -177,13 +194,22 @@
   .electron-ball-css {
     width: 12px;
     height: 12px;
-    top: -6px;
-    margin-left: -6px;
   }
-  @keyframes stableOrbit {
-    from { transform: rotate(0deg) translateX(90px) rotate(0deg); }
-    to { transform: rotate(360deg) translateX(90px) rotate(-360deg); }
+  
+  /* Elliptical path for mobile (width: 180px, height: 80px) */
+  /* Radius X = 90px, Radius Y = 40px */
+  @keyframes ellipticalOrbitMobile {
+    0% { transform: translate(90px, 0px); }
+    25% { transform: translate(0px, 40px); }
+    50% { transform: translate(-90px, 0px); }
+    75% { transform: translate(0px, -40px); }
+    100% { transform: translate(90px, 0px); }
   }
+  
+  .orbit-1 .electron-ball-css { animation: ellipticalOrbitMobile 3s linear infinite; }
+  .orbit-2 .electron-ball-css { animation: ellipticalOrbitMobile 3.5s linear infinite; animation-delay: -1.2s; }
+  .orbit-3 .electron-ball-css { animation: ellipticalOrbitMobile 4s linear infinite; animation-delay: -2.4s; }
+
   .loading-title {
     font-size: 24px;
     letter-spacing: 4px;
