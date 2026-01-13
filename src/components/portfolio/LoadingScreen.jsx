@@ -22,10 +22,13 @@ const LoadingScreen = () => {
         <div className="atom-container">
           <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              {/* Define three distinct paths for the orbits */}
-              <path id="orbit-path-1" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" />
-              <path id="orbit-path-2" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(60 200 200)" />
-              <path id="orbit-path-3" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(120 200 200)" />
+              {/* Define three distinct paths for the orbits with different sizes */}
+              {/* Inner Orbit */}
+              <path id="orbit-path-1" d="M 200 150 A 50 50 0 1 1 200 250 A 50 50 0 1 1 200 150" fill="none" />
+              {/* Middle Orbit */}
+              <path id="orbit-path-2" d="M 200 115 A 85 85 0 1 1 200 285 A 85 85 0 1 1 200 115" fill="none" />
+              {/* Outer Orbit */}
+              <path id="orbit-path-3" d="M 200 80 A 120 120 0 1 1 200 320 A 120 120 0 1 1 200 80" fill="none" />
             </defs>
 
             {/* Visual Orbit Paths */}
@@ -33,49 +36,29 @@ const LoadingScreen = () => {
             <use href="#orbit-path-2" className="orbit-path" />
             <use href="#orbit-path-3" className="orbit-path" />
 
-            {/* Animated Arrows - One for each distinct orbit */}
-            <g>
-              <animateMotion dur="3.5s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#orbit-path-1" />
-              </animateMotion>
-              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
-            </g>
-            <g>
-              <animateMotion dur="4.2s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#orbit-path-2" />
-              </animateMotion>
-              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
-            </g>
-            <g>
-              <animateMotion dur="3.8s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#orbit-path-3" />
-              </animateMotion>
-              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
-            </g>
-
-            {/* Animated Electrons (Balls) - Correctly linked to each distinct orbit */}
-            <circle r="7" className="electron-ball">
-              <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1.75s">
+            {/* Animated Electrons (Balls) - Linked to each distinct orbit */}
+            <circle r="6" className="electron-ball">
+              <animateMotion dur="3s" repeatCount="indefinite">
                 <mpath href="#orbit-path-1" />
               </animateMotion>
             </circle>
-            <circle r="7" className="electron-ball">
-              <animateMotion dur="4.2s" repeatCount="indefinite" begin="-2.1s">
+            <circle r="6" className="electron-ball">
+              <animateMotion dur="4.5s" repeatCount="indefinite">
                 <mpath href="#orbit-path-2" />
               </animateMotion>
             </circle>
-            <circle r="7" className="electron-ball">
-              <animateMotion dur="3.8s" repeatCount="indefinite" begin="-1.9s">
+            <circle r="6" className="electron-ball">
+              <animateMotion dur="6s" repeatCount="indefinite">
                 <mpath href="#orbit-path-3" />
               </animateMotion>
             </circle>
 
-            {/* Center Logo - Enlarged */}
+            {/* Center Logo */}
             <foreignObject x="150" y="150" width="100" height="100">
               <div className="center-logo-wrapper" style={{ 
                 width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffcc33'
               }}>
-                <LaravelIcon size={85} />
+                <LaravelIcon size={60} />
               </div>
             </foreignObject>
           </svg>
