@@ -11,10 +11,10 @@ const LoadingScreen = () => {
           <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
               {/* Define three distinct paths by rotating the base elliptical path */}
-              {/* Reduced radius from 75/38 to 65/32 for a more compact look */}
-              <path id="orbit-path-1" d="M 200 135 A 65 32 0 1 1 200 265 A 65 32 0 1 1 200 135" fill="none" />
-              <path id="orbit-path-2" d="M 200 135 A 65 32 0 1 1 200 265 A 65 32 0 1 1 200 135" fill="none" transform="rotate(60 200 200)" />
-              <path id="orbit-path-3" d="M 200 135 A 65 32 0 1 1 200 265 A 65 32 0 1 1 200 135" fill="none" transform="rotate(120 200 200)" />
+              {/* Further reduced radius from 65/32 to 55/28 for a more compact look as requested */}
+              <path id="orbit-path-1" d="M 200 145 A 55 28 0 1 1 200 255 A 55 28 0 1 1 200 145" fill="none" />
+              <path id="orbit-path-2" d="M 200 145 A 55 28 0 1 1 200 255 A 55 28 0 1 1 200 145" fill="none" transform="rotate(60 200 200)" />
+              <path id="orbit-path-3" d="M 200 145 A 55 28 0 1 1 200 255 A 55 28 0 1 1 200 145" fill="none" transform="rotate(120 200 200)" />
             </defs>
 
             {/* Visual Orbit Paths */}
@@ -22,23 +22,23 @@ const LoadingScreen = () => {
             <use href="#orbit-path-2" className="orbit-path" />
             <use href="#orbit-path-3" className="orbit-path" />
 
-            {/* Orbit 1 - One Electron - Increased radius to 8 for larger size */}
+            {/* Orbit 1 - One Electron */}
             <circle r="8" className="electron-ball">
               <animateMotion dur="3s" repeatCount="indefinite">
                 <mpath href="#orbit-path-1" />
               </animateMotion>
             </circle>
 
-            {/* Orbit 2 - One Electron - Increased radius to 8 for larger size */}
+            {/* Orbit 2 - One Electron */}
             <circle r="8" className="electron-ball">
-              <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1s">
+              <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1.2s">
                 <mpath href="#orbit-path-2" />
               </animateMotion>
             </circle>
 
-            {/* Orbit 3 - One Electron - Increased radius to 8 for larger size */}
+            {/* Orbit 3 - One Electron */}
             <circle r="8" className="electron-ball">
-              <animateMotion dur="4s" repeatCount="indefinite" begin="-2s">
+              <animateMotion dur="4s" repeatCount="indefinite" begin="-2.4s">
                 <mpath href="#orbit-path-3" />
               </animateMotion>
             </circle>
