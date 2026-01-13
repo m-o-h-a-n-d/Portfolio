@@ -16,11 +16,7 @@ const LoadingScreen = ({ progress }) => {
               d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" 
               className="orbit-path" 
             />
-            <circle r="10" className="electron-ball">
-              <animateMotion dur="3s" repeatCount="indefinite">
-                <mpath href="#path1" />
-              </animateMotion>
-            </circle>
+            <circle r="8" className="electron-ball electron-1" />
 
             {/* Orbit 2 - Rotated 60deg */}
             <g transform="rotate(60 200 200)">
@@ -29,11 +25,7 @@ const LoadingScreen = ({ progress }) => {
                 d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" 
                 className="orbit-path" 
               />
-              <circle r="10" className="electron-ball">
-                <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1.2s">
-                  <mpath href="#path2" />
-                </animateMotion>
-              </circle>
+              <circle r="8" className="electron-ball electron-2" />
             </g>
 
             {/* Orbit 3 - Rotated 120deg */}
@@ -43,21 +35,15 @@ const LoadingScreen = ({ progress }) => {
                 d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" 
                 className="orbit-path" 
               />
-              <circle r="10" className="electron-ball">
-                <animateMotion dur="4s" repeatCount="indefinite" begin="-2.4s">
-                  <mpath href="#path3" />
-                </animateMotion>
-              </circle>
+              <circle r="8" className="electron-ball electron-3" />
             </g>
 
-            {/* Center Logo - Using the new LaravelIcon component */}
-            <foreignObject x="150" y="150" width="100" height="100">
-              <div className="center-logo-wrapper" style={{ 
-                width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffcc33'
-              }}>
+            {/* Center Logo - Integrated directly without foreignObject */}
+            <g transform="translate(172.5, 171.5)">
+              <g className="center-logo-wrapper">
                 <LaravelIcon size={55} />
-              </div>
-            </foreignObject>
+              </g>
+            </g>
           </svg>
         </div>
 

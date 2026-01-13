@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { DataProvider } from '../../context/DataContext';
+// Removed redundant DataProvider import
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import AboutSection from './AboutSection';
@@ -50,8 +50,7 @@ const PortfolioLayout = () => {
   };
 
   return (
-    <DataProvider>
-      <main className="m-[15px_12px_75px] md:my-[60px] md:mb-[100px] min-w-[259px]">
+    <main className="m-[15px_12px_75px] md:my-[60px] md:mb-[100px] min-w-[259px]">
         <div className="max-w-[1200px] mx-auto xl:flex xl:items-stretch xl:gap-[25px]">
           
           {/* Sidebar Area */}
@@ -72,8 +71,7 @@ const PortfolioLayout = () => {
             
           </div>
         </div>
-      </main>
-    </DataProvider>
+    </main>
   );
 };
 
