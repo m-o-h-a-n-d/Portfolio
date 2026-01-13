@@ -72,8 +72,8 @@ export const DataProvider = ({ children }) => {
         const results = {};
         let completed = 0;
 
-        // Fetch data sequentially or in small batches for smoother progress bar
-        for (const endpoint of endpoints) {
+        // Fetch data in parallel for maximum speed
+        const fetchPromises = endpoints.map(async (endpoint) => {
           try {
             const res = await apiGet(endpoint.url);
             results[endpoint.key] = res;
@@ -82,16 +82,24 @@ export const DataProvider = ({ children }) => {
             results[endpoint.key] = { data: null };
           } finally {
             completed++;
-            const newProgress = 10 + Math.floor((completed / endpoints.length) * 80);
-            setProgress(newProgress);
-            // Small delay to make progress visible and smooth
-            await new Promise(resolve => setTimeout(resolve, 100));
+            setProgress(10 + Math.floor((completed / endpoints.length) * 90));
           }
+        });
+
+        // Add a safety timeout of 8 seconds
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Timeout')), 8000)
+        );
+
+        try {
+          await Promise.race([Promise.all(fetchPromises), timeoutPromise]);
+        } catch (err) {
+          console.warn('Data fetching timed out or failed, proceeding with partial data');
         }
         
         setProgress(100);
-        // Give a moment for the 100% to be seen before hiding
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Small delay to ensure 100% is visible
+        await new Promise(resolve => setTimeout(resolve, 200));
 
         const {
           profile: profileRes,

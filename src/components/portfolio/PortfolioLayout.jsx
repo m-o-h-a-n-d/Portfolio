@@ -11,20 +11,11 @@ import LoadingScreen from './LoadingScreen';
 
 const PortfolioLayout = () => {
   const [activePage, setActivePage] = useState('about');
-  const [isPageLoading, setIsPageLoading] = useState(false);
-  const [isInitialLoading, setIsInitialLoading] = useState(true);
-  const [loadingProgress, setLoadingProgress] = useState(0);
 
   const handlePageChange = (page) => {
     if (page === activePage) return;
     setActivePage(page);
   };
-
-  useEffect(() => {
-    // Initial loading for refresh or first visit
-    // This is now handled by DataContext, but we keep a fallback or initial state here if needed
-    // For now, we'll let DataContext control the initial loading screen
-  }, []);
 
   const renderPage = () => {
     switch (activePage) {
@@ -42,10 +33,6 @@ const PortfolioLayout = () => {
         return <AboutSection />;
     }
   };
-
-  if (isInitialLoading) {
-    return <LoadingScreen progress={loadingProgress} />;
-  }
 
   return (
     <DataProvider>
