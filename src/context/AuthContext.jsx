@@ -1,5 +1,5 @@
 import { useState, createContext, useContext, useEffect } from 'react';
-import Loader from '../components/portfolio/Loader';
+import LoadingScreen from '../components/portfolio/LoadingScreen';
 import { isAuthenticated, removeAuthToken, apiFetch, setAuthToken } from '../api/request';
 import { useNavigate } from 'react-router-dom';
 
@@ -58,11 +58,7 @@ export const AuthProvider = ({ children }) => {
   };
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Loader />
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   return (

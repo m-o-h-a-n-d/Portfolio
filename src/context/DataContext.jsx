@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext } from 'react';
-import Loader from '../components/portfolio/Loader';
+import LoadingScreen from '../components/portfolio/LoadingScreen';
 import { apiGet } from '../api/request';
 import { 
   API_PROFILE_GET, 
@@ -109,14 +109,7 @@ export const DataProvider = ({ children }) => {
   }, []);
 
   if (loading) {
-    return (
-      <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
-        <div className="text-center">
-          <Loader />
-          <p className="text-muted-foreground text-lg font-medium mt-4">Loading portfolio...</p>
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (error) {
