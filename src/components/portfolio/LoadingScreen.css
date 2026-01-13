@@ -82,15 +82,15 @@
   position: absolute;
   width: 100%;
   height: 100%;
-  border: 8px solid #1a1a1a; /* Much darker path */
+  border: 8px solid #4d3d00; /* Dark Yellow/Gold path */
   border-radius: 50%;
-  opacity: 0.8;
+  opacity: 0.9;
   box-sizing: border-box;
   box-shadow: 
     inset 0 0 15px rgba(255, 204, 51, 0.1),
-    0 0 10px rgba(255, 204, 51, 0.2); /* Metallic shine effect */
-  border-color: #222; /* Dark metallic border */
-  border-top-color: #444; /* Add a highlight for shine */
+    0 0 10px rgba(255, 204, 51, 0.2); /* Golden shine effect */
+  border-color: #665200; /* Darker gold border */
+  border-top-color: #997a00; /* Brighter gold highlight for shine */
 }
 
 /* Electron Balls - Elliptical CSS Motion */
