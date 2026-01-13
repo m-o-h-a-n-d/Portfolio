@@ -22,10 +22,10 @@ const LoadingScreen = () => {
         <div className="atom-container">
           <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              {/* Reduced Radius Elliptical Paths - Closer to the logo */}
-              <path id="orbit-1" d="M 200 110 A 90 45 0 1 1 200 290 A 90 45 0 1 1 200 110" fill="none" />
-              <path id="orbit-2" d="M 200 110 A 90 45 0 1 1 200 290 A 90 45 0 1 1 200 110" fill="none" transform="rotate(60 200 200)" />
-              <path id="orbit-3" d="M 200 110 A 90 45 0 1 1 200 290 A 90 45 0 1 1 200 110" fill="none" transform="rotate(120 200 200)" />
+              {/* Further Reduced Radius Elliptical Paths - Very close to the logo */}
+              <path id="orbit-1" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" />
+              <path id="orbit-2" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(60 200 200)" />
+              <path id="orbit-3" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(120 200 200)" />
             </defs>
 
             {/* Visual Orbit Paths */}
@@ -33,49 +33,49 @@ const LoadingScreen = () => {
             <use href="#orbit-2" className="orbit-path" />
             <use href="#orbit-3" className="orbit-path" />
 
-            {/* Animated Arrows on Paths */}
+            {/* Animated Arrows on Paths - One for each orbit */}
             <g>
-              <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
+              <animateMotion dur="3.5s" repeatCount="indefinite" rotate="auto">
                 <mpath href="#orbit-1" />
               </animateMotion>
-              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
+              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
             </g>
             <g>
-              <animateMotion dur="5s" repeatCount="indefinite" rotate="auto">
+              <animateMotion dur="4.2s" repeatCount="indefinite" rotate="auto">
                 <mpath href="#orbit-2" />
               </animateMotion>
-              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
+              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
             </g>
             <g>
-              <animateMotion dur="4.5s" repeatCount="indefinite" rotate="auto">
+              <animateMotion dur="3.8s" repeatCount="indefinite" rotate="auto">
                 <mpath href="#orbit-3" />
               </animateMotion>
-              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
+              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
             </g>
 
-            {/* Animated Electrons (Balls) */}
-            <circle r="6" className="electron-ball">
-              <animateMotion dur="4s" repeatCount="indefinite" begin="-2s">
+            {/* Animated Electrons (Balls) - One for each orbit */}
+            <circle r="7" className="electron-ball">
+              <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1.75s">
                 <mpath href="#orbit-1" />
               </animateMotion>
             </circle>
-            <circle r="6" className="electron-ball">
-              <animateMotion dur="5s" repeatCount="indefinite" begin="-1s">
+            <circle r="7" className="electron-ball">
+              <animateMotion dur="4.2s" repeatCount="indefinite" begin="-2.1s">
                 <mpath href="#orbit-2" />
               </animateMotion>
             </circle>
-            <circle r="6" className="electron-ball">
-              <animateMotion dur="4.5s" repeatCount="indefinite" begin="-3s">
+            <circle r="7" className="electron-ball">
+              <animateMotion dur="3.8s" repeatCount="indefinite" begin="-1.9s">
                 <mpath href="#orbit-3" />
               </animateMotion>
             </circle>
 
-            {/* Center Logo */}
-            <foreignObject x="160" y="160" width="80" height="80">
+            {/* Center Logo - Enlarged */}
+            <foreignObject x="150" y="150" width="100" height="100">
               <div className="center-logo-wrapper" style={{ 
                 width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffcc33'
               }}>
-                <LaravelIcon size={60} />
+                <LaravelIcon size={85} />
               </div>
             </foreignObject>
           </svg>
