@@ -22,33 +22,33 @@ const LoadingScreen = () => {
         <div className="atom-container">
           <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              {/* Define three distinct paths for the orbits with different sizes */}
-              {/* Inner Orbit */}
-              <path id="orbit-path-1" d="M 200 150 A 50 50 0 1 1 200 250 A 50 50 0 1 1 200 150" fill="none" />
-              {/* Middle Orbit */}
-              <path id="orbit-path-2" d="M 200 115 A 85 85 0 1 1 200 285 A 85 85 0 1 1 200 115" fill="none" />
-              {/* Outer Orbit */}
-              <path id="orbit-path-3" d="M 200 80 A 120 120 0 1 1 200 320 A 120 120 0 1 1 200 80" fill="none" />
+              {/* Define the base elliptical path */}
+              <path id="base-orbit" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" />
+              
+              {/* Define three distinct paths by rotating the base path */}
+              <path id="orbit-path-1" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" />
+              <path id="orbit-path-2" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(60 200 200)" />
+              <path id="orbit-path-3" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(120 200 200)" />
             </defs>
 
-            {/* Visual Orbit Paths */}
+            {/* Visual Orbit Paths - Using the rotated paths */}
             <use href="#orbit-path-1" className="orbit-path" />
             <use href="#orbit-path-2" className="orbit-path" />
             <use href="#orbit-path-3" className="orbit-path" />
 
-            {/* Animated Electrons (Balls) - Linked to each distinct orbit */}
-            <circle r="6" className="electron-ball">
+            {/* Animated Electrons (Balls) - Each on its own rotated orbit */}
+            <circle r="5" className="electron-ball">
               <animateMotion dur="3s" repeatCount="indefinite">
                 <mpath href="#orbit-path-1" />
               </animateMotion>
             </circle>
-            <circle r="6" className="electron-ball">
-              <animateMotion dur="4.5s" repeatCount="indefinite">
+            <circle r="5" className="electron-ball">
+              <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1s">
                 <mpath href="#orbit-path-2" />
               </animateMotion>
             </circle>
-            <circle r="6" className="electron-ball">
-              <animateMotion dur="6s" repeatCount="indefinite">
+            <circle r="5" className="electron-ball">
+              <animateMotion dur="4s" repeatCount="indefinite" begin="-2s">
                 <mpath href="#orbit-path-3" />
               </animateMotion>
             </circle>
@@ -58,7 +58,7 @@ const LoadingScreen = () => {
               <div className="center-logo-wrapper" style={{ 
                 width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffcc33'
               }}>
-                <LaravelIcon size={60} />
+                <LaravelIcon size={70} />
               </div>
             </foreignObject>
           </svg>
