@@ -1,6 +1,6 @@
 /* ============================================
-   ULTRA-LIGHTWEIGHT LOADING SCREEN
-   Optimized for zero lag on all devices
+   LOADING SCREEN STYLES - REVERTED & ENHANCED
+   Increased path thickness and optimized
 ============================================ */
 
 .loading-screen-container {
@@ -16,9 +16,6 @@
   background: #050505;
   font-family: 'Poppins', sans-serif;
   overflow: hidden;
-  /* Force hardware acceleration for the entire container */
-  transform: translateZ(0);
-  backface-visibility: hidden;
 }
 
 .loading-bg {
@@ -27,8 +24,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  /* Simple background color is faster than gradients */
-  background: #050505;
+  background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
 }
 
 .loading-content {
@@ -42,67 +38,57 @@
 }
 
 /* ============================================
-   SIMPLIFIED ATOM ANIMATION
+   ATOM CONTAINER & ORBITS
 ============================================ */
 
 .atom-container {
   position: relative;
-  width: 120px;
-  height: 120px;
+  width: 350px;
+  height: 350px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.center-logo-wrapper {
-  color: #ffcc33;
-  z-index: 2;
-  /* Simple scale animation is very cheap */
-  animation: simplePulse 2s ease-in-out infinite;
-}
-
-@keyframes simplePulse {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
-  50% { transform: scale(1.1); opacity: 1; }
-}
-
-/* Orbit Rings - Simple CSS Borders */
-.orbit {
-  position: absolute;
-  border: 1.5px solid rgba(255, 204, 51, 0.2);
-  border-radius: 50%;
+.orbital-svg {
   width: 100%;
-  height: 40%;
+  height: 100%;
+  overflow: visible;
 }
 
-.orbit-1 { transform: rotate(0deg); }
-.orbit-2 { transform: rotate(60deg); }
-.orbit-3 { transform: rotate(120deg); }
-
-/* Electron Dots - Using simple transforms instead of offset-path */
-.electron {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: #ffcc33;
-  border-radius: 50%;
-  box-shadow: 0 0 8px #ffcc33;
-  top: -4px;
-  left: 50%;
-  margin-left: -4px;
+/* Orbit Paths - Increased thickness as requested */
+.orbit-path {
+  stroke: #ffcc33;
+  stroke-width: 8; /* Increased from 5 to 8 */
+  fill: none;
+  opacity: 0.6;
+  /* Optimized filter for better performance */
+  filter: drop-shadow(0 0 5px rgba(255, 204, 51, 0.4));
 }
 
-.orbit-1 .electron { animation: orbitRotate 2s linear infinite; }
-.orbit-2 .electron { animation: orbitRotate 2.5s linear infinite; animation-delay: -0.5s; }
-.orbit-3 .electron { animation: orbitRotate 3s linear infinite; animation-delay: -1s; }
-
-@keyframes orbitRotate {
-  from { transform: rotate(0deg) translateX(60px) rotate(0deg); }
-  to { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
+/* Electrons */
+.electron-ball {
+  fill: #ffcc33;
+  filter: drop-shadow(0 0 15px rgba(255, 204, 51, 1));
+  will-change: transform;
 }
 
 /* ============================================
-   LOADING TEXT & BAR
+   CENTER LOGO
+============================================ */
+
+.center-logo-wrapper {
+  filter: drop-shadow(0 0 15px rgba(255, 204, 51, 0.5));
+  animation: logoGlow 3s ease-in-out infinite;
+}
+
+@keyframes logoGlow {
+  0%, 100% { filter: drop-shadow(0 0 12px rgba(255, 204, 51, 0.4)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 25px rgba(255, 204, 51, 0.8)); transform: scale(1.05); }
+}
+
+/* ============================================
+   LOADING TEXT
 ============================================ */
 
 .loading-text {
@@ -110,57 +96,60 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .loading-title {
-  font-size: 24px;
-  font-weight: 700;
-  letter-spacing: 4px;
+  font-size: 38px;
+  font-weight: 800;
+  letter-spacing: 6px;
   color: #ffcc33;
+  text-shadow: 0 0 15px rgba(255, 204, 51, 0.5);
   margin: 0;
   text-transform: uppercase;
 }
 
 .loading-bar-container {
-  width: 140px;
-  height: 2px;
+  width: 180px;
+  height: 3px;
   background: rgba(255, 204, 51, 0.1);
-  border-radius: 1px;
+  border-radius: 2px;
   overflow: hidden;
+  position: relative;
 }
 
 .loading-bar-progress {
+  position: absolute;
   height: 100%;
+  width: 0%;
   background: #ffcc33;
-  /* Use transform for progress bar instead of width for better performance */
-  transform-origin: left;
-  transition: transform 0.3s ease-out;
+  box-shadow: 0 0 12px #ffcc33;
+  border-radius: 2px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .loading-subtitle {
-  font-size: 11px;
+  font-size: 13px;
   color: rgba(255, 204, 51, 0.5);
-  letter-spacing: 1px;
+  letter-spacing: 1.5px;
   margin: 0;
 }
 
 /* ============================================
-   RESPONSIVE - Further Simplification
+   RESPONSIVE
 ============================================ */
 
 @media (max-width: 768px) {
   .atom-container {
-    width: 100px;
-    height: 100px;
+    width: 280px;
+    height: 280px;
   }
-  .electron {
-    width: 6px;
-    height: 6px;
-    box-shadow: none; /* Remove shadow on mobile for performance */
+  .loading-title {
+    font-size: 28px;
+    letter-spacing: 4px;
   }
-  @keyframes orbitRotate {
-    from { transform: rotate(0deg) translateX(50px) rotate(0deg); }
-    to { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
+  /* Slightly thinner paths on mobile to maintain clarity */
+  .orbit-path {
+    stroke-width: 6;
   }
 }

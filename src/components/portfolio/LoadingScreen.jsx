@@ -1,34 +1,64 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import './LoadingScreen.css';
 import LaravelIcon from '../ui/LaravelIcon';
 
 const LoadingScreen = ({ progress }) => {
-  // Memoize the progress transform to prevent unnecessary calculations
-  const progressStyle = useMemo(() => ({
-    transform: `scaleX(${(progress || 0) / 100})`
-  }), [progress]);
-
   return (
     <div className="loading-screen-container">
       <div className="loading-bg"></div>
 
       <div className="loading-content">
         <div className="atom-container">
-          {/* Center Logo */}
-          <div className="center-logo-wrapper">
-            <LaravelIcon size={50} />
-          </div>
+          <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
+            {/* Orbit 1 - Horizontal */}
+            <path 
+              id="path1" 
+              d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" 
+              className="orbit-path" 
+            />
+            <circle r="10" className="electron-ball">
+              <animateMotion dur="3s" repeatCount="indefinite">
+                <mpath href="#path1" />
+              </animateMotion>
+            </circle>
 
-          {/* Orbit Rings and Electrons */}
-          <div className="orbit orbit-1">
-            <div className="electron"></div>
-          </div>
-          <div className="orbit orbit-2">
-            <div className="electron"></div>
-          </div>
-          <div className="orbit orbit-3">
-            <div className="electron"></div>
-          </div>
+            {/* Orbit 2 - Rotated 60deg */}
+            <g transform="rotate(60 200 200)">
+              <path 
+                id="path2" 
+                d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" 
+                className="orbit-path" 
+              />
+              <circle r="10" className="electron-ball">
+                <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1.2s">
+                  <mpath href="#path2" />
+                </animateMotion>
+              </circle>
+            </g>
+
+            {/* Orbit 3 - Rotated 120deg */}
+            <g transform="rotate(120 200 200)">
+              <path 
+                id="path3" 
+                d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" 
+                className="orbit-path" 
+              />
+              <circle r="10" className="electron-ball">
+                <animateMotion dur="4s" repeatCount="indefinite" begin="-2.4s">
+                  <mpath href="#path3" />
+                </animateMotion>
+              </circle>
+            </g>
+
+            {/* Center Logo */}
+            <foreignObject x="150" y="150" width="100" height="100">
+              <div className="center-logo-wrapper" style={{ 
+                width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffcc33'
+              }}>
+                <LaravelIcon size={55} />
+              </div>
+            </foreignObject>
+          </svg>
         </div>
 
         {/* Loading Text Section */}
@@ -37,7 +67,7 @@ const LoadingScreen = ({ progress }) => {
           <div className="loading-bar-container">
             <div 
               className="loading-bar-progress" 
-              style={progressStyle}
+              style={{ width: `${progress || 0}%` }}
             ></div>
           </div>
           <p className="loading-subtitle">Please wait...</p>
@@ -47,5 +77,4 @@ const LoadingScreen = ({ progress }) => {
   );
 };
 
-// Use React.memo to prevent re-renders unless progress changes
-export default React.memo(LoadingScreen);
+export default LoadingScreen;
