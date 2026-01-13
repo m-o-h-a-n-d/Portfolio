@@ -1,5 +1,5 @@
 /* ============================================
-   LOADING SCREEN STYLES
+   LOADING SCREEN STYLES - FIXED VERSION
    Animated Orbital Loading with Laravel Logo
 ============================================ */
 
@@ -14,6 +14,7 @@
   justify-content: center;
   z-index: 9999;
   background: #0a0a0a;
+  font-family: 'Poppins', sans-serif;
 }
 
 .loading-bg {
@@ -32,7 +33,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 40px;
+  gap: 50px;
 }
 
 /* ============================================
@@ -41,71 +42,43 @@
 
 .atom-container {
   position: relative;
-  width: 300px;
-  height: 300px;
+  width: 320px;
+  height: 320px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* Center Logo */
-.center-logo {
-  position: absolute;
-  width: 80px;
-  height: 80px;
-  z-index: 20;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.laravel-logo {
+/* SVG Orbital */
+.orbital-svg {
   width: 100%;
   height: 100%;
-  color: #d4af37;
-  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.8));
-  animation: logoGlow 2s ease-in-out infinite;
+  filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.3));
 }
 
-@keyframes logoGlow {
-  0%, 100% {
-    filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.8));
-  }
-  50% {
-    filter: drop-shadow(0 0 30px rgba(212, 175, 55, 1));
-  }
-}
-
-/* Orbits SVG */
-.orbits {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  color: #d4af37;
-}
-
-.orbit {
-  opacity: 0.8;
-  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+/* Orbit Paths */
+.orbit-path {
+  opacity: 0.85;
+  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
   animation: orbitGlow 3s ease-in-out infinite;
 }
 
-.orbit-1 {
+.orbit-path-1 {
   animation-delay: 0s;
 }
 
-.orbit-2 {
+.orbit-path-2 {
   animation-delay: 0.3s;
 }
 
-.orbit-3 {
+.orbit-path-3 {
   animation-delay: 0.6s;
 }
 
 @keyframes orbitGlow {
   0%, 100% {
     opacity: 0.7;
-    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
+    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
   }
   50% {
     opacity: 1;
@@ -117,97 +90,67 @@
    ELECTRONS (ANIMATED BALLS)
 ============================================ */
 
-.electrons {
-  position: absolute;
-  width: 100%;
-  height: 100%;
+.electron-group {
+  animation: electronGlow 2s ease-in-out infinite;
 }
 
-.electron {
-  position: absolute;
-  width: 16px;
-  height: 16px;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-}
-
-.electron-ball {
-  width: 100%;
-  height: 100%;
-  background: #d4af37;
-  border-radius: 50%;
-  box-shadow: 0 0 15px rgba(212, 175, 55, 1), 0 0 25px rgba(212, 175, 55, 0.6);
-}
-
-/* Electron 1 - Orbit 1 (Horizontal) */
 .electron-1 {
-  animation: orbitMotion1 6s linear infinite;
+  animation-delay: 0s;
 }
 
-@keyframes orbitMotion1 {
-  0% {
-    transform: translate(-50%, -50%) translateX(70px) translateY(0px);
-  }
-  25% {
-    transform: translate(-50%, -50%) translateX(0px) translateY(35px);
-  }
-  50% {
-    transform: translate(-50%, -50%) translateX(-70px) translateY(0px);
-  }
-  75% {
-    transform: translate(-50%, -50%) translateX(0px) translateY(-35px);
-  }
-  100% {
-    transform: translate(-50%, -50%) translateX(70px) translateY(0px);
-  }
-}
-
-/* Electron 2 - Orbit 2 (60 degrees) */
 .electron-2 {
-  animation: orbitMotion2 6s linear infinite;
   animation-delay: -2s;
 }
 
-@keyframes orbitMotion2 {
-  0% {
-    transform: translate(-50%, -50%) rotate(60deg) translateX(70px) rotate(-60deg);
-  }
-  25% {
-    transform: translate(-50%, -50%) rotate(60deg) translateX(0px) translateY(35px) rotate(-60deg);
-  }
-  50% {
-    transform: translate(-50%, -50%) rotate(60deg) translateX(-70px) rotate(-60deg);
-  }
-  75% {
-    transform: translate(-50%, -50%) rotate(60deg) translateX(0px) translateY(-35px) rotate(-60deg);
-  }
-  100% {
-    transform: translate(-50%, -50%) rotate(60deg) translateX(70px) rotate(-60deg);
-  }
-}
-
-/* Electron 3 - Orbit 3 (120 degrees) */
 .electron-3 {
-  animation: orbitMotion3 6s linear infinite;
   animation-delay: -4s;
 }
 
-@keyframes orbitMotion3 {
-  0% {
-    transform: translate(-50%, -50%) rotate(120deg) translateX(70px) rotate(-120deg);
-  }
-  25% {
-    transform: translate(-50%, -50%) rotate(120deg) translateX(0px) translateY(35px) rotate(-120deg);
+.electron-ball {
+  filter: drop-shadow(0 0 12px rgba(212, 175, 55, 1)) drop-shadow(0 0 6px rgba(212, 175, 55, 0.8));
+  animation: electronPulse 2s ease-in-out infinite;
+}
+
+@keyframes electronGlow {
+  0%, 100% {
+    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
   }
   50% {
-    transform: translate(-50%, -50%) rotate(120deg) translateX(-70px) rotate(-120deg);
+    filter: drop-shadow(0 0 16px rgba(212, 175, 55, 1));
   }
-  75% {
-    transform: translate(-50%, -50%) rotate(120deg) translateX(0px) translateY(-35px) rotate(-120deg);
+}
+
+@keyframes electronPulse {
+  0%, 100% {
+    r: 7px;
+    opacity: 0.8;
   }
-  100% {
-    transform: translate(-50%, -50%) rotate(120deg) translateX(70px) rotate(-120deg);
+  50% {
+    r: 9px;
+    opacity: 1;
+  }
+}
+
+/* ============================================
+   CENTER LOGO
+============================================ */
+
+.center-logo {
+  animation: logoPulse 2s ease-in-out infinite;
+}
+
+.logo-stroke {
+  filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.8));
+}
+
+@keyframes logoPulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.8));
+    opacity: 0.9;
+  }
+  50% {
+    filter: drop-shadow(0 0 25px rgba(212, 175, 55, 1));
+    opacity: 1;
   }
 }
 
@@ -229,37 +172,37 @@
 }
 
 .mark-1 {
-  width: 3px;
-  height: 20px;
-  top: 20px;
-  right: 30px;
+  width: 2px;
+  height: 18px;
+  top: 15px;
+  right: 25px;
   animation: markFlicker 2s ease-in-out infinite;
   animation-delay: 0s;
 }
 
 .mark-2 {
-  width: 3px;
-  height: 15px;
-  top: 35px;
-  right: 15px;
+  width: 2px;
+  height: 14px;
+  top: 30px;
+  right: 12px;
   animation: markFlicker 2s ease-in-out infinite;
   animation-delay: 0.3s;
 }
 
 .mark-3 {
-  width: 3px;
-  height: 25px;
-  bottom: 40px;
-  left: 25px;
+  width: 2px;
+  height: 20px;
+  bottom: 35px;
+  left: 20px;
   animation: markFlicker 2s ease-in-out infinite;
   animation-delay: 0.6s;
 }
 
 .mark-4 {
-  width: 3px;
-  height: 18px;
-  bottom: 30px;
-  left: 45px;
+  width: 2px;
+  height: 16px;
+  bottom: 25px;
+  left: 40px;
   animation: markFlicker 2s ease-in-out infinite;
   animation-delay: 0.9s;
 }
@@ -269,7 +212,7 @@
     opacity: 0;
   }
   50% {
-    opacity: 0.8;
+    opacity: 0.7;
   }
 }
 
@@ -282,13 +225,13 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 12px;
+  gap: 10px;
 }
 
 .loading-title {
-  font-size: 32px;
+  font-size: 36px;
   font-weight: 700;
-  letter-spacing: 4px;
+  letter-spacing: 5px;
   background: linear-gradient(to right, #d4af37, #f0d070);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -299,48 +242,49 @@
 
 @keyframes titlePulse {
   0%, 100% {
-    opacity: 1;
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+    opacity: 0.95;
+    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
   }
   50% {
-    opacity: 0.9;
-    text-shadow: 0 0 30px rgba(212, 175, 55, 0.8);
+    opacity: 1;
+    text-shadow: 0 0 30px rgba(212, 175, 55, 0.7);
   }
 }
 
 .loading-underline {
-  width: 80px;
+  width: 90px;
   height: 3px;
   background: linear-gradient(to right, transparent, #d4af37, transparent);
   border-radius: 2px;
   animation: underlineExpand 2s ease-in-out infinite;
+  margin: 5px 0;
 }
 
 @keyframes underlineExpand {
   0%, 100% {
-    width: 60px;
+    width: 70px;
     opacity: 0.6;
   }
   50% {
-    width: 100px;
+    width: 110px;
     opacity: 1;
   }
 }
 
 .loading-subtitle {
-  font-size: 14px;
-  color: #999999;
-  letter-spacing: 1px;
+  font-size: 13px;
+  color: #888888;
+  letter-spacing: 0.5px;
   margin: 0;
   animation: subtitleFade 2s ease-in-out infinite;
 }
 
 @keyframes subtitleFade {
   0%, 100% {
-    opacity: 0.6;
+    opacity: 0.5;
   }
   50% {
-    opacity: 1;
+    opacity: 0.8;
   }
 }
 
@@ -350,24 +294,24 @@
 
 .sparkle {
   position: fixed;
-  width: 12px;
-  height: 12px;
+  width: 10px;
+  height: 10px;
   background: #d4af37;
   border-radius: 50%;
-  bottom: 40px;
-  right: 40px;
+  bottom: 50px;
+  right: 50px;
   box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
   animation: sparkleFloat 3s ease-in-out infinite;
 }
 
 @keyframes sparkleFloat {
   0%, 100% {
-    transform: translate(0, 0) scale(1);
+    transform: translate(0, 0) scale(0.8);
     opacity: 0.3;
   }
   50% {
-    transform: translate(-10px, -10px) scale(1.2);
-    opacity: 0.8;
+    transform: translate(-12px, -12px) scale(1.2);
+    opacity: 0.9;
   }
 }
 
@@ -377,18 +321,31 @@
 
 @media (max-width: 768px) {
   .atom-container {
-    width: 240px;
-    height: 240px;
+    width: 260px;
+    height: 260px;
   }
 
-  .center-logo {
-    width: 60px;
-    height: 60px;
+  .loading-title {
+    font-size: 28px;
+    letter-spacing: 3px;
   }
 
-  .electron-ball {
-    width: 12px;
-    height: 12px;
+  .loading-content {
+    gap: 40px;
+  }
+
+  .sparkle {
+    width: 8px;
+    height: 8px;
+    bottom: 30px;
+    right: 30px;
+  }
+}
+
+@media (max-width: 480px) {
+  .atom-container {
+    width: 220px;
+    height: 220px;
   }
 
   .loading-title {
@@ -396,39 +353,22 @@
     letter-spacing: 2px;
   }
 
-  .loading-content {
-    gap: 30px;
-  }
-
-  .sparkle {
-    width: 8px;
-    height: 8px;
-    bottom: 20px;
-    right: 20px;
-  }
-}
-
-@media (max-width: 480px) {
-  .atom-container {
-    width: 200px;
-    height: 200px;
-  }
-
-  .center-logo {
-    width: 50px;
-    height: 50px;
-  }
-
-  .loading-title {
-    font-size: 20px;
-    letter-spacing: 1px;
-  }
-
   .loading-subtitle {
     font-size: 12px;
   }
 
   .loading-content {
-    gap: 20px;
+    gap: 30px;
+  }
+
+  .loading-underline {
+    width: 60px;
+  }
+
+  .sparkle {
+    width: 6px;
+    height: 6px;
+    bottom: 20px;
+    right: 20px;
   }
 }
