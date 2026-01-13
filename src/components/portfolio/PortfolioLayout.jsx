@@ -13,33 +13,48 @@ const PortfolioLayout = () => {
   const [activePage, setActivePage] = useState('about');
   const [isPageLoading, setIsPageLoading] = useState(false);
   const [isInitialLoading, setIsInitialLoading] = useState(true);
+  const [loadingProgress, setLoadingProgress] = useState(0);
 
   const handlePageChange = (page) => {
     if (page === activePage) return;
     setIsPageLoading(true);
+    setLoadingProgress(0);
     setActivePage(page);
   };
 
   useEffect(() => {
     // Initial loading for refresh or first visit
-    const initialTimer = setTimeout(() => {
-      setIsInitialLoading(false);
-    }, 2000); // Show atom loader for 2 seconds on initial load
+    let currentProgress = 0;
+    const interval = setInterval(() => {
+      currentProgress += 5;
+      if (currentProgress >= 100) {
+        clearInterval(interval);
+        setIsInitialLoading(false);
+      }
+      setLoadingProgress(currentProgress);
+    }, 100);
 
-    return () => clearTimeout(initialTimer);
+    return () => clearInterval(interval);
   }, []);
 
   useEffect(() => {
     if (isPageLoading) {
-      const timer = setTimeout(() => {
-        setIsPageLoading(false);
-      }, 500); // Show simple circle loader for 0.5s on page change
-      return () => clearTimeout(timer);
+      let currentProgress = 0;
+      const interval = setInterval(() => {
+        currentProgress += 20;
+        if (currentProgress >= 100) {
+          clearInterval(interval);
+          setIsPageLoading(false);
+        }
+        setLoadingProgress(currentProgress);
+      }, 100);
+      
+      return () => clearInterval(interval);
     }
   }, [isPageLoading]);
 
   const renderPage = () => {
-    if (isPageLoading) return <LoadingScreen />;
+    if (isPageLoading) return <LoadingScreen progress={loadingProgress} />;
     
     switch (activePage) {
       case 'about':
@@ -58,7 +73,7 @@ const PortfolioLayout = () => {
   };
 
   if (isInitialLoading) {
-    return <LoadingScreen />;
+    return <LoadingScreen progress={loadingProgress} />;
   }
 
   return (

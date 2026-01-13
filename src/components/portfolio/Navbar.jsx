@@ -1,5 +1,21 @@
+import { useState, useEffect } from 'react';
+
 const Navbar = ({ activePage, onPageChange }) => {
   const pages = ['About', 'Resume', 'Portfolio', 'Blog', 'Contact'];
+  const [isTransitioning, setIsTransitioning] = useState(false);
+
+  const handleNavClick = (page) => {
+    if (page.toLowerCase() === activePage) return;
+    setIsTransitioning(true);
+    onPageChange(page.toLowerCase());
+  };
+
+  useEffect(() => {
+    if (isTransitioning) {
+      const timer = setTimeout(() => setIsTransitioning(false), 500);
+      return () => clearTimeout(timer);
+    }
+  }, [isTransitioning]);
 
   return (
     <nav 
@@ -19,9 +35,9 @@ const Navbar = ({ activePage, onPageChange }) => {
         {pages.map((page) => (
           <li key={page}>
             <button
-              onClick={() => onPageChange(page.toLowerCase())}
+              onClick={() => handleNavClick(page)}
               className={`
-                px-2 py-4 md:py-5 text-[12px] md:text-[16px] font-medium transition-colors
+                relative px-2 py-4 md:py-5 text-[12px] md:text-[16px] font-medium transition-colors
                 ${
                   activePage === page.toLowerCase()
                     ? 'text-primary'
@@ -30,6 +46,9 @@ const Navbar = ({ activePage, onPageChange }) => {
                 `}
               >
               {page}
+              {isTransitioning && activePage === page.toLowerCase() && (
+                <span className="absolute bottom-2 left-1/2 -translate-x-1/2 w-2 h-2 bg-primary rounded-full shadow-[0_0_8px_#ffcc33] animate-pulse"></span>
+              )}
             </button>
           </li>
         ))}

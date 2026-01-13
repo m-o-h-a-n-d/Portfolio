@@ -2,7 +2,7 @@ import React from 'react';
 import './LoadingScreen.css';
 import LaravelIcon from '../ui/LaravelIcon';
 
-const LoadingScreen = () => {
+const LoadingScreen = ({ progress }) => {
   return (
     <div className="loading-screen-container">
       <div className="loading-bg"></div>
@@ -65,7 +65,10 @@ const LoadingScreen = () => {
         <div className="loading-text">
           <h2 className="loading-title">LOADING</h2>
           <div className="loading-bar-container">
-            <div className="loading-bar-progress"></div>
+            <div 
+              className="loading-bar-progress" 
+              style={progress !== undefined ? { width: `${progress}%`, animation: 'none', left: 0 } : {}}
+            ></div>
           </div>
           <p className="loading-subtitle">Please wait...</p>
         </div>

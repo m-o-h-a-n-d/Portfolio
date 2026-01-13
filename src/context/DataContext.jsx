@@ -46,38 +46,58 @@ export const DataProvider = ({ children }) => {
   const [team, setTeam] = useState(null);
   const [settings, setSettings] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [progress, setProgress] = useState(0);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     const fetchAllData = async () => {
       try {
         setLoading(true);
+        setProgress(10);
         
-        const [
-          profileRes,
-          resumeOrderRes,
-          eduRes,
-          expRes,
-          skillsRes,
-          portfolioRes,
-          blogRes,
-          certificatesRes,
-          teamRes,
-          servicesRes,
-          settingsRes
-        ] = await Promise.all([
-          apiGet(API_PROFILE_GET),
-          apiGet(API_RESUME_GET),
-          apiGet(API_EDUCATION_GET),
-          apiGet(API_EXPERIENCE_GET),
-          apiGet(API_SKILLS_GET),
-          apiGet(API_PORTFOLIO_LIST),
-          apiGet(API_BLOG_LIST),
-          apiGet(API_CERTIFICATES_LIST),
-          apiGet(API_TEAM_LIST),
-          apiGet(API_SERVICES_LIST),
-          apiGet(API_SETTINGS_GET)
-        ]);
+        const endpoints = [
+          { key: 'profile', url: API_PROFILE_GET },
+          { key: 'resumeOrder', url: API_RESUME_GET },
+          { key: 'edu', url: API_EDUCATION_GET },
+          { key: 'exp', url: API_EXPERIENCE_GET },
+          { key: 'skills', url: API_SKILLS_GET },
+          { key: 'portfolio', url: API_PORTFOLIO_LIST },
+          { key: 'blog', url: API_BLOG_LIST },
+          { key: 'certificates', url: API_CERTIFICATES_LIST },
+          { key: 'team', url: API_TEAM_LIST },
+          { key: 'services', url: API_SERVICES_LIST },
+          { key: 'settings', url: API_SETTINGS_GET }
+        ];
+
+        const results = {};
+        let completed = 0;
+
+        await Promise.all(endpoints.map(async (endpoint) => {
+          try {
+            const res = await apiGet(endpoint.url);
+            results[endpoint.key] = res;
+          } catch (err) {
+            console.error(`Error fetching ${endpoint.key}:`, err);
+            results[endpoint.key] = { data: null };
+          } finally {
+            completed++;
+            setProgress(10 + Math.floor((completed / endpoints.length) * 90));
+          }
+        }));
+
+        const {
+          profile: profileRes,
+          resumeOrder: resumeOrderRes,
+          edu: eduRes,
+          exp: expRes,
+          skills: skillsRes,
+          portfolio: portfolioRes,
+          blog: blogRes,
+          certificates: certificatesRes,
+          team: teamRes,
+          services: servicesRes,
+          settings: settingsRes
+        } = results;
 
         // Reconstruct the resume object based on the order array and individual data
         const order = resumeOrderRes.data || ["education", "experience", "skills"];
@@ -109,7 +129,7 @@ export const DataProvider = ({ children }) => {
   }, []);
 
   if (loading) {
-    return <LoadingScreen />;
+    return <LoadingScreen progress={progress} />;
   }
 
   if (error) {

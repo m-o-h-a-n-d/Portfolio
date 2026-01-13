@@ -76,6 +76,8 @@
 .electron-ball {
   fill: #ffcc33;
   filter: drop-shadow(0 0 18px rgba(255, 204, 51, 1));
+  /* Ensure smooth motion */
+  will-change: transform;
 }
 
 /* ============================================
@@ -131,6 +133,7 @@
   box-shadow: 0 0 12px #ffcc33;
   border-radius: 2px;
   animation: progressMove 2s ease-in-out infinite;
+  transition: width 0.3s ease-out;
 }
 
 @keyframes progressMove {
