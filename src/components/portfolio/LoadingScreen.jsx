@@ -35,11 +35,10 @@ const LoadingScreen = () => {
         <div className="atom-container">
           <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              {/* Main Orbit Paths */}
-              <path id="orbit-v" d="M 200 50 Q 320 200 200 350 Q 80 200 200 50" fill="none" />
-              <path id="orbit-h" d="M 50 200 Q 200 320 350 200 Q 200 80 50 200" fill="none" />
-              <path id="orbit-d1" d="M 200 50 Q 320 200 200 350 Q 80 200 200 50" fill="none" transform="rotate(45 200 200)" />
-              <path id="orbit-d2" d="M 200 50 Q 320 200 200 350 Q 80 200 200 50" fill="none" transform="rotate(-45 200 200)" />
+              {/* Correct Elliptical Paths - Smooth and Circular like the reference */}
+              <path id="orbit-1" d="M 200 80 A 120 60 0 1 1 200 320 A 120 60 0 1 1 200 80" fill="none" />
+              <path id="orbit-2" d="M 200 80 A 120 60 0 1 1 200 320 A 120 60 0 1 1 200 80" fill="none" transform="rotate(60 200 200)" />
+              <path id="orbit-3" d="M 200 80 A 120 60 0 1 1 200 320 A 120 60 0 1 1 200 80" fill="none" transform="rotate(120 200 200)" />
               
               {/* Arrow Head Marker */}
               <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
@@ -48,46 +47,44 @@ const LoadingScreen = () => {
             </defs>
 
             {/* Visual Orbit Paths */}
-            <use href="#orbit-v" className="orbit-path" />
-            <use href="#orbit-h" className="orbit-path" />
-            <use href="#orbit-d1" className="orbit-path" />
-            <use href="#orbit-d2" className="orbit-path" />
+            <use href="#orbit-1" className="orbit-path" />
+            <use href="#orbit-2" className="orbit-path" />
+            <use href="#orbit-3" className="orbit-path" />
 
-            {/* Animated Arrows on Paths */}
+            {/* Animated Arrows on Paths - Following the smooth elliptical path */}
             <g>
               <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#orbit-v" />
+                <mpath href="#orbit-1" />
               </animateMotion>
-              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
+              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
             </g>
             <g>
               <animateMotion dur="5s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#orbit-h" />
+                <mpath href="#orbit-2" />
               </animateMotion>
-              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
+              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
             </g>
             <g>
               <animateMotion dur="4.5s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#orbit-d1" />
+                <mpath href="#orbit-3" />
               </animateMotion>
-              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
-            </g>
-            <g>
-              <animateMotion dur="5.5s" repeatCount="indefinite" rotate="auto">
-                <mpath href="#orbit-d2" />
-              </animateMotion>
-              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
+              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
             </g>
 
             {/* Animated Electrons (Balls) */}
-            <circle r="6" className="electron-ball">
+            <circle r="7" className="electron-ball">
               <animateMotion dur="4s" repeatCount="indefinite" begin="-2s">
-                <mpath href="#orbit-v" />
+                <mpath href="#orbit-1" />
               </animateMotion>
             </circle>
-            <circle r="6" className="electron-ball">
+            <circle r="7" className="electron-ball">
               <animateMotion dur="5s" repeatCount="indefinite" begin="-1s">
-                <mpath href="#orbit-h" />
+                <mpath href="#orbit-2" />
+              </animateMotion>
+            </circle>
+            <circle r="7" className="electron-ball">
+              <animateMotion dur="4.5s" repeatCount="indefinite" begin="-3s">
+                <mpath href="#orbit-3" />
               </animateMotion>
             </circle>
 
