@@ -1,6 +1,6 @@
 /* ============================================
-   LOADING SCREEN STYLES - REVERTED & ENHANCED
-   Increased path thickness and optimized
+   LOADING SCREEN STYLES - STABLE CSS VERSION
+   Fixed jumping balls and lag
 ============================================ */
 
 .loading-screen-container {
@@ -34,57 +34,84 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 30px;
+  gap: 40px;
 }
 
 /* ============================================
-   ATOM CONTAINER & ORBITS
+   STABLE ATOM SYSTEM
 ============================================ */
 
 .atom-container {
   position: relative;
-  width: 350px;
-  height: 350px;
+  width: 300px;
+  height: 300px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.orbital-svg {
+.center-logo-wrapper {
+  position: relative;
+  z-index: 20;
+  color: #ffcc33;
+  filter: drop-shadow(0 0 15px rgba(255, 204, 51, 0.5));
+  animation: logoPulse 2s ease-in-out infinite;
+}
+
+@keyframes logoPulse {
+  0%, 100% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* Orbit Containers */
+.orbit-container {
+  position: absolute;
+  width: 220px;
+  height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.orbit-1 { transform: rotate(0deg); }
+.orbit-2 { transform: rotate(60deg); }
+.orbit-3 { transform: rotate(120deg); }
+
+/* Orbit Paths - Thick CSS Borders */
+.orbit-path-css {
+  position: absolute;
   width: 100%;
   height: 100%;
-  overflow: visible;
+  border: 8px solid #ffcc33; /* Thick paths as requested */
+  border-radius: 50%;
+  opacity: 0.4;
+  box-sizing: border-box;
 }
 
-/* Orbit Paths - Increased thickness as requested */
-.orbit-path {
-  stroke: #ffcc33;
-  stroke-width: 8; /* Increased from 5 to 8 */
-  fill: none;
-  opacity: 0.6;
-  /* Optimized filter for better performance */
-  filter: drop-shadow(0 0 5px rgba(255, 204, 51, 0.4));
-}
-
-/* Electrons */
-.electron-ball {
-  fill: #ffcc33;
-  filter: drop-shadow(0 0 15px rgba(255, 204, 51, 1));
+/* Electron Balls - Stable CSS Motion */
+.electron-ball-css {
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  background: #ffcc33;
+  border-radius: 50%;
+  box-shadow: 0 0 15px #ffcc33;
+  /* Start at the top center of the ellipse */
+  top: -8px;
+  left: 50%;
+  margin-left: -8px;
   will-change: transform;
 }
 
-/* ============================================
-   CENTER LOGO
-============================================ */
+/* Stable Rotation Animation */
+.orbit-1 .electron-ball-css { animation: stableOrbit 3s linear infinite; }
+.orbit-2 .electron-ball-css { animation: stableOrbit 3.5s linear infinite; animation-delay: -1.2s; }
+.orbit-3 .electron-ball-css { animation: stableOrbit 4s linear infinite; animation-delay: -2.4s; }
 
-.center-logo-wrapper {
-  filter: drop-shadow(0 0 15px rgba(255, 204, 51, 0.5));
-  animation: logoGlow 3s ease-in-out infinite;
-}
-
-@keyframes logoGlow {
-  0%, 100% { filter: drop-shadow(0 0 12px rgba(255, 204, 51, 0.4)); transform: scale(1); }
-  50% { filter: drop-shadow(0 0 25px rgba(255, 204, 51, 0.8)); transform: scale(1.05); }
+@keyframes stableOrbit {
+  /* This creates a perfect elliptical path by rotating the container's coordinate system */
+  from { transform: rotate(0deg) translateX(110px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(110px) rotate(-360deg); }
 }
 
 /* ============================================
@@ -96,11 +123,11 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .loading-title {
-  font-size: 38px;
+  font-size: 32px;
   font-weight: 800;
   letter-spacing: 6px;
   color: #ffcc33;
@@ -115,17 +142,13 @@
   background: rgba(255, 204, 51, 0.1);
   border-radius: 2px;
   overflow: hidden;
-  position: relative;
 }
 
 .loading-bar-progress {
-  position: absolute;
   height: 100%;
-  width: 0%;
   background: #ffcc33;
   box-shadow: 0 0 12px #ffcc33;
-  border-radius: 2px;
-  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.4s ease-out;
 }
 
 .loading-subtitle {
@@ -141,15 +164,28 @@
 
 @media (max-width: 768px) {
   .atom-container {
-    width: 280px;
-    height: 280px;
+    width: 250px;
+    height: 250px;
+  }
+  .orbit-container {
+    width: 180px;
+    height: 80px;
+  }
+  .orbit-path-css {
+    border-width: 6px;
+  }
+  .electron-ball-css {
+    width: 12px;
+    height: 12px;
+    top: -6px;
+    margin-left: -6px;
+  }
+  @keyframes stableOrbit {
+    from { transform: rotate(0deg) translateX(90px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(90px) rotate(-360deg); }
   }
   .loading-title {
-    font-size: 28px;
+    font-size: 24px;
     letter-spacing: 4px;
-  }
-  /* Slightly thinner paths on mobile to maintain clarity */
-  .orbit-path {
-    stroke-width: 6;
   }
 }

@@ -9,56 +9,28 @@ const LoadingScreen = ({ progress }) => {
 
       <div className="loading-content">
         <div className="atom-container">
-          <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
-            {/* Orbit 1 - Horizontal */}
-            <path 
-              id="path1" 
-              d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" 
-              className="orbit-path" 
-            />
-            <circle r="10" className="electron-ball">
-              <animateMotion dur="3s" repeatCount="indefinite">
-                <mpath href="#path1" />
-              </animateMotion>
-            </circle>
+          {/* Center Logo */}
+          <div className="center-logo-wrapper">
+            <LaravelIcon size={55} />
+          </div>
 
-            {/* Orbit 2 - Rotated 60deg */}
-            <g transform="rotate(60 200 200)">
-              <path 
-                id="path2" 
-                d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" 
-                className="orbit-path" 
-              />
-              <circle r="10" className="electron-ball">
-                <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1.2s">
-                  <mpath href="#path2" />
-                </animateMotion>
-              </circle>
-            </g>
+          {/* Orbit 1 - Horizontal */}
+          <div className="orbit-container orbit-1">
+            <div className="orbit-path-css"></div>
+            <div className="electron-ball-css"></div>
+          </div>
 
-            {/* Orbit 3 - Rotated 120deg */}
-            <g transform="rotate(120 200 200)">
-              <path 
-                id="path3" 
-                d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" 
-                className="orbit-path" 
-              />
-              <circle r="10" className="electron-ball">
-                <animateMotion dur="4s" repeatCount="indefinite" begin="-2.4s">
-                  <mpath href="#path3" />
-                </animateMotion>
-              </circle>
-            </g>
+          {/* Orbit 2 - Rotated 60deg */}
+          <div className="orbit-container orbit-2">
+            <div className="orbit-path-css"></div>
+            <div className="electron-ball-css"></div>
+          </div>
 
-            {/* Center Logo */}
-            <foreignObject x="150" y="150" width="100" height="100">
-              <div className="center-logo-wrapper" style={{ 
-                width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffcc33'
-              }}>
-                <LaravelIcon size={55} />
-              </div>
-            </foreignObject>
-          </svg>
+          {/* Orbit 3 - Rotated 120deg */}
+          <div className="orbit-container orbit-3">
+            <div className="orbit-path-css"></div>
+            <div className="electron-ball-css"></div>
+          </div>
         </div>
 
         {/* Loading Text Section */}
