@@ -67,7 +67,7 @@ const LoadingScreen = ({ progress }) => {
           <div className="loading-bar-container">
             <div 
               className="loading-bar-progress" 
-              style={progress !== undefined ? { width: `${progress}%`, animation: 'none', left: 0 } : {}}
+              style={{ width: `${progress || 0}%` }}
             ></div>
           </div>
           <p className="loading-subtitle">Please wait...</p>

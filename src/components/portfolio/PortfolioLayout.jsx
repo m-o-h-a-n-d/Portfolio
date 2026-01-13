@@ -17,45 +17,16 @@ const PortfolioLayout = () => {
 
   const handlePageChange = (page) => {
     if (page === activePage) return;
-    setIsPageLoading(true);
-    setLoadingProgress(0);
     setActivePage(page);
   };
 
   useEffect(() => {
     // Initial loading for refresh or first visit
-    let currentProgress = 0;
-    const interval = setInterval(() => {
-      currentProgress += 5;
-      if (currentProgress >= 100) {
-        clearInterval(interval);
-        setIsInitialLoading(false);
-      }
-      setLoadingProgress(currentProgress);
-    }, 100);
-
-    return () => clearInterval(interval);
+    // This is now handled by DataContext, but we keep a fallback or initial state here if needed
+    // For now, we'll let DataContext control the initial loading screen
   }, []);
 
-  useEffect(() => {
-    if (isPageLoading) {
-      let currentProgress = 0;
-      const interval = setInterval(() => {
-        currentProgress += 20;
-        if (currentProgress >= 100) {
-          clearInterval(interval);
-          setIsPageLoading(false);
-        }
-        setLoadingProgress(currentProgress);
-      }, 100);
-      
-      return () => clearInterval(interval);
-    }
-  }, [isPageLoading]);
-
   const renderPage = () => {
-    if (isPageLoading) return <LoadingScreen progress={loadingProgress} />;
-    
     switch (activePage) {
       case 'about':
         return <AboutSection />;

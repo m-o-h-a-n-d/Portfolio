@@ -128,18 +128,14 @@
 .loading-bar-progress {
   position: absolute;
   height: 100%;
-  width: 40%;
+  width: 0%;
   background: #ffcc33;
   box-shadow: 0 0 12px #ffcc33;
   border-radius: 2px;
-  animation: progressMove 2s ease-in-out infinite;
-  transition: width 0.3s ease-out;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-@keyframes progressMove {
-  0% { left: -40%; }
-  100% { left: 100%; }
-}
+/* Removed progressMove animation as we use real progress now */
 
 .loading-subtitle {
   font-size: 13px;
