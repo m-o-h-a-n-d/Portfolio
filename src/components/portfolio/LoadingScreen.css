@@ -93,21 +93,20 @@
     inset 0 0 10px #ffcc33;
 }
 
-/* Electron Balls - Matching the path color and glow */
+/* Electron Balls - Black color with subtle glow to stay visible */
 .electron-ball-css {
   position: absolute;
   width: 16px;
   height: 16px;
-  background: #ffcc33; /* Same color as the path */
+  background: #000000; /* Black color */
   border-radius: 50%;
-  /* Strong glow matching the path */
-  box-shadow: 
-    0 0 15px #ffcc33,
-    0 0 30px #ffcc33;
+  /* Subtle glow to maintain visibility on dark background if needed, or just black */
+  box-shadow: 0 0 5px rgba(255, 204, 51, 0.5); 
   will-change: transform;
   margin-top: -8px; /* Center the ball on the path */
   margin-left: -8px; /* Center the ball on the path */
   z-index: 25;
+  border: 1px solid #ffcc33; /* Optional: thin gold border to define the black ball better */
 }
 
 /* 
