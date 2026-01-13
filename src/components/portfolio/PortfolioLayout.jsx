@@ -8,6 +8,7 @@ import PortfolioSection from './PortfolioSection';
 import BlogSection from './BlogSection';
 import ContactSection from './ContactSection';
 import Loader from './Loader';
+import LoadingScreen from './LoadingScreen';
 
 const PortfolioLayout = () => {
   const [activePage, setActivePage] = useState('about');
@@ -29,7 +30,7 @@ const PortfolioLayout = () => {
   }, [isPageLoading]);
 
   const renderPage = () => {
-    if (isPageLoading) return <Loader />;
+    if (isPageLoading) return <LoadingScreen />;
     
     switch (activePage) {
       case 'about':
