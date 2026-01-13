@@ -1,6 +1,6 @@
 /* ============================================
-   LOADING SCREEN STYLES - ENHANCED GOLD VERSION
-   Deeper gold, shining paths, and optimized
+   LOADING SCREEN STYLES - STABLE ELLIPTICAL VERSION
+   Fixed balls staying on elliptical tracks
 ============================================ */
 
 .loading-screen-container {
@@ -24,7 +24,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, #1a1400 0%, #050505 100%);
+  background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
 }
 
 .loading-content {
@@ -53,13 +53,13 @@
 .center-logo-wrapper {
   position: relative;
   z-index: 20;
-  color: #d4af37; /* Deeper Metallic Gold */
-  filter: drop-shadow(0 0 20px rgba(212, 175, 55, 0.6));
+  color: #ffcc33;
+  filter: drop-shadow(0 0 15px rgba(255, 204, 51, 0.5));
   animation: logoPulse 2s ease-in-out infinite;
 }
 
 @keyframes logoPulse {
-  0%, 100% { transform: scale(1); opacity: 0.9; }
+  0%, 100% { transform: scale(1); opacity: 0.8; }
   50% { transform: scale(1.1); opacity: 1; }
 }
 
@@ -77,37 +77,32 @@
 .orbit-2 { transform: rotate(60deg); }
 .orbit-3 { transform: rotate(120deg); }
 
-/* Orbit Paths - Deeper Gold with Shining Effect */
+/* Orbit Paths - Thick CSS Borders */
 .orbit-path-css {
   position: absolute;
   width: 100%;
   height: 100%;
-  border: 8px solid #b8860b; /* Dark Goldenrod for depth */
+  border: 8px solid #ffcc33;
   border-radius: 50%;
-  opacity: 0.7;
+  opacity: 0.4;
   box-sizing: border-box;
-  /* Shining glow effect */
-  box-shadow: 0 0 15px rgba(212, 175, 55, 0.3), inset 0 0 10px rgba(212, 175, 55, 0.2);
-  animation: pathShine 3s ease-in-out infinite;
 }
 
-@keyframes pathShine {
-  0%, 100% { border-color: #b8860b; filter: brightness(1); }
-  50% { border-color: #ffd700; filter: brightness(1.3); }
-}
-
-/* Electron Balls - Vibrant Gold */
+/* Electron Balls - Elliptical CSS Motion */
 .electron-ball-css {
   position: absolute;
   width: 16px;
   height: 16px;
-  background: #ffd700; /* Bright Gold */
+  background: #ffcc33;
   border-radius: 50%;
-  box-shadow: 0 0 20px #ffd700, 0 0 40px rgba(255, 215, 0, 0.5);
+  box-shadow: 0 0 15px #ffcc33;
   will-change: transform;
 }
 
-/* Elliptical Path Keyframes */
+/* 
+   To follow an elliptical path (width: 220px, height: 100px):
+   Radius X = 110px, Radius Y = 50px
+*/
 @keyframes ellipticalOrbit {
   0% { transform: translate(110px, 0px); }
   25% { transform: translate(0px, 50px); }
@@ -136,30 +131,30 @@
   font-size: 32px;
   font-weight: 800;
   letter-spacing: 6px;
-  color: #d4af37;
-  text-shadow: 0 0 20px rgba(212, 175, 55, 0.5);
+  color: #ffcc33;
+  text-shadow: 0 0 15px rgba(255, 204, 51, 0.5);
   margin: 0;
   text-transform: uppercase;
 }
 
 .loading-bar-container {
   width: 180px;
-  height: 4px;
-  background: rgba(212, 175, 55, 0.1);
+  height: 3px;
+  background: rgba(255, 204, 51, 0.1);
   border-radius: 2px;
   overflow: hidden;
 }
 
 .loading-bar-progress {
   height: 100%;
-  background: linear-gradient(90deg, #b8860b, #ffd700);
-  box-shadow: 0 0 15px #ffd700;
+  background: #ffcc33;
+  box-shadow: 0 0 12px #ffcc33;
   transition: width 0.4s ease-out;
 }
 
 .loading-subtitle {
   font-size: 13px;
-  color: rgba(212, 175, 55, 0.6);
+  color: rgba(255, 204, 51, 0.5);
   letter-spacing: 1.5px;
   margin: 0;
 }
@@ -185,6 +180,8 @@
     height: 12px;
   }
   
+  /* Elliptical path for mobile (width: 180px, height: 80px) */
+  /* Radius X = 90px, Radius Y = 40px */
   @keyframes ellipticalOrbitMobile {
     0% { transform: translate(90px, 0px); }
     25% { transform: translate(0px, 40px); }
@@ -196,4 +193,9 @@
   .orbit-1 .electron-ball-css { animation: ellipticalOrbitMobile 3s linear infinite; }
   .orbit-2 .electron-ball-css { animation: ellipticalOrbitMobile 3.5s linear infinite; animation-delay: -1.2s; }
   .orbit-3 .electron-ball-css { animation: ellipticalOrbitMobile 4s linear infinite; animation-delay: -2.4s; }
+
+  .loading-title {
+    font-size: 24px;
+    letter-spacing: 4px;
+  }
 }
