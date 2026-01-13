@@ -10,11 +10,14 @@ const LoadingScreen = () => {
         <div className="atom-container">
           <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              {/* Define three distinct paths by rotating the base elliptical path */}
-              {/* Further reduced radius from 65/32 to 55/28 for a more compact look as requested */}
-              <path id="orbit-path-1" d="M 200 145 A 55 28 0 1 1 200 255 A 55 28 0 1 1 200 145" fill="none" />
-              <path id="orbit-path-2" d="M 200 145 A 55 28 0 1 1 200 255 A 55 28 0 1 1 200 145" fill="none" transform="rotate(60 200 200)" />
-              <path id="orbit-path-3" d="M 200 145 A 55 28 0 1 1 200 255 A 55 28 0 1 1 200 145" fill="none" transform="rotate(120 200 200)" />
+              {/* 
+                  Significantly reduced orbit radius to match the compact look in the image.
+                  Original was 75/38, then 65/32, then 55/28.
+                  Now reducing to 45/22 for a very compact look.
+              */}
+              <path id="orbit-path-1" d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" fill="none" />
+              <path id="orbit-path-2" d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" fill="none" transform="rotate(60 200 200)" />
+              <path id="orbit-path-3" d="M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155" fill="none" transform="rotate(120 200 200)" />
             </defs>
 
             {/* Visual Orbit Paths */}
@@ -22,22 +25,22 @@ const LoadingScreen = () => {
             <use href="#orbit-path-2" className="orbit-path" />
             <use href="#orbit-path-3" className="orbit-path" />
 
-            {/* Orbit 1 - One Electron */}
-            <circle r="8" className="electron-ball">
+            {/* Orbit 1 - One Electron - Increased radius to 10 for a bolder look */}
+            <circle r="10" className="electron-ball">
               <animateMotion dur="3s" repeatCount="indefinite">
                 <mpath href="#orbit-path-1" />
               </animateMotion>
             </circle>
 
-            {/* Orbit 2 - One Electron */}
-            <circle r="8" className="electron-ball">
+            {/* Orbit 2 - One Electron - Increased radius to 10 */}
+            <circle r="10" className="electron-ball">
               <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1.2s">
                 <mpath href="#orbit-path-2" />
               </animateMotion>
             </circle>
 
-            {/* Orbit 3 - One Electron */}
-            <circle r="8" className="electron-ball">
+            {/* Orbit 3 - One Electron - Increased radius to 10 */}
+            <circle r="10" className="electron-ball">
               <animateMotion dur="4s" repeatCount="indefinite" begin="-2.4s">
                 <mpath href="#orbit-path-3" />
               </animateMotion>
@@ -48,7 +51,7 @@ const LoadingScreen = () => {
               <div className="center-logo-wrapper" style={{ 
                 width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffcc33'
               }}>
-                <i className="fab fa-laravel" style={{ fontSize: '65px' }}></i>
+                <i className="fab fa-laravel" style={{ fontSize: '55px' }}></i>
               </div>
             </foreignObject>
           </svg>
