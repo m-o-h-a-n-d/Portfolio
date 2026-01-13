@@ -1,6 +1,6 @@
 /* ============================================
-   LOADING SCREEN STYLES - OPTIMIZED VERSION
-   Fixed lag on small and large screens
+   ULTRA-LIGHTWEIGHT LOADING SCREEN
+   Optimized for zero lag on all devices
 ============================================ */
 
 .loading-screen-container {
@@ -16,6 +16,9 @@
   background: #050505;
   font-family: 'Poppins', sans-serif;
   overflow: hidden;
+  /* Force hardware acceleration for the entire container */
+  transform: translateZ(0);
+  backface-visibility: hidden;
 }
 
 .loading-bg {
@@ -24,7 +27,8 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
+  /* Simple background color is faster than gradients */
+  background: #050505;
 }
 
 .loading-content {
@@ -34,93 +38,71 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 20px;
-  /* Use hardware acceleration for the whole content */
-  transform: translateZ(0);
+  gap: 30px;
 }
 
 /* ============================================
-   ATOM CONTAINER & ORBITS
+   SIMPLIFIED ATOM ANIMATION
 ============================================ */
 
 .atom-container {
   position: relative;
-  width: 300px;
-  height: 300px;
+  width: 120px;
+  height: 120px;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-.orbital-svg {
-  width: 100%;
-  height: 100%;
-  overflow: visible;
-}
-
-.orbit-path {
-  stroke: #ffcc33;
-  stroke-width: 3;
-  fill: none;
-  opacity: 0.4;
-  /* Reduced filter complexity */
-  filter: drop-shadow(0 0 5px rgba(255, 204, 51, 0.3));
-}
-
-.electron-ball {
-  fill: #ffcc33;
-  /* Optimized glow */
-  filter: drop-shadow(0 0 10px rgba(255, 204, 51, 0.8));
-  will-change: offset-distance;
-}
-
-/* CSS Animations for Electrons using offset-path */
-.electron-1 {
-  offset-path: path("M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155");
-  animation: orbit-move 3s linear infinite;
-}
-
-.electron-2 {
-  offset-path: path("M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155");
-  animation: orbit-move 3.5s linear infinite;
-  animation-delay: -1.2s;
-}
-
-.electron-3 {
-  offset-path: path("M 200 155 A 45 22 0 1 1 200 245 A 45 22 0 1 1 200 155");
-  animation: orbit-move 4s linear infinite;
-  animation-delay: -2.4s;
-}
-
-@keyframes orbit-move {
-  from { offset-distance: 0%; }
-  to { offset-distance: 100%; }
-}
-
-/* ============================================
-   CENTER LOGO
-============================================ */
-
 .center-logo-wrapper {
   color: #ffcc33;
-  /* Use transform and opacity for glow instead of filter animation */
-  animation: logoPulse 2s ease-in-out infinite;
-  will-change: transform, opacity;
+  z-index: 2;
+  /* Simple scale animation is very cheap */
+  animation: simplePulse 2s ease-in-out infinite;
 }
 
-@keyframes logoPulse {
-  0%, 100% { 
-    transform: scale(1);
-    opacity: 0.8;
-  }
-  50% { 
-    transform: scale(1.1);
-    opacity: 1;
-  }
+@keyframes simplePulse {
+  0%, 100% { transform: scale(1); opacity: 0.9; }
+  50% { transform: scale(1.1); opacity: 1; }
+}
+
+/* Orbit Rings - Simple CSS Borders */
+.orbit {
+  position: absolute;
+  border: 1.5px solid rgba(255, 204, 51, 0.2);
+  border-radius: 50%;
+  width: 100%;
+  height: 40%;
+}
+
+.orbit-1 { transform: rotate(0deg); }
+.orbit-2 { transform: rotate(60deg); }
+.orbit-3 { transform: rotate(120deg); }
+
+/* Electron Dots - Using simple transforms instead of offset-path */
+.electron {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #ffcc33;
+  border-radius: 50%;
+  box-shadow: 0 0 8px #ffcc33;
+  top: -4px;
+  left: 50%;
+  margin-left: -4px;
+}
+
+.orbit-1 .electron { animation: orbitRotate 2s linear infinite; }
+.orbit-2 .electron { animation: orbitRotate 2.5s linear infinite; animation-delay: -0.5s; }
+.orbit-3 .electron { animation: orbitRotate 3s linear infinite; animation-delay: -1s; }
+
+@keyframes orbitRotate {
+  from { transform: rotate(0deg) translateX(60px) rotate(0deg); }
+  to { transform: rotate(360deg) translateX(60px) rotate(-360deg); }
 }
 
 /* ============================================
-   LOADING TEXT
+   LOADING TEXT & BAR
 ============================================ */
 
 .loading-text {
@@ -128,68 +110,57 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
 }
 
 .loading-title {
-  font-size: 32px;
-  font-weight: 800;
-  letter-spacing: 5px;
+  font-size: 24px;
+  font-weight: 700;
+  letter-spacing: 4px;
   color: #ffcc33;
-  /* Simplified shadow */
-  text-shadow: 0 0 10px rgba(255, 204, 51, 0.4);
   margin: 0;
   text-transform: uppercase;
 }
 
 .loading-bar-container {
-  width: 160px;
-  height: 3px;
+  width: 140px;
+  height: 2px;
   background: rgba(255, 204, 51, 0.1);
-  border-radius: 2px;
+  border-radius: 1px;
   overflow: hidden;
-  position: relative;
 }
 
 .loading-bar-progress {
-  position: absolute;
   height: 100%;
-  width: 0%;
   background: #ffcc33;
-  box-shadow: 0 0 8px #ffcc33;
-  border-radius: 2px;
-  transition: width 0.3s ease-out;
+  /* Use transform for progress bar instead of width for better performance */
+  transform-origin: left;
+  transition: transform 0.3s ease-out;
 }
 
 .loading-subtitle {
-  font-size: 12px;
-  color: rgba(255, 204, 51, 0.6);
+  font-size: 11px;
+  color: rgba(255, 204, 51, 0.5);
   letter-spacing: 1px;
   margin: 0;
 }
 
 /* ============================================
-   RESPONSIVE
+   RESPONSIVE - Further Simplification
 ============================================ */
 
 @media (max-width: 768px) {
   .atom-container {
-    width: 240px;
-    height: 240px;
+    width: 100px;
+    height: 100px;
   }
-  .loading-title {
-    font-size: 24px;
-    letter-spacing: 3px;
+  .electron {
+    width: 6px;
+    height: 6px;
+    box-shadow: none; /* Remove shadow on mobile for performance */
   }
-  .loading-bar-container {
-    width: 140px;
-  }
-  /* Reduce filter complexity further on mobile */
-  .orbit-path, .electron-ball, .loading-title {
-    filter: none;
-    text-shadow: none;
-  }
-  .electron-ball {
-    box-shadow: 0 0 5px #ffcc33;
+  @keyframes orbitRotate {
+    from { transform: rotate(0deg) translateX(50px) rotate(0deg); }
+    to { transform: rotate(360deg) translateX(50px) rotate(-360deg); }
   }
 }

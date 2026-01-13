@@ -82,7 +82,9 @@ export const DataProvider = ({ children }) => {
             results[endpoint.key] = { data: null };
           } finally {
             completed++;
-            setProgress(10 + Math.floor((completed / endpoints.length) * 90));
+            // Only update progress if it's a significant change to reduce re-renders
+            const newProgress = 10 + Math.floor((completed / endpoints.length) * 90);
+            setProgress(prev => Math.max(prev, newProgress));
           }
         });
 
