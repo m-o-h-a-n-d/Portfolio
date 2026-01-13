@@ -18,32 +18,14 @@ const LoadingScreen = () => {
     <div className="loading-screen-container">
       <div className="loading-bg"></div>
 
-      {/* Outer Code Rings (Rotating Background) */}
-      <div className="outer-rings-container">
-        <div className="code-ring ring-1">
-          <span className="code-snippet" style={{ left: '10%', top: '20%' }}>public function handle()</span>
-          <span className="code-snippet" style={{ right: '15%', bottom: '30%' }}>Route::get('/', [Controller::class])</span>
-          <span className="code-snippet" style={{ left: '40%', top: '10%' }}>php artisan migrate</span>
-        </div>
-        <div className="code-ring ring-2">
-          <span className="code-snippet" style={{ left: '20%', bottom: '20%' }}>composer require laravel/sanctum</span>
-          <span className="code-snippet" style={{ right: '10%', top: '40%' }}>DB::table('users')->where('id', 1)</span>
-        </div>
-      </div>
-
       <div className="loading-content">
         <div className="atom-container">
           <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              {/* Correct Elliptical Paths - Smooth and Circular like the reference */}
-              <path id="orbit-1" d="M 200 80 A 120 60 0 1 1 200 320 A 120 60 0 1 1 200 80" fill="none" />
-              <path id="orbit-2" d="M 200 80 A 120 60 0 1 1 200 320 A 120 60 0 1 1 200 80" fill="none" transform="rotate(60 200 200)" />
-              <path id="orbit-3" d="M 200 80 A 120 60 0 1 1 200 320 A 120 60 0 1 1 200 80" fill="none" transform="rotate(120 200 200)" />
-              
-              {/* Arrow Head Marker */}
-              <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
-                <polygon points="0 0, 10 3.5, 0 7" className="arrow-head" />
-              </marker>
+              {/* Reduced Radius Elliptical Paths - Closer to the logo */}
+              <path id="orbit-1" d="M 200 110 A 90 45 0 1 1 200 290 A 90 45 0 1 1 200 110" fill="none" />
+              <path id="orbit-2" d="M 200 110 A 90 45 0 1 1 200 290 A 90 45 0 1 1 200 110" fill="none" transform="rotate(60 200 200)" />
+              <path id="orbit-3" d="M 200 110 A 90 45 0 1 1 200 290 A 90 45 0 1 1 200 110" fill="none" transform="rotate(120 200 200)" />
             </defs>
 
             {/* Visual Orbit Paths */}
@@ -51,49 +33,49 @@ const LoadingScreen = () => {
             <use href="#orbit-2" className="orbit-path" />
             <use href="#orbit-3" className="orbit-path" />
 
-            {/* Animated Arrows on Paths - Following the smooth elliptical path */}
+            {/* Animated Arrows on Paths */}
             <g>
               <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
                 <mpath href="#orbit-1" />
               </animateMotion>
-              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
+              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
             </g>
             <g>
               <animateMotion dur="5s" repeatCount="indefinite" rotate="auto">
                 <mpath href="#orbit-2" />
               </animateMotion>
-              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
+              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
             </g>
             <g>
               <animateMotion dur="4.5s" repeatCount="indefinite" rotate="auto">
                 <mpath href="#orbit-3" />
               </animateMotion>
-              <polygon points="-6 -5, 10 0, -6 5" className="arrow-head" />
+              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
             </g>
 
             {/* Animated Electrons (Balls) */}
-            <circle r="7" className="electron-ball">
+            <circle r="6" className="electron-ball">
               <animateMotion dur="4s" repeatCount="indefinite" begin="-2s">
                 <mpath href="#orbit-1" />
               </animateMotion>
             </circle>
-            <circle r="7" className="electron-ball">
+            <circle r="6" className="electron-ball">
               <animateMotion dur="5s" repeatCount="indefinite" begin="-1s">
                 <mpath href="#orbit-2" />
               </animateMotion>
             </circle>
-            <circle r="7" className="electron-ball">
+            <circle r="6" className="electron-ball">
               <animateMotion dur="4.5s" repeatCount="indefinite" begin="-3s">
                 <mpath href="#orbit-3" />
               </animateMotion>
             </circle>
 
             {/* Center Logo */}
-            <foreignObject x="150" y="150" width="100" height="100">
+            <foreignObject x="160" y="160" width="80" height="80">
               <div className="center-logo-wrapper" style={{ 
                 width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffcc33'
               }}>
-                <LaravelIcon size={80} />
+                <LaravelIcon size={60} />
               </div>
             </foreignObject>
           </svg>
