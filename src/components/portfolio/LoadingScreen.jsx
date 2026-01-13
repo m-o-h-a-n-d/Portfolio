@@ -22,32 +22,48 @@ const LoadingScreen = () => {
         <div className="atom-container">
           <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              {/* Define the base elliptical path */}
-              <path id="base-orbit" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" />
-              
-              {/* Define three distinct paths by rotating the base path */}
+              {/* Define three distinct paths by rotating the base elliptical path */}
               <path id="orbit-path-1" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" />
               <path id="orbit-path-2" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(60 200 200)" />
               <path id="orbit-path-3" d="M 200 125 A 75 38 0 1 1 200 275 A 75 38 0 1 1 200 125" fill="none" transform="rotate(120 200 200)" />
             </defs>
 
-            {/* Visual Orbit Paths - Using the rotated paths */}
+            {/* Visual Orbit Paths */}
             <use href="#orbit-path-1" className="orbit-path" />
             <use href="#orbit-path-2" className="orbit-path" />
             <use href="#orbit-path-3" className="orbit-path" />
 
-            {/* Animated Electrons (Balls) - Each on its own rotated orbit */}
-            <circle r="5" className="electron-ball">
+            {/* Orbit 1 Electrons */}
+            <circle r="4" className="electron-ball">
               <animateMotion dur="3s" repeatCount="indefinite">
                 <mpath href="#orbit-path-1" />
               </animateMotion>
             </circle>
-            <circle r="5" className="electron-ball">
-              <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1s">
+            <circle r="4" className="electron-ball">
+              <animateMotion dur="3s" repeatCount="indefinite" begin="-1.5s">
+                <mpath href="#orbit-path-1" />
+              </animateMotion>
+            </circle>
+
+            {/* Orbit 2 Electrons */}
+            <circle r="4" className="electron-ball">
+              <animateMotion dur="3.5s" repeatCount="indefinite">
                 <mpath href="#orbit-path-2" />
               </animateMotion>
             </circle>
-            <circle r="5" className="electron-ball">
+            <circle r="4" className="electron-ball">
+              <animateMotion dur="3.5s" repeatCount="indefinite" begin="-1.75s">
+                <mpath href="#orbit-path-2" />
+              </animateMotion>
+            </circle>
+
+            {/* Orbit 3 Electrons */}
+            <circle r="4" className="electron-ball">
+              <animateMotion dur="4s" repeatCount="indefinite">
+                <mpath href="#orbit-path-3" />
+              </animateMotion>
+            </circle>
+            <circle r="4" className="electron-ball">
               <animateMotion dur="4s" repeatCount="indefinite" begin="-2s">
                 <mpath href="#orbit-path-3" />
               </animateMotion>
