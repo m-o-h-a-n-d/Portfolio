@@ -1,5 +1,5 @@
 import { useState, createContext, useContext, useEffect } from 'react';
-import ReactLogoAnimation from '../components/portfolio/ReactLogoAnimation';
+import Loader from '../components/portfolio/Loader';
 import { isAuthenticated, removeAuthToken, apiFetch, setAuthToken } from '../api/request';
 import { useNavigate } from 'react-router-dom';
 
@@ -60,7 +60,7 @@ export const AuthProvider = ({ children }) => {
   if (loading) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
-        <ReactLogoAnimation size="w-16 h-16" />
+        <Loader />
       </div>
     );
   }

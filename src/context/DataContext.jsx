@@ -1,5 +1,5 @@
 import { useState, useEffect, createContext, useContext } from 'react';
-import ReactLogoAnimation from '../components/portfolio/ReactLogoAnimation';
+import Loader from '../components/portfolio/Loader';
 import { apiGet } from '../api/request';
 import { 
   API_PROFILE_GET, 
@@ -112,10 +112,8 @@ export const DataProvider = ({ children }) => {
     return (
       <div className="fixed inset-0 bg-background/80 backdrop-blur-sm flex items-center justify-center z-50">
         <div className="text-center">
-          <div className="flex items-center justify-center mb-8">
-            <ReactLogoAnimation size="w-24 h-24" />
-          </div>
-          <p className="text-muted-foreground text-lg font-medium">Loading portfolio...</p>
+          <Loader />
+          <p className="text-muted-foreground text-lg font-medium mt-4">Loading portfolio...</p>
         </div>
       </div>
     );
