@@ -1,6 +1,6 @@
 /* ============================================
-   LOADING SCREEN STYLES - FIXED VERSION
-   Animated Orbital Loading with Laravel Logo
+   LOADING SCREEN STYLES - ENHANCED VERSION
+   Matching the provided reference image
 ============================================ */
 
 .loading-screen-container {
@@ -13,8 +13,9 @@
   align-items: center;
   justify-content: center;
   z-index: 9999;
-  background: #0a0a0a;
+  background: #050505;
   font-family: 'Poppins', sans-serif;
+  overflow: hidden;
 }
 
 .loading-bg {
@@ -23,7 +24,7 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background: linear-gradient(135deg, #0a0a0a 0%, #1a1a1a 50%, #0a0a0a 100%);
+  background: radial-gradient(circle at center, #1a1a1a 0%, #050505 100%);
 }
 
 .loading-content {
@@ -33,7 +34,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 50px;
+  gap: 40px;
 }
 
 /* ============================================
@@ -42,8 +43,8 @@
 
 .atom-container {
   position: relative;
-  width: 320px;
-  height: 320px;
+  width: 400px;
+  height: 400px;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -53,167 +54,91 @@
 .orbital-svg {
   width: 100%;
   height: 100%;
-  filter: drop-shadow(0 0 30px rgba(212, 175, 55, 0.3));
+  overflow: visible;
 }
 
 /* Orbit Paths */
 .orbit-path {
-  opacity: 0.85;
-  filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
-  animation: orbitGlow 3s ease-in-out infinite;
+  stroke: #ffcc33;
+  stroke-width: 3;
+  fill: none;
+  opacity: 0.9;
+  filter: drop-shadow(0 0 12px rgba(255, 204, 51, 0.8));
 }
 
-.orbit-path-1 {
-  animation-delay: 0s;
+/* Arrow Heads */
+.arrow-head {
+  fill: #ffcc33;
+  filter: drop-shadow(0 0 8px rgba(255, 204, 51, 0.9));
 }
 
-.orbit-path-2 {
-  animation-delay: 0.3s;
-}
-
-.orbit-path-3 {
-  animation-delay: 0.6s;
-}
-
-@keyframes orbitGlow {
-  0%, 100% {
-    opacity: 0.7;
-    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.5));
-  }
-  50% {
-    opacity: 1;
-    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.9));
-  }
-}
-
-/* ============================================
-   ELECTRONS (ANIMATED BALLS)
-============================================ */
-
-.electron-group {
-  animation: electronGlow 2s ease-in-out infinite;
-}
-
-.electron-1 {
-  animation-delay: 0s;
-}
-
-.electron-2 {
-  animation-delay: -2s;
-}
-
-.electron-3 {
-  animation-delay: -4s;
-}
-
+/* Electrons */
 .electron-ball {
-  filter: drop-shadow(0 0 12px rgba(212, 175, 55, 1)) drop-shadow(0 0 6px rgba(212, 175, 55, 0.8));
-  animation: electronPulse 2s ease-in-out infinite;
+  fill: #ffcc33;
+  filter: drop-shadow(0 0 15px rgba(255, 204, 51, 1));
 }
 
-@keyframes electronGlow {
-  0%, 100% {
-    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.6));
-  }
-  50% {
-    filter: drop-shadow(0 0 16px rgba(212, 175, 55, 1));
-  }
+/* Outer Code Rings */
+.outer-rings-container {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-@keyframes electronPulse {
-  0%, 100% {
-    r: 7px;
-    opacity: 0.8;
-  }
-  50% {
-    r: 9px;
-    opacity: 1;
-  }
+.code-ring {
+  position: absolute;
+  border: 1px solid rgba(255, 204, 51, 0.15);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.ring-1 {
+  width: 450px;
+  height: 200px;
+  transform: rotateX(75deg);
+  animation: rotateRing 20s linear infinite;
+}
+
+.ring-2 {
+  width: 500px;
+  height: 220px;
+  transform: rotateX(75deg) rotateZ(180deg);
+  animation: rotateRing 25s linear infinite reverse;
+}
+
+.code-snippet {
+  position: absolute;
+  color: #ffcc33;
+  font-family: 'Courier New', monospace;
+  font-size: 8px;
+  opacity: 0.4;
+  white-space: nowrap;
+  text-shadow: 0 0 5px rgba(255, 204, 51, 0.5);
+}
+
+@keyframes rotateRing {
+  from { transform: rotateX(75deg) rotateZ(0deg); }
+  to { transform: rotateX(75deg) rotateZ(360deg); }
 }
 
 /* ============================================
    CENTER LOGO
 ============================================ */
 
-.center-logo {
-  animation: logoPulse 2s ease-in-out infinite;
+.center-logo-wrapper {
+  filter: drop-shadow(0 0 20px rgba(255, 204, 51, 0.6));
+  animation: logoGlow 3s ease-in-out infinite;
 }
 
-.logo-stroke {
-  filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.8));
-}
-
-@keyframes logoPulse {
-  0%, 100% {
-    filter: drop-shadow(0 0 15px rgba(212, 175, 55, 0.8));
-    opacity: 0.9;
-  }
-  50% {
-    filter: drop-shadow(0 0 25px rgba(212, 175, 55, 1));
-    opacity: 1;
-  }
-}
-
-/* ============================================
-   DECORATIVE MARKS
-============================================ */
-
-.decorative-marks {
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
-
-.mark {
-  position: absolute;
-  background: rgba(212, 175, 55, 0.3);
-  opacity: 0;
-}
-
-.mark-1 {
-  width: 2px;
-  height: 18px;
-  top: 15px;
-  right: 25px;
-  animation: markFlicker 2s ease-in-out infinite;
-  animation-delay: 0s;
-}
-
-.mark-2 {
-  width: 2px;
-  height: 14px;
-  top: 30px;
-  right: 12px;
-  animation: markFlicker 2s ease-in-out infinite;
-  animation-delay: 0.3s;
-}
-
-.mark-3 {
-  width: 2px;
-  height: 20px;
-  bottom: 35px;
-  left: 20px;
-  animation: markFlicker 2s ease-in-out infinite;
-  animation-delay: 0.6s;
-}
-
-.mark-4 {
-  width: 2px;
-  height: 16px;
-  bottom: 25px;
-  left: 40px;
-  animation: markFlicker 2s ease-in-out infinite;
-  animation-delay: 0.9s;
-}
-
-@keyframes markFlicker {
-  0%, 100% {
-    opacity: 0;
-  }
-  50% {
-    opacity: 0.7;
-  }
+@keyframes logoGlow {
+  0%, 100% { filter: drop-shadow(0 0 15px rgba(255, 204, 51, 0.5)); transform: scale(1); }
+  50% { filter: drop-shadow(0 0 30px rgba(255, 204, 51, 0.9)); transform: scale(1.05); }
 }
 
 /* ============================================
@@ -225,150 +150,63 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 10px;
+  gap: 12px;
 }
 
 .loading-title {
-  font-size: 36px;
-  font-weight: 700;
-  letter-spacing: 5px;
-  background: linear-gradient(to right, #d4af37, #f0d070);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
+  font-size: 42px;
+  font-weight: 800;
+  letter-spacing: 8px;
+  color: #ffcc33;
+  text-shadow: 0 0 20px rgba(255, 204, 51, 0.6);
   margin: 0;
-  animation: titlePulse 2s ease-in-out infinite;
+  text-transform: uppercase;
 }
 
-@keyframes titlePulse {
-  0%, 100% {
-    opacity: 0.95;
-    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-  }
-  50% {
-    opacity: 1;
-    text-shadow: 0 0 30px rgba(212, 175, 55, 0.7);
-  }
-}
-
-.loading-underline {
-  width: 90px;
-  height: 3px;
-  background: linear-gradient(to right, transparent, #d4af37, transparent);
+.loading-bar-container {
+  width: 200px;
+  height: 4px;
+  background: rgba(255, 204, 51, 0.1);
   border-radius: 2px;
-  animation: underlineExpand 2s ease-in-out infinite;
-  margin: 5px 0;
+  overflow: hidden;
+  position: relative;
 }
 
-@keyframes underlineExpand {
-  0%, 100% {
-    width: 70px;
-    opacity: 0.6;
-  }
-  50% {
-    width: 110px;
-    opacity: 1;
-  }
+.loading-bar-progress {
+  position: absolute;
+  height: 100%;
+  width: 40%;
+  background: #ffcc33;
+  box-shadow: 0 0 15px #ffcc33;
+  border-radius: 2px;
+  animation: progressMove 2s ease-in-out infinite;
+}
+
+@keyframes progressMove {
+  0% { left: -40%; }
+  100% { left: 100%; }
 }
 
 .loading-subtitle {
-  font-size: 13px;
-  color: #888888;
-  letter-spacing: 0.5px;
+  font-size: 14px;
+  color: rgba(255, 204, 51, 0.6);
+  letter-spacing: 2px;
   margin: 0;
-  animation: subtitleFade 2s ease-in-out infinite;
-}
-
-@keyframes subtitleFade {
-  0%, 100% {
-    opacity: 0.5;
-  }
-  50% {
-    opacity: 0.8;
-  }
 }
 
 /* ============================================
-   DECORATIVE SPARKLE
-============================================ */
-
-.sparkle {
-  position: fixed;
-  width: 10px;
-  height: 10px;
-  background: #d4af37;
-  border-radius: 50%;
-  bottom: 50px;
-  right: 50px;
-  box-shadow: 0 0 10px rgba(212, 175, 55, 0.8);
-  animation: sparkleFloat 3s ease-in-out infinite;
-}
-
-@keyframes sparkleFloat {
-  0%, 100% {
-    transform: translate(0, 0) scale(0.8);
-    opacity: 0.3;
-  }
-  50% {
-    transform: translate(-12px, -12px) scale(1.2);
-    opacity: 0.9;
-  }
-}
-
-/* ============================================
-   RESPONSIVE DESIGN
+   RESPONSIVE
 ============================================ */
 
 @media (max-width: 768px) {
   .atom-container {
-    width: 260px;
-    height: 260px;
+    width: 300px;
+    height: 300px;
   }
-
   .loading-title {
-    font-size: 28px;
-    letter-spacing: 3px;
+    font-size: 32px;
+    letter-spacing: 5px;
   }
-
-  .loading-content {
-    gap: 40px;
-  }
-
-  .sparkle {
-    width: 8px;
-    height: 8px;
-    bottom: 30px;
-    right: 30px;
-  }
-}
-
-@media (max-width: 480px) {
-  .atom-container {
-    width: 220px;
-    height: 220px;
-  }
-
-  .loading-title {
-    font-size: 24px;
-    letter-spacing: 2px;
-  }
-
-  .loading-subtitle {
-    font-size: 12px;
-  }
-
-  .loading-content {
-    gap: 30px;
-  }
-
-  .loading-underline {
-    width: 60px;
-  }
-
-  .sparkle {
-    width: 6px;
-    height: 6px;
-    bottom: 20px;
-    right: 20px;
-  }
+  .ring-1 { width: 350px; height: 150px; }
+  .ring-2 { width: 400px; height: 170px; }
 }

@@ -16,161 +16,100 @@ const LaravelIcon = ({ className, size = 40 }) => (
 const LoadingScreen = () => {
   return (
     <div className="loading-screen-container">
-      {/* Background */}
       <div className="loading-bg"></div>
 
-      {/* Main Loading Content */}
+      {/* Outer Code Rings (Rotating Background) */}
+      <div className="outer-rings-container">
+        <div className="code-ring ring-1">
+          <span className="code-snippet" style={{ left: '10%', top: '20%' }}>public function handle()</span>
+          <span className="code-snippet" style={{ right: '15%', bottom: '30%' }}>Route::get('/', [Controller::class])</span>
+          <span className="code-snippet" style={{ left: '40%', top: '10%' }}>php artisan migrate</span>
+        </div>
+        <div className="code-ring ring-2">
+          <span className="code-snippet" style={{ left: '20%', bottom: '20%' }}>composer require laravel/sanctum</span>
+          <span className="code-snippet" style={{ right: '10%', top: '40%' }}>DB::table('users')->where('id', 1)</span>
+        </div>
+      </div>
+
       <div className="loading-content">
-        {/* Animated Atom/Orbital Structure */}
         <div className="atom-container">
-          {/* SVG with Motion Paths for Electrons */}
-          <svg
-            className="orbital-svg"
-            viewBox="0 0 300 300"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            {/* Define Motion Paths for electrons */}
+          <svg className="orbital-svg" viewBox="0 0 400 400" xmlns="http://www.w3.org/2000/svg">
             <defs>
-              {/* Orbit 1 - Horizontal ellipse */}
-              <path
-                id="orbit1"
-                d="M 150 80 Q 210 150 150 220 Q 90 150 150 80"
-                fill="none"
-              />
-              {/* Orbit 2 - Rotated 60 degrees */}
-              <path
-                id="orbit2"
-                d="M 150 80 Q 210 150 150 220 Q 90 150 150 80"
-                fill="none"
-                transform="rotate(60 150 150)"
-              />
-              {/* Orbit 3 - Rotated 120 degrees */}
-              <path
-                id="orbit3"
-                d="M 150 80 Q 210 150 150 220 Q 90 150 150 80"
-                fill="none"
-                transform="rotate(120 150 150)"
-              />
+              {/* Main Orbit Paths */}
+              <path id="orbit-v" d="M 200 50 Q 320 200 200 350 Q 80 200 200 50" fill="none" />
+              <path id="orbit-h" d="M 50 200 Q 200 320 350 200 Q 200 80 50 200" fill="none" />
+              <path id="orbit-d1" d="M 200 50 Q 320 200 200 350 Q 80 200 200 50" fill="none" transform="rotate(45 200 200)" />
+              <path id="orbit-d2" d="M 200 50 Q 320 200 200 350 Q 80 200 200 50" fill="none" transform="rotate(-45 200 200)" />
+              
+              {/* Arrow Head Marker */}
+              <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
+                <polygon points="0 0, 10 3.5, 0 7" className="arrow-head" />
+              </marker>
             </defs>
 
-            {/* Orbital Paths (Visual) */}
-            <ellipse
-              cx="150"
-              cy="150"
-              rx="70"
-              ry="35"
-              fill="none"
-              stroke="url(#goldGradient)"
-              strokeWidth="2.5"
-              className="orbit-path orbit-path-1"
-            />
-            <ellipse
-              cx="150"
-              cy="150"
-              rx="70"
-              ry="35"
-              fill="none"
-              stroke="url(#goldGradient)"
-              strokeWidth="2.5"
-              className="orbit-path orbit-path-2"
-              transform="rotate(60 150 150)"
-            />
-            <ellipse
-              cx="150"
-              cy="150"
-              rx="70"
-              ry="35"
-              fill="none"
-              stroke="url(#goldGradient)"
-              strokeWidth="2.5"
-              className="orbit-path orbit-path-3"
-              transform="rotate(120 150 150)"
-            />
+            {/* Visual Orbit Paths */}
+            <use href="#orbit-v" className="orbit-path" />
+            <use href="#orbit-h" className="orbit-path" />
+            <use href="#orbit-d1" className="orbit-path" />
+            <use href="#orbit-d2" className="orbit-path" />
 
-            {/* Gradient Definition */}
-            <defs>
-              <radialGradient id="goldGradient">
-                <stop offset="0%" stopColor="#d4af37" stopOpacity="0.8" />
-                <stop offset="100%" stopColor="#d4af37" stopOpacity="0.3" />
-              </radialGradient>
-            </defs>
-
-            {/* Animated Electrons on Motion Paths */}
-            {/* Electron 1 */}
-            <g className="electron-group electron-1">
-              <animateMotion dur="6s" repeatCount="indefinite">
-                <mpath href="#orbit1" />
+            {/* Animated Arrows on Paths */}
+            <g>
+              <animateMotion dur="4s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#orbit-v" />
               </animateMotion>
-              <circle
-                cx="0"
-                cy="0"
-                r="8"
-                fill="#d4af37"
-                className="electron-ball"
-              />
+              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
+            </g>
+            <g>
+              <animateMotion dur="5s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#orbit-h" />
+              </animateMotion>
+              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
+            </g>
+            <g>
+              <animateMotion dur="4.5s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#orbit-d1" />
+              </animateMotion>
+              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
+            </g>
+            <g>
+              <animateMotion dur="5.5s" repeatCount="indefinite" rotate="auto">
+                <mpath href="#orbit-d2" />
+              </animateMotion>
+              <polygon points="-5 -4, 8 0, -5 4" className="arrow-head" />
             </g>
 
-            {/* Electron 2 */}
-            <g className="electron-group electron-2">
-              <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1">
-                <mpath href="#orbit2" />
+            {/* Animated Electrons (Balls) */}
+            <circle r="6" className="electron-ball">
+              <animateMotion dur="4s" repeatCount="indefinite" begin="-2s">
+                <mpath href="#orbit-v" />
               </animateMotion>
-              <circle
-                cx="0"
-                cy="0"
-                r="8"
-                fill="#d4af37"
-                className="electron-ball"
-              />
-            </g>
-
-            {/* Electron 3 */}
-            <g className="electron-group electron-3">
-              <animateMotion dur="6s" repeatCount="indefinite" keyPoints="0;1" keyTimes="0;1">
-                <mpath href="#orbit3" />
+            </circle>
+            <circle r="6" className="electron-ball">
+              <animateMotion dur="5s" repeatCount="indefinite" begin="-1s">
+                <mpath href="#orbit-h" />
               </animateMotion>
-              <circle
-                cx="0"
-                cy="0"
-                r="8"
-                fill="#d4af37"
-                className="electron-ball"
-              />
-            </g>
+            </circle>
 
-            {/* Center Logo - Laravel Icon */}
-            <foreignObject x="110" y="110" width="80" height="80">
-              <div style={{ 
-                width: '100%', 
-                height: '100%', 
-                display: 'flex', 
-                alignItems: 'center', 
-                justifyContent: 'center',
-                color: '#d4af37'
+            {/* Center Logo */}
+            <foreignObject x="150" y="150" width="100" height="100">
+              <div className="center-logo-wrapper" style={{ 
+                width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#ffcc33'
               }}>
-                <LaravelIcon size={60} className="logo-svg" />
+                <LaravelIcon size={80} />
               </div>
             </foreignObject>
           </svg>
-
-          {/* Decorative Code-like Marks */}
-          <div className="decorative-marks">
-            <div className="mark mark-1"></div>
-            <div className="mark mark-2"></div>
-            <div className="mark mark-3"></div>
-            <div className="mark mark-4"></div>
-          </div>
         </div>
 
-        {/* Loading Text */}
+        {/* Loading Text Section */}
         <div className="loading-text">
           <h2 className="loading-title">LOADING</h2>
-          <div className="loading-underline"></div>
+          <div className="loading-bar-container">
+            <div className="loading-bar-progress"></div>
+          </div>
           <p className="loading-subtitle">Please wait...</p>
         </div>
-
-        {/* Decorative Sparkle */}
-        <div className="sparkle"></div>
       </div>
     </div>
   );
