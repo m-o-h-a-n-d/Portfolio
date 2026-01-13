@@ -88,18 +88,35 @@
   box-sizing: border-box;
 }
 
-/* Electron Balls - Original Style with Fixed Centering */
+/* Electron Balls - "Bead" Style (Path looks like it passes through) */
 .electron-ball-css {
   position: absolute;
-  width: 16px;
-  height: 16px;
+  width: 20px; /* Slightly larger to look like a bead */
+  height: 20px;
   background: #ffcc33;
   border-radius: 50%;
-  box-shadow: 0 0 15px #ffcc33;
+  box-shadow: 
+    0 0 15px rgba(255, 204, 51, 0.6),
+    inset 0 0 8px rgba(0, 0, 0, 0.5); /* Inner shadow to create depth */
   will-change: transform;
   /* Centering fix */
-  margin-top: -8px;
-  margin-left: -8px;
+  margin-top: -10px;
+  margin-left: -10px;
+  z-index: 25;
+  border: 2px solid #ffcc33;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Visual trick: A small line inside the ball to simulate the path passing through */
+.electron-ball-css::after {
+  content: '';
+  position: absolute;
+  width: 100%;
+  height: 4px;
+  background: rgba(0, 0, 0, 0.2); /* Darker line to simulate path hole */
+  border-radius: 2px;
 }
 
 /* 
@@ -179,11 +196,11 @@
     border-width: 6px;
   }
   .electron-ball-css {
-    width: 12px;
-    height: 12px;
+    width: 16px;
+    height: 16px;
     /* Centering fix for mobile */
-    margin-top: -6px;
-    margin-left: -6px;
+    margin-top: -8px;
+    margin-left: -8px;
   }
   
   /* Elliptical path for mobile (width: 180px, height: 80px) */
