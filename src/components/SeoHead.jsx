@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 
+// Optimized SEO Component for Mohanad Ahmed Portfolio
 const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   const [profileData, setProfileData] = useState(null);
   const [settingsData, setSettingsData] = useState(null);
