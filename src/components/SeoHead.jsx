@@ -23,7 +23,8 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   const finalJobTitle = jobTitle || profileData?.title || 'Full Stack Web Developer';
   
   // Priority: Prop description > Profile 'about' data > Default fallback
-  const finalDescription = description || profileData?.about || 'Mohanad Ahmed Shehata - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير المواقع المتكاملة، بناء تطبيقات الويب باستخدام Laravel و React، وحلول الـ Backend المتقدمة.';
+  const fallbackDescription = 'Mohanad Ahmed Shehata - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير تطبيقات الويب المتكاملة وحلول الـ Backend المتقدمة.';
+  const finalDescription = (description || profileData?.about || fallbackDescription).substring(0, 155);
 
   const finalWebsiteUrl = websiteUrl || 'https://mohanadportfolio.vercel.app/';
   
