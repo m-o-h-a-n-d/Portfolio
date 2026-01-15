@@ -74,7 +74,10 @@ const ProjectEditor = () => {
         apiGet('/team')
       ]);
       setPortfolio(portfolioRes.data);
-      setTeam(teamRes.data);
+      
+      // Ensure team data is always an array
+      const teamData = teamRes.data.team || teamRes.data;
+      setTeam(Array.isArray(teamData) ? teamData : []);
     } catch (error) {
       console.error('Error fetching data:', error);
       Swal.fire({
@@ -216,14 +219,21 @@ const ProjectEditor = () => {
     }));
   };
 
-  const getTeamMemberName = (memberId) => team?.team?.find(m => m.id === memberId)?.name || 'Unknown';
-  const getTeamMemberTrack = (memberId) => team?.team?.find(m => m.id === memberId)?.track || '';
+  const getTeamMemberName = (memberId) => {
+    const member = Array.isArray(team) ? team.find(m => m.id === memberId) : null;
+    return member?.name || 'Unknown';
+  };
+  
+  const getTeamMemberTrack = (memberId) => {
+    const member = Array.isArray(team) ? team.find(m => m.id === memberId) : null;
+    return member?.track || '';
+  };
 
-  const filteredTeamMembers = team?.team?.filter(member =>
+  const filteredTeamMembers = (Array.isArray(team) ? team : []).filter(member =>
     (member.name.toLowerCase().includes(teamSearchQuery.toLowerCase()) ||
-     member.track.toLowerCase().includes(teamSearchQuery.toLowerCase())) &&
+     (member.track && member.track.toLowerCase().includes(teamSearchQuery.toLowerCase()))) &&
     !formData.team_members.includes(member.id)
-  ) || [];
+  );
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
