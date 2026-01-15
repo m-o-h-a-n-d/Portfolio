@@ -6,6 +6,7 @@ import {
   ArrowLeft, Plus, X, Save, Upload, Image, ChevronDown, 
   Trash2, Code, Link as LinkIcon, Users, Tag, GripVertical
 } from 'lucide-react';
+import Select from 'react-select';
 import Swal from '../../lib/swal';
 
 const ProjectEditor = () => {
@@ -17,11 +18,8 @@ const ProjectEditor = () => {
   const [team, setTeam] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
-  const [teamSearchOpen, setTeamSearchOpen] = useState(false);
-  const [teamSearchQuery, setTeamSearchQuery] = useState('');
   const [techInput, setTechInput] = useState('');
   const [dragActive, setDragActive] = useState(false);
-  const teamDropdownRef = useRef(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -38,15 +36,7 @@ const ProjectEditor = () => {
 
   useEffect(() => {
     fetchData();
-    
-    const handleClickOutside = (event) => {
-      if (teamSearchOpen && teamDropdownRef.current && !teamDropdownRef.current.contains(event.target)) {
-        setTeamSearchOpen(false);
-      }
-    };
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
-  }, [teamSearchOpen]);
+  }, []);
 
   useEffect(() => {
     if (isEditMode && portfolio) {
@@ -208,8 +198,6 @@ const ProjectEditor = () => {
         team_members: [...prev.team_members, memberId]
       }));
     }
-    setTeamSearchOpen(false);
-    setTeamSearchQuery('');
   };
 
   const removeTeamMember = (memberId) => {
@@ -229,11 +217,7 @@ const ProjectEditor = () => {
     return member?.track || '';
   };
 
-  const filteredTeamMembers = (Array.isArray(team) ? team : []).filter(member =>
-    (member.name.toLowerCase().includes(teamSearchQuery.toLowerCase()) ||
-     (member.track && member.track.toLowerCase().includes(teamSearchQuery.toLowerCase()))) &&
-    !formData.team_members.includes(member.id)
-  );
+
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
@@ -483,62 +467,76 @@ const ProjectEditor = () => {
                 <h3 className="h3 text-white-2">Team Members</h3>
               </div>
               
-              <div className="relative mb-4" ref={teamDropdownRef}>
-                <div className="relative">
-                  <input
-                    type="text"
-                    value={teamSearchQuery}
-                    onChange={(e) => {
-                      setTeamSearchQuery(e.target.value);
-                      setTeamSearchOpen(true);
-                    }}
-                    onFocus={(e) => {
-                      e.preventDefault();
-                      setTeamSearchOpen(true);
-                    }}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        e.preventDefault();
-                        e.stopPropagation();
+              <div className="relative mb-4">
+                <Select
+                  options={(Array.isArray(team) ? team : [])
+                    .filter(member => !formData.team_members.includes(member.id))
+                    .map(member => ({
+                      value: member.id,
+                      label: member.name,
+                      track: member.track
+                    }))
+                  }
+                  onChange={(option) => {
+                    if (option) {
+                      addTeamMember(null, option.value);
+                    }
+                  }
+                  }
+                  placeholder="Search and add members..."
+                  className="react-select-container"
+                  classNamePrefix="react-select"
+                  isSearchable
+                  formatOptionLabel={(member) => (
+                    <div>
+                      <div className="text-xs font-medium">{member.label}</div>
+                      <div className="text-[10px] opacity-60">{member.track}</div>
+                    </div>
+                  )}
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      background: 'transparent',
+                      borderColor: state.isFocused ? 'hsl(var(--primary))' : 'hsl(var(--jet))',
+                      borderRadius: '14px',
+                      padding: '5px 10px',
+                      boxShadow: 'none',
+                      '&:hover': {
+                        borderColor: 'hsl(var(--primary))'
                       }
-                    }}
-                    placeholder="Search and add members..."
-                    className="form-input text-sm py-2 pr-10"
-                  />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-transform cursor-pointer"
-                    onClick={(e) => {
-                      e.preventDefault();
-                      e.stopPropagation();
-                      setTeamSearchOpen(!teamSearchOpen);
-                    }}
-                  >
-                    <ChevronDown className={`w-4 h-4 ${teamSearchOpen ? 'rotate-180' : ''}`} />
-                  </button>
-                </div>
-                
-                {teamSearchOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-onyx border border-border rounded-xl z-50 shadow-2xl max-h-48 overflow-y-auto has-scrollbar">
-                    {filteredTeamMembers.length > 0 ? (
-                      filteredTeamMembers.map(member => (
-                        <button
-                          key={member.id}
-                          type="button"
-                          onClick={(e) => addTeamMember(e, member.id)}
-                          className="w-full text-left px-4 py-2 hover:bg-primary/10 border-b border-border last:border-0"
-                        >
-                          <div className="text-xs font-medium text-white-2">{member.name}</div>
-                          <div className="text-[10px] text-light-gray/60">{member.track}</div>
-                        </button>
-                      ))
-                    ) : (
-                      <div className="px-4 py-3 text-xs text-muted-foreground text-center">
-                        No members found
-                      </div>
-                    )}
-                  </div>
-                )}
+                    }),
+                    menu: (base) => ({
+                      ...base,
+                      background: 'hsl(var(--eerie-black-2))',
+                      border: '1px solid hsl(var(--jet))',
+                      borderRadius: '14px',
+                      zIndex: 50,
+                      overflow: 'hidden'
+                    }),
+                    option: (base, state) => ({
+                      ...base,
+                      background: state.isFocused ? 'rgba(255, 219, 112, 0.1)' : 'transparent',
+                      color: 'var(--white-2)',
+                      cursor: 'pointer',
+                      '&:active': {
+                        background: 'rgba(255, 219, 112, 0.2)'
+                      }
+                    }),
+                    input: (base) => ({
+                      ...base,
+                      color: 'var(--white-2)'
+                    }),
+                    singleValue: (base) => ({
+                      ...base,
+                      color: 'var(--white-2)'
+                    }),
+                    placeholder: (base) => ({
+                      ...base,
+                      color: 'hsl(var(--muted-foreground))',
+                      fontSize: '14px'
+                    })
+                  }}
+                />
               </div>
 
               <div className="flex flex-wrap gap-2">
