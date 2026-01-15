@@ -8,13 +8,30 @@ import PortfolioSection from './PortfolioSection';
 import BlogSection from './BlogSection';
 import ContactSection from './ContactSection';
 import LoadingScreen from './LoadingScreen';
+import ProjectDetails from './ProjectDetails';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const PortfolioLayout = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
   const [activePage, setActivePage] = useState('about');
   const [isTransitioning, setIsTransitioning] = useState(false);
 
+  useEffect(() => {
+    if (location.pathname.startsWith('/project/')) {
+      setActivePage('project-details');
+    } else if (location.pathname === '/') {
+      // Keep current activePage or default to about
+    }
+  }, [location]);
+
   const handlePageChange = (page) => {
     if (page === activePage) return;
+    
+    if (page !== 'project-details' && location.pathname !== '/') {
+      navigate('/');
+    }
+
     setIsTransitioning(true);
     
     // Simulate a short loading time for the transition effect
@@ -44,6 +61,8 @@ const PortfolioLayout = () => {
         return <BlogSection />;
       case 'contact':
         return <ContactSection />;
+      case 'project-details':
+        return <ProjectDetails />;
       default:
         return <AboutSection />;
     }

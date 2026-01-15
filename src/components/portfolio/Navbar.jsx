@@ -4,8 +4,9 @@ const Navbar = ({ activePage, onPageChange }) => {
   const pages = ['About', 'Resume', 'Portfolio', 'Blog', 'Contact'];
 
   const handleNavClick = (page) => {
-    if (page.toLowerCase() === activePage) return;
-    onPageChange(page.toLowerCase());
+    const pageId = page.toLowerCase();
+    if (pageId === activePage) return;
+    onPageChange(pageId);
   };
 
   return (
@@ -30,7 +31,7 @@ const Navbar = ({ activePage, onPageChange }) => {
               className={`
                 relative px-2 py-4 md:py-5 text-[12px] md:text-[16px] font-medium transition-colors
                 ${
-                  activePage === page.toLowerCase()
+                  activePage === page.toLowerCase() || (activePage === 'project-details' && page.toLowerCase() === 'portfolio')
                     ? 'text-primary'
                     : 'text-light-gray hover:text-light-gray/70'
                 }

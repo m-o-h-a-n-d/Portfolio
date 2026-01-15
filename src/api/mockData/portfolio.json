@@ -5,64 +5,104 @@
       "title": "Parking System",
       "category": "Backend Development",
       "image": "/images/parkingmo.webp",
+      "images": ["/images/parkingmo.webp", "/images/iot.webp"],
       "description": "Backend system to manage parking lots efficiently with real-time monitoring and automated ticketing.",
-      "link": "https://parkingmo.up.railway.app/"
+      "full_description": "A comprehensive backend solution designed to streamline parking lot operations. It features real-time occupancy tracking, automated ticketing, and an administrative dashboard for monitoring. Built with scalability in mind to handle high traffic and multiple locations.",
+      "link": "https://parkingmo.up.railway.app/",
+      "github": "https://github.com/m-o-h-a-n-d/parking-system",
+      "technologies": ["Laravel", "MySQL", "Redis", "Docker"],
+      "team_members": [1]
     },
     {
       "id": 2,
       "title": "NewMO",
       "category": "Backend Development",
       "image": "/images/newmo.webp",
+      "images": ["/images/newmo.webp"],
       "description": "Modern SaaS platform for team collaboration and project management with robust backend APIs.",
-      "link": "https://newmo.wuaze.com/"
+      "full_description": "NewMO is a SaaS platform that empowers teams to collaborate effectively. It includes task management, real-time chat, and file sharing capabilities. The backend is built with a microservices architecture to ensure high availability and performance.",
+      "link": "https://newmo.wuaze.com/",
+      "github": "",
+      "technologies": ["Node.js", "Express", "MongoDB", "Socket.io"],
+      "team_members": [1]
     },
     {
       "id": 3,
       "title": "Egycare",
       "category": "Frontend Development",
       "image": "/images/egycare.webp",
+      "images": ["/images/egycare.webp"],
       "description": "Healthcare platform with intuitive UI, patient management features, and responsive design.",
-      "link": "https://egycarepro.netlify.app/"
+      "full_description": "Egycare is a patient-centric healthcare platform. It provides a seamless experience for booking appointments, accessing medical records, and communicating with healthcare providers. The UI is designed to be accessible and easy to navigate for all age groups.",
+      "link": "https://egycarepro.netlify.app/",
+      "github": "https://github.com/m-o-h-a-n-d/egycare",
+      "technologies": ["React", "Tailwind CSS", "Redux", "Framer Motion"],
+      "team_members": [1]
     },
     {
       "id": 4,
       "title": "SystemMO",
       "category": "Frontend Development",
       "image": "/images/systemmo.webp",
+      "images": ["/images/systemmo.webp"],
       "description": "Interactive frontend dashboard for monitoring data and system metrics in real-time.",
-      "link": "https://systemmo.netlify.app/"
+      "full_description": "A high-performance dashboard for real-time system monitoring. It visualizes complex data sets using interactive charts and graphs, allowing users to quickly identify trends and anomalies. Optimized for speed and responsiveness.",
+      "link": "https://systemmo.netlify.app/",
+      "github": "https://github.com/m-o-h-a-n-d/systemmo",
+      "technologies": ["React", "Chart.js", "Material UI", "Firebase"],
+      "team_members": [1]
     },
     {
       "id": 5,
       "title": "Parking System",
       "category": "IOT",
       "image": "/images/iot.webp",
+      "images": ["/images/iot.webp", "/images/parkingmo.webp"],
       "description": "IoT-enabled parking system with smart sensors and automated parking management.",
-      "link": "https://www.linkedin.com/posts/mohannad-ahmed11_smartparking-iot-laravel-activity-7409986207083810816-7AI-?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAERsl-MBWw7UeYsYyH1p62UEEGwJPivaE7M"
+      "full_description": "This project integrates hardware and software to create a smart parking environment. Using IoT sensors, the system detects vehicle presence and updates occupancy status in real-time. It includes a mobile app for users to find and reserve spots.",
+      "link": "https://www.linkedin.com/posts/mohannad-ahmed11_smartparking-iot-laravel-activity-7409986207083810816-7AI-?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAERsl-MBWw7UeYsYyH1p62UEEGwJPivaE7M",
+      "github": "",
+      "technologies": ["Arduino", "ESP32", "MQTT", "Laravel"],
+      "team_members": [1]
     },
     {
       "id": 6,
       "title": "Meterika",
       "category": "Backend Development",
       "image": "/images/meterika.webp",
+      "images": ["/images/meterika.webp"],
       "description": "Analytics platform with backend support for data processing, reporting, and visualization.",
-      "link": "http://meterika.com/"
+      "full_description": "Meterika is a powerful analytics engine that processes large volumes of data to provide actionable insights. It features custom report generation, data export options, and a robust API for third-party integrations.",
+      "link": "http://meterika.com/",
+      "github": "",
+      "technologies": ["Python", "Django", "PostgreSQL", "Celery"],
+      "team_members": [1]
     },
     {
       "id": 7,
       "title": "Education Platform",
       "category": "Frontend Development",
       "image": "/images/education.webp",
+      "images": ["/images/education.webp", "/images/education2.webp"],
       "description": "Interactive learning platform with responsive design and rich educational content.",
-      "link": "https://mahmoudelnegm.vercel.app/"
+      "full_description": "A modern e-learning platform designed to provide an engaging experience for students and teachers. It supports video lessons, interactive quizzes, and progress tracking. The platform is fully responsive and optimized for mobile learning.",
+      "link": "https://mahmoudelnegm.vercel.app/",
+      "github": "https://github.com/m-o-h-a-n-d/edu-platform",
+      "technologies": ["Next.js", "TypeScript", "Tailwind CSS", "Prisma"],
+      "team_members": [1]
     },
     {
       "id": 8,
       "title": "Education Platform",
       "category": "Frontend Development",
       "image": "/images/education2.webp",
+      "images": ["/images/education2.webp", "/images/education.webp"],
       "description": "Interactive learning platform with responsive design and rich educational content.",
-      "link": "https://communicationproject.vercel.app/"
+      "full_description": "Another iteration of our education platform, focusing on community-driven learning. It includes features like discussion forums, peer review systems, and collaborative project spaces.",
+      "link": "https://communicationproject.vercel.app/",
+      "github": "https://github.com/m-o-h-a-n-d/edu-platform-v2",
+      "technologies": ["Vue.js", "Vuex", "Sass", "Node.js"],
+      "team_members": [1]
     }
   ],
   "categories": ["all", "Backend Development", "Frontend Development", "IOT"]

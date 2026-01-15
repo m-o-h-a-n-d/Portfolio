@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { usePortfolio } from '../../context/DataContext';
 import { Eye, ChevronDown } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 const PortfolioSection = () => {
   const portfolio = usePortfolio();
@@ -80,7 +81,7 @@ const PortfolioSection = () => {
               className="animate-scale-up"
               style={{ animationDelay: `${project.id * 50}ms` }}
             >
-              <a href={project.link} className="block">
+              <Link to={`/project/${project.id}`} className="block">
                 {/* Project Image */}
                 <figure className="project-card mb-4 rounded-2xl overflow-hidden h-[200px]">
                   <img 
@@ -103,7 +104,7 @@ const PortfolioSection = () => {
                 <p className="text-light-gray/70 text-sm font-light ml-[10px] capitalize">
                   {project.category}
                 </p>
-              </a>
+              </Link>
             </li>
           ))}
         </ul>
