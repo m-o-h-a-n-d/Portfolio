@@ -29,7 +29,8 @@ const ProjectEditor = () => {
     github: '',
     technologies: [],
     team_members: [],
-    images: []
+    images: [],
+    status: 1
   });
 
   const [imageFiles, setImageFiles] = useState([]);
@@ -50,7 +51,8 @@ const ProjectEditor = () => {
           github: project.github || '',
           technologies: project.technologies || [],
           team_members: project.team_members || [],
-          images: project.images || [project.image]
+          images: project.images || [project.image],
+          status: project.status !== undefined ? project.status : 1
         });
       }
     }
@@ -304,6 +306,38 @@ const ProjectEditor = () => {
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
         {/* Left Column: Images + Links (4 cols) */}
         <div className="lg:col-span-4 space-y-6">
+          {/* Images Section - Drag & Drop */}
+          {/* Project Status Toggle */}
+          <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Tag className="w-5 h-5 text-primary" />
+                <h3 className="h3 text-white-2">Project Status</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, status: prev.status === 1 ? 0 : 1 }))}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                  formData.status === 1 ? 'bg-primary' : 'bg-onyx border border-border'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    formData.status === 1 ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-sm font-medium ${formData.status === 1 ? 'text-primary' : 'text-vegas-gold'}`}>
+                {formData.status === 1 ? 'Completed' : 'Uncomplete'}
+              </span>
+              <p className="text-xs text-muted-foreground">
+                (This will be shown in project details)
+              </p>
+            </div>
+          </div>
+
           {/* Images Section - Drag & Drop */}
           <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
             <div className="flex items-center gap-2 mb-4">

@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiGet, apiDelete } from '../../api/request';
-import { API_PORTFOLIO_DELETE } from '../../api/endpoints';
-import { Plus, Edit2, Trash2, Search, Eye } from 'lucide-react';
+import { apiGet, apiDelete, apiPut } from '../../api/request';
+import { API_PORTFOLIO_DELETE, API_PORTFOLIO_UPDATE } from '../../api/endpoints';
+import { Plus, Edit2, Trash2, Search, Eye, CheckCircle2, Circle } from 'lucide-react';
 import Swal from '../../lib/swal';
 
 const PortfolioManager = () => {
@@ -44,6 +44,38 @@ const PortfolioManager = () => {
       p.description?.toLowerCase().includes(query)
     );
     setFilteredProjects(filtered);
+  };
+
+  const handleToggleStatus = async (project) => {
+    const newStatus = project.status === 1 ? 0 : 1;
+    try {
+      await apiPut(API_PORTFOLIO_UPDATE(project.id), { ...project, status: newStatus });
+      
+      // Update local state
+      const updatedProjects = portfolio.projects.map(p => 
+        p.id === project.id ? { ...p, status: newStatus } : p
+      );
+      
+      setPortfolio(prev => ({ ...prev, projects: updatedProjects }));
+      setFilteredProjects(prev => prev.map(p => 
+        p.id === project.id ? { ...p, status: newStatus } : p
+      ));
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Status Updated',
+        text: `Project marked as ${newStatus === 1 ? 'Completed' : 'Uncomplete'}`,
+        timer: 1500,
+        showConfirmButton: false,
+      });
+    } catch (error) {
+      console.error('Error updating status:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: 'Failed to update project status',
+      });
+    }
   };
 
   const handleDelete = async (id) => {
@@ -166,12 +198,30 @@ const PortfolioManager = () => {
               <h3 className="text-foreground font-medium mb-1">{project.title}</h3>
               <p className="text-vegas-gold text-sm capitalize mb-2">{project.category}</p>
               
-              {/* Team Members Badge */}
-              {project.team_members && project.team_members.length > 0 && (
-                <div className="flex items-center gap-1 text-xs text-light-gray bg-onyx/50 w-fit px-2 py-1 rounded">
-                  <span>👥 {project.team_members.length} member{project.team_members.length > 1 ? 's' : ''}</span>
-                </div>
-              )}
+              {/* Status Toggle & Team Members */}
+              <div className="flex flex-wrap items-center gap-2 mb-2">
+                <button
+                  onClick={() => handleToggleStatus(project)}
+                  className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${
+                    project.status === 1 
+                      ? 'bg-primary/10 text-primary border border-primary/20' 
+                      : 'bg-vegas-gold/10 text-vegas-gold border border-vegas-gold/20'
+                  }`}
+                >
+                  {project.status === 1 ? (
+                    <CheckCircle2 className="w-3 h-3" />
+                  ) : (
+                    <Circle className="w-3 h-3" />
+                  )}
+                  <span>{project.status === 1 ? 'Completed' : 'Uncomplete'}</span>
+                </button>
+
+                {project.team_members && project.team_members.length > 0 && (
+                  <div className="flex items-center gap-1 text-xs text-light-gray bg-onyx/50 px-2 py-1 rounded border border-border/50">
+                    <span>👥 {project.team_members.length} member{project.team_members.length > 1 ? 's' : ''}</span>
+                  </div>
+                )}
+              </div>
 
               {/* Images Badge */}
               {project.images && project.images.length > 1 && (

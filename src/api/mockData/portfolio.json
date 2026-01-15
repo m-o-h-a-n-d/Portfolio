@@ -12,7 +12,8 @@
       "link": "https://parkingmo.up.railway.app/",
       "github": "https://github.com/m-o-h-a-n-d/parking-system",
       "technologies": ["Laravel", "MySQL", "Redis", "Docker"],
-      "team_members": [1]
+      "team_members": [1],
+      "status": 1
     },
     {
       "id": 2,
@@ -26,7 +27,8 @@
       "link": "https://newmo.wuaze.com/",
       "github": "",
       "technologies": ["Node.js", "Express", "MongoDB", "Socket.io"],
-      "team_members": [1]
+      "team_members": [1],
+      "status": 1
     },
     {
       "id": 3,
@@ -40,7 +42,8 @@
       "link": "https://egycarepro.netlify.app/",
       "github": "https://github.com/m-o-h-a-n-d/egycare",
       "technologies": ["React", "Tailwind CSS", "Redux", "Framer Motion"],
-      "team_members": [1]
+      "team_members": [1],
+      "status": 1
     },
     {
       "id": 4,
@@ -54,7 +57,8 @@
       "link": "https://systemmo.netlify.app/",
       "github": "https://github.com/m-o-h-a-n-d/systemmo",
       "technologies": ["React", "Chart.js", "Material UI", "Firebase"],
-      "team_members": [1]
+      "team_members": [1],
+      "status": 1
     },
     {
       "id": 5,
@@ -68,7 +72,8 @@
       "link": "https://www.linkedin.com/posts/mohannad-ahmed11_smartparking-iot-laravel-activity-7409986207083810816-7AI-?utm_source=social_share_send&utm_medium=member_desktop_web&rcm=ACoAAERsl-MBWw7UeYsYyH1p62UEEGwJPivaE7M",
       "github": "",
       "technologies": ["Arduino", "ESP32", "MQTT", "Laravel"],
-      "team_members": [1]
+      "team_members": [1],
+      "status": 1
     },
     {
       "id": 6,
@@ -82,7 +87,8 @@
       "link": "http://meterika.com/",
       "github": "",
       "technologies": ["Python", "Django", "PostgreSQL", "Celery"],
-      "team_members": [1]
+      "team_members": [1],
+      "status": 1
     },
     {
       "id": 7,
@@ -96,7 +102,8 @@
       "link": "https://mahmoudelnegm.vercel.app/",
       "github": "https://github.com/m-o-h-a-n-d/edu-platform",
       "technologies": ["Next.js", "TypeScript", "Tailwind CSS", "Prisma"],
-      "team_members": [1]
+      "team_members": [1],
+      "status": 1
     },
     {
       "id": 8,
@@ -110,7 +117,8 @@
       "link": "https://communicationproject.vercel.app/",
       "github": "https://github.com/m-o-h-a-n-d/edu-platform-v2",
       "technologies": ["Vue.js", "Vuex", "Sass", "Node.js"],
-      "team_members": [1]
+      "team_members": [1],
+      "status": 1
     }
   ],
   "categories": ["all", "Backend Development", "Frontend Development", "IOT"]
