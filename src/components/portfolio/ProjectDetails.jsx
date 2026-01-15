@@ -1,8 +1,9 @@
-import { useParams, useNavigate, Link } from 'react-router-dom';
+import { useParams, useNavigate } from 'react-router-dom';
 import { usePortfolio, useTeam } from '../../context/DataContext';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination } from 'swiper/modules';
 import { ExternalLink, Github, ArrowLeft, Share2, Users, Code } from 'lucide-react';
+import { useEffect, useRef } from 'react';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -10,33 +11,56 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 
 const ProjectDetails = () => {
-  const { id } = useParams();
+  const { slug } = useParams();
   const navigate = useNavigate();
   const portfolio = usePortfolio();
   const teamData = useTeam();
+  const teamRef = useRef(null);
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [slug]);
+
+  useEffect(() => {
+    const scrollInterval = setInterval(() => {
+      if (teamRef.current) {
+        const { scrollLeft, scrollWidth, clientWidth } = teamRef.current;
+        const itemWidth = teamRef.current.querySelector('li')?.offsetWidth || 200;
+        const gap = 30;
+        const scrollStep = itemWidth + gap;
+
+        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+          teamRef.current.scrollTo({ left: 0, behavior: 'smooth' });
+        } else {
+          const nextScroll = Math.ceil((scrollLeft + 1) / scrollStep) * scrollStep;
+          teamRef.current.scrollTo({ left: nextScroll, behavior: 'smooth' });
+        }
+      }
+    }, 5000);
+
+    return () => clearInterval(scrollInterval);
+  }, [teamData]);
 
   if (!portfolio) return null;
 
-  const project = portfolio.projects.find(p => p.id === parseInt(id));
+  const project = portfolio.projects.find(p => p.slug === slug || p.id === parseInt(slug));
 
   if (!project) {
     return (
       <div className="text-center py-20">
         <h2 className="text-white-2 text-2xl mb-4">Project not found</h2>
-        <button onClick={() => navigate('/')} className="form-btn w-auto px-6 mx-auto">
+        <a href="/" className="form-btn w-auto px-6 mx-auto inline-flex">
           Back to Portfolio
-        </button>
+        </a>
       </div>
     );
   }
 
-  // Get related projects (same category, excluding current, latest 3)
   const relatedProjects = portfolio.projects
     .filter(p => p.category === project.category && p.id !== project.id)
     .sort((a, b) => b.id - a.id)
     .slice(0, 3);
 
-  // Get team members for this project
   const projectTeam = teamData?.team?.filter(member => 
     project.team_members?.includes(member.id)
   ) || [];
@@ -54,15 +78,15 @@ const ProjectDetails = () => {
   };
 
   return (
-    <article className="animate-fade-in">
+    <article className="animate-fade-in pt-16 md:pt-20">
       <header className="flex justify-between items-center mb-8">
-        <button 
-          onClick={() => navigate('/')} 
+        <a 
+          href="/" 
           className="flex items-center gap-2 text-light-gray hover:text-primary transition-colors"
         >
           <ArrowLeft className="w-5 h-5" />
           <span>Back</span>
-        </button>
+        </a>
         <h2 className="h2 article-title !mb-0">{project.title}</h2>
         <button 
           onClick={handleShare}
@@ -81,7 +105,7 @@ const ProjectDetails = () => {
           navigation
           pagination={{ clickable: true }}
           autoplay={{ delay: 3000, disableOnInteraction: false }}
-          className="project-swiper h-[300px] md:h-[500px]"
+          className="project-swiper h-[250px] sm:h-[350px] md:h-[500px]"
         >
           {(project.images || [project.image]).map((img, index) => (
             <SwiperSlide key={index}>
@@ -96,16 +120,14 @@ const ProjectDetails = () => {
       </section>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-10">
-        {/* Project Info */}
         <div className="lg:col-span-2">
           <section className="mb-8">
             <h3 className="h3 mb-4">About Project</h3>
-            <p className="text-light-gray leading-relaxed font-light">
+            <p className="text-light-gray leading-relaxed font-light text-left">
               {project.full_description || project.description}
             </p>
           </section>
 
-          {/* Technologies */}
           {project.technologies && (
             <section className="mb-8">
               <h3 className="h3 mb-4 flex items-center gap-2">
@@ -125,39 +147,41 @@ const ProjectDetails = () => {
             </section>
           )}
 
-          {/* Team Members */}
+          {/* Team Members Slider - Same as About Section */}
           {projectTeam.length > 0 && (
             <section className="mb-8">
-              <h3 className="h3 mb-4 flex items-center gap-2">
+              <h3 className="h3 mb-5 flex items-center gap-2">
                 <Users className="w-5 h-5 text-primary" />
                 Team Work
               </h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {projectTeam.map((member) => (
-                  <a 
-                    key={member.id}
-                    href={member.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="service-item !p-4 hover:border-primary transition-colors group"
-                  >
-                    <div className="icon-box !w-12 !h-12 !rounded-full overflow-hidden">
-                      <img src={member.logo} alt={member.name} className="w-full h-full object-cover" />
-                    </div>
-                    <div>
-                      <h4 className="h4 !text-sm group-hover:text-primary transition-colors">{member.name}</h4>
-                      <p className="text-xs text-light-gray/70">{member.track}</p>
-                    </div>
-                  </a>
-                ))}
+              <div className="-mx-[15px] px-[15px]">
+                <ul 
+                  ref={teamRef}
+                  className="flex gap-[30px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x snap-mandatory"
+                >
+                  {projectTeam.map((member) => (
+                    <li key={member.id} className="min-w-[75%] md:min-w-[190px] flex-shrink-0 snap-start">
+                      <a href={member.url} target="_blank" rel="noopener noreferrer" className="block group text-center">
+                        <div className="relative w-full h-[150px] md:h-[170px] overflow-hidden bg-onyx mb-3">
+                          <img 
+                            src={member.logo} 
+                            alt={member.name}
+                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 rounded-[14px]"
+                          />
+                        </div>
+                        <h4 className="text-white-1 font-medium text-lg mb-1">{member.name}</h4>
+                        <p className="text-orange-yellow text-sm">{member.track}</p>
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </section>
           )}
         </div>
 
-        {/* Sidebar Actions */}
         <div className="lg:col-span-1">
-          <div className="sticky top-8 space-y-4">
+          <div className="sticky top-24 space-y-4">
             {project.link && (
               <a 
                 href={project.link} 
@@ -184,11 +208,11 @@ const ProjectDetails = () => {
             <div className="bg-card border border-border rounded-2xl p-6 mt-8">
               <h4 className="h4 mb-4 text-sm uppercase tracking-wider text-light-gray/50">Project Details</h4>
               <ul className="space-y-4">
-                <li className="flex justify-between text-sm">
+                <li className="flex justify-between items-center text-sm">
                   <span className="text-light-gray/60">Category</span>
-                  <span className="text-white-2">{project.category}</span>
+                  <span className="text-white-2 text-right">{project.category}</span>
                 </li>
-                <li className="flex justify-between text-sm">
+                <li className="flex justify-between items-center text-sm">
                   <span className="text-light-gray/60">Status</span>
                   <span className="text-primary">Completed</span>
                 </li>
@@ -198,14 +222,13 @@ const ProjectDetails = () => {
         </div>
       </div>
 
-      {/* Related Projects */}
       {relatedProjects.length > 0 && (
         <section className="mt-16 pt-16 border-t border-border">
           <h3 className="h3 mb-8">Related Projects</h3>
           <ul className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {relatedProjects.map((p) => (
               <li key={p.id} className="animate-scale-up">
-                <Link to={`/project/${p.id}`} className="block group">
+                <a href={`/project/${p.slug || p.id}`} className="block group">
                   <figure className="project-card mb-4 rounded-2xl overflow-hidden h-[180px]">
                     <img 
                       src={p.image} 
@@ -224,7 +247,7 @@ const ProjectDetails = () => {
                   <p className="text-light-gray/70 text-sm font-light ml-2 capitalize">
                     {p.category}
                   </p>
-                </Link>
+                </a>
               </li>
             ))}
           </ul>

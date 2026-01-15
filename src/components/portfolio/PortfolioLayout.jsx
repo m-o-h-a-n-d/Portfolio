@@ -20,8 +20,6 @@ const PortfolioLayout = () => {
   useEffect(() => {
     if (location.pathname.startsWith('/project/')) {
       setActivePage('project-details');
-    } else if (location.pathname === '/') {
-      // Keep current activePage or default to about
     }
   }, [location]);
 

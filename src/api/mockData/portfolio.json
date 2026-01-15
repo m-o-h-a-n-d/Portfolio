@@ -2,6 +2,7 @@
   "projects": [
     {
       "id": 1,
+      "slug": "parking-system",
       "title": "Parking System",
       "category": "Backend Development",
       "image": "/images/parkingmo.webp",
@@ -15,6 +16,7 @@
     },
     {
       "id": 2,
+      "slug": "newmo",
       "title": "NewMO",
       "category": "Backend Development",
       "image": "/images/newmo.webp",
@@ -28,6 +30,7 @@
     },
     {
       "id": 3,
+      "slug": "egycare",
       "title": "Egycare",
       "category": "Frontend Development",
       "image": "/images/egycare.webp",
@@ -41,6 +44,7 @@
     },
     {
       "id": 4,
+      "slug": "systemmo",
       "title": "SystemMO",
       "category": "Frontend Development",
       "image": "/images/systemmo.webp",
@@ -54,6 +58,7 @@
     },
     {
       "id": 5,
+      "slug": "smart-parking-iot",
       "title": "Parking System",
       "category": "IOT",
       "image": "/images/iot.webp",
@@ -67,6 +72,7 @@
     },
     {
       "id": 6,
+      "slug": "meterika",
       "title": "Meterika",
       "category": "Backend Development",
       "image": "/images/meterika.webp",
@@ -80,6 +86,7 @@
     },
     {
       "id": 7,
+      "slug": "education-platform",
       "title": "Education Platform",
       "category": "Frontend Development",
       "image": "/images/education.webp",
@@ -93,6 +100,7 @@
     },
     {
       "id": 8,
+      "slug": "education-platform-v2",
       "title": "Education Platform",
       "category": "Frontend Development",
       "image": "/images/education2.webp",

@@ -42,7 +42,7 @@ const App = () => (
             <Routes>
             {/* Public Portfolio */}
             <Route path="/" element={<Index />} />
-            <Route path="/project/:id" element={<Index />} />
+            <Route path="/project/:slug" element={<Index />} />
             
 	            {/* Admin Auth */}
 	            <Route path="/admin/login" element={<LoginPage />} />
