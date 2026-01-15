@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { apiGet, apiPost } from '../../api/request';
 import { 
   ArrowLeft, Plus, X, Save, Upload, Image, Search, ChevronDown, 
-  Trash2, Eye, EyeOff, Code, Link as LinkIcon, Users, Tag
+  Trash2, Code, Link as LinkIcon, Users, Tag, GripVertical
 } from 'lucide-react';
 import Swal from '../../lib/swal';
 
@@ -19,13 +19,12 @@ const ProjectEditor = () => {
   const [teamSearchOpen, setTeamSearchOpen] = useState(false);
   const [teamSearchQuery, setTeamSearchQuery] = useState('');
   const [techInput, setTechInput] = useState('');
-  const [previewMode, setPreviewMode] = useState(false);
+  const [dragActive, setDragActive] = useState(false);
 
   const [formData, setFormData] = useState({
     title: '',
     category: 'Backend Development',
     description: '',
-    full_description: '',
     link: '',
     github: '',
     technologies: [],
@@ -46,8 +45,7 @@ const ProjectEditor = () => {
         setFormData({
           title: project.title,
           category: project.category,
-          description: project.description,
-          full_description: project.full_description || project.description,
+          description: project.description || project.full_description,
           link: project.link || '',
           github: project.github || '',
           technologies: project.technologies || [],
@@ -84,8 +82,36 @@ const ProjectEditor = () => {
     setFormData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Drag and Drop Handlers
+  const handleDrag = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (e.type === "dragenter" || e.type === "dragover") {
+      setDragActive(true);
+    } else if (e.type === "dragleave") {
+      setDragActive(false);
+    }
+  };
+
+  const handleDrop = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setDragActive(false);
+
+    const files = Array.from(e.dataTransfer.files);
+    const imageFiles = files.filter(file => file.type.startsWith('image/'));
+    
+    if (imageFiles.length > 0) {
+      processImages(imageFiles);
+    }
+  };
+
   const handleImageUpload = (e) => {
     const files = Array.from(e.target.files || []);
+    processImages(files);
+  };
+
+  const processImages = (files) => {
     const newFiles = [...imageFiles, ...files];
     setImageFiles(newFiles);
 
@@ -113,6 +139,16 @@ const ProjectEditor = () => {
       images: prev.images.filter((_, i) => i !== index)
     }));
     setImageFiles(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const moveImage = (index, direction) => {
+    const newImages = [...formData.images];
+    if (direction === 'up' && index > 0) {
+      [newImages[index], newImages[index - 1]] = [newImages[index - 1], newImages[index]];
+    } else if (direction === 'down' && index < newImages.length - 1) {
+      [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
+    }
+    setFormData(prev => ({ ...prev, images: newImages }));
   };
 
   const addTechnology = () => {
@@ -188,6 +224,7 @@ const ProjectEditor = () => {
       setSaving(true);
       const projectData = {
         ...formData,
+        full_description: formData.description,
         id: isEditMode ? parseInt(id) : Date.now(),
         slug: formData.title.toLowerCase().replace(/\s+/g, '-'),
         image: formData.images[0]
@@ -241,9 +278,9 @@ const ProjectEditor = () => {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-onyx via-black to-onyx">
-      {/* Header */}
-      <div className="sticky top-0 z-40 bg-onyx/95 backdrop-blur-sm border-b border-border">
+    <div className="min-h-screen bg-gradient-to-br from-onyx via-black to-onyx flex flex-col">
+      {/* Fixed Header with Actions */}
+      <div className="sticky top-0 z-50 bg-onyx/95 backdrop-blur-sm border-b border-border">
         <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
           <div className="flex items-center gap-4">
             <button
@@ -253,193 +290,142 @@ const ProjectEditor = () => {
               <ArrowLeft className="w-5 h-5 text-primary" />
             </button>
             <div>
-              <h1 className="h2 text-white-2 !mb-0">
+              <h1 className="h3 text-white-2 !mb-0">
                 {isEditMode ? 'Edit Project' : 'Create New Project'}
               </h1>
-              <p className="text-muted-foreground text-sm mt-1">
-                {isEditMode ? 'Update your project details' : 'Add a new project to your portfolio'}
-              </p>
             </div>
           </div>
-          <button
-            onClick={() => setPreviewMode(!previewMode)}
-            className="flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-colors"
-          >
-            {previewMode ? (
-              <>
-                <EyeOff className="w-4 h-4" />
-                Edit
-              </>
-            ) : (
-              <>
-                <Eye className="w-4 h-4" />
-                Preview
-              </>
-            )}
-          </button>
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={() => navigate('/admin/portfolio')}
+              className="px-6 py-2 rounded-lg bg-onyx border border-border text-light-gray hover:bg-onyx/80 transition-colors font-medium"
+            >
+              Cancel
+            </button>
+            <button
+              onClick={handleSubmit}
+              disabled={saving}
+              className="px-6 py-2 form-btn !w-auto flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+            >
+              {saving ? (
+                <>
+                  <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
+                  Saving...
+                </>
+              ) : (
+                <>
+                  <Save className="w-5 h-5" />
+                  {isEditMode ? 'Update' : 'Create'}
+                </>
+              )}
+            </button>
+          </div>
         </div>
       </div>
 
-      {/* Main Content */}
-      <div className="max-w-7xl mx-auto px-6 py-8">
-        {previewMode ? (
-          // Preview Mode
-          <div className="space-y-8">
-            {/* Images Preview */}
-            {formData.images.length > 0 && (
-              <div className="rounded-2xl overflow-hidden border border-border">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-onyx">
+      {/* Main Content - Split Layout */}
+      <div className="flex-1 overflow-hidden">
+        <div className="grid grid-cols-1 lg:grid-cols-2 h-full max-w-7xl mx-auto w-full">
+          {/* Left Side - Images */}
+          <div className="border-r border-border overflow-y-auto p-6 space-y-6">
+            <div>
+              <h2 className="h3 mb-4 flex items-center gap-2">
+                <Image className="w-5 h-5 text-primary" />
+                Project Images
+              </h2>
+
+              {/* Drag and Drop Area */}
+              <div
+                onDragEnter={handleDrag}
+                onDragLeave={handleDrag}
+                onDragOver={handleDrag}
+                onDrop={handleDrop}
+                className={`border-2 border-dashed rounded-xl p-8 text-center transition-all ${
+                  dragActive
+                    ? 'border-primary bg-primary/10'
+                    : 'border-border hover:border-primary/50'
+                }`}
+              >
+                {formData.images.length > 0 ? (
+                  <div className="space-y-3">
+                    <p className="text-light-gray text-sm">Drag to reorder or drop new images</p>
+                    <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-colors cursor-pointer">
+                      <Plus className="w-4 h-4" />
+                      <span>Add More</span>
+                      <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
+                    </label>
+                  </div>
+                ) : (
+                  <label className="cursor-pointer">
+                    <Upload className="w-12 h-12 mx-auto text-muted-foreground mb-3" />
+                    <p className="text-light-gray mb-2">Drop images here or click to upload</p>
+                    <p className="text-muted-foreground text-sm">PNG, JPG, WebP up to 10MB</p>
+                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
+                  </label>
+                )}
+              </div>
+
+              {/* Images List */}
+              {formData.images.length > 0 && (
+                <div className="space-y-3 mt-6">
                   {formData.images.map((img, index) => (
-                    <div key={index} className="relative rounded-lg overflow-hidden h-48">
-                      <img src={img} alt={`Preview ${index + 1}`} className="w-full h-full object-cover" />
-                      {index === 0 && (
-                        <div className="absolute top-2 left-2 bg-primary text-black text-xs px-2 py-1 rounded">
-                          Main Image
-                        </div>
-                      )}
+                    <div
+                      key={index}
+                      className="flex items-center gap-3 p-3 bg-onyx border border-border rounded-lg hover:border-primary/50 transition-colors group"
+                    >
+                      <GripVertical className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                      <img src={img} alt={`Preview ${index + 1}`} className="w-12 h-12 object-cover rounded" />
+                      <div className="flex-1">
+                        <p className="text-sm text-light-gray">Image {index + 1}</p>
+                        {index === 0 && <p className="text-xs text-primary">Main Image</p>}
+                      </div>
+                      <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                        {index > 0 && (
+                          <button
+                            type="button"
+                            onClick={() => moveImage(index, 'up')}
+                            className="p-1 hover:bg-primary/20 rounded text-muted-foreground hover:text-primary transition-colors"
+                            title="Move up"
+                          >
+                            ↑
+                          </button>
+                        )}
+                        {index < formData.images.length - 1 && (
+                          <button
+                            type="button"
+                            onClick={() => moveImage(index, 'down')}
+                            className="p-1 hover:bg-primary/20 rounded text-muted-foreground hover:text-primary transition-colors"
+                            title="Move down"
+                          >
+                            ↓
+                          </button>
+                        )}
+                        <button
+                          type="button"
+                          onClick={() => removeImage(index)}
+                          className="p-1 hover:bg-destructive/20 rounded text-muted-foreground hover:text-destructive transition-colors"
+                        >
+                          <X className="w-4 h-4" />
+                        </button>
+                      </div>
                     </div>
                   ))}
                 </div>
-              </div>
-            )}
-
-            {/* Preview Content */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 space-y-6">
-                <div>
-                  <h2 className="h2 text-white-2 mb-2">{formData.title}</h2>
-                  <p className="text-vegas-gold text-sm capitalize">{formData.category}</p>
-                </div>
-
-                <div>
-                  <h3 className="h3 mb-3">Description</h3>
-                  <p className="text-light-gray leading-relaxed">{formData.description}</p>
-                </div>
-
-                <div>
-                  <h3 className="h3 mb-3">Full Description</h3>
-                  <p className="text-light-gray leading-relaxed">{formData.full_description}</p>
-                </div>
-
-                {formData.technologies.length > 0 && (
-                  <div>
-                    <h3 className="h3 mb-3 flex items-center gap-2">
-                      <Code className="w-5 h-5 text-primary" />
-                      Technologies
-                    </h3>
-                    <div className="flex flex-wrap gap-2">
-                      {formData.technologies.map((tech, index) => (
-                        <span key={index} className="px-3 py-1 bg-onyx border border-border rounded-full text-xs text-light-gray">
-                          {tech}
-                        </span>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {formData.team_members.length > 0 && (
-                  <div>
-                    <h3 className="h3 mb-3 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-primary" />
-                      Team Members
-                    </h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      {formData.team_members.map((memberId) => (
-                        <div key={memberId} className="p-4 bg-onyx border border-border rounded-lg">
-                          <p className="text-white-2 font-medium">{getTeamMemberName(memberId)}</p>
-                          <p className="text-orange-yellow text-sm">{getTeamMemberTrack(memberId)}</p>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
-
-              <div className="space-y-4">
-                {formData.link && (
-                  <a
-                    href={formData.link}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="form-btn flex items-center justify-center gap-2 w-full"
-                  >
-                    <LinkIcon className="w-5 h-5" />
-                    Live Project
-                  </a>
-                )}
-                {formData.github && (
-                  <a
-                    href={formData.github}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="form-btn !bg-transparent border border-border hover:!bg-onyx flex items-center justify-center gap-2 w-full"
-                  >
-                    <Code className="w-5 h-5" />
-                    View Code
-                  </a>
-                )}
-              </div>
-            </div>
-          </div>
-        ) : (
-          // Edit Mode
-          <form onSubmit={handleSubmit} className="space-y-8">
-            {/* Images Section */}
-            <div className="bg-card border border-border rounded-2xl p-8">
-              <h3 className="h3 mb-6 flex items-center gap-2">
-                <Image className="w-5 h-5 text-primary" />
-                Project Images
-              </h3>
-
-              {formData.images.length > 0 ? (
-                <div className="space-y-4">
-                  <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-4">
-                    {formData.images.map((img, index) => (
-                      <div key={index} className="relative group">
-                        <img src={img} alt={`Preview ${index + 1}`} className="w-full h-24 object-cover rounded-lg" />
-                        <div className="absolute inset-0 bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg flex items-center justify-center gap-2">
-                          <button
-                            type="button"
-                            onClick={() => removeImage(index)}
-                            className="p-2 bg-destructive rounded-lg text-white-1 hover:bg-destructive/80"
-                          >
-                            <Trash2 className="w-4 h-4" />
-                          </button>
-                        </div>
-                        {index === 0 && (
-                          <div className="absolute bottom-1 left-1 bg-primary text-black text-xs px-2 py-0.5 rounded font-medium">
-                            Main
-                          </div>
-                        )}
-                      </div>
-                    ))}
-                  </div>
-
-                  <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-primary/20 text-primary hover:bg-primary/30 transition-colors cursor-pointer">
-                    <Plus className="w-4 h-4" />
-                    <span>Add More Images</span>
-                    <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
-                  </label>
-                </div>
-              ) : (
-                <label className="border-2 border-dashed border-border rounded-xl p-12 text-center cursor-pointer hover:border-primary/50 transition-colors">
-                  <Image className="w-16 h-16 mx-auto text-muted-foreground mb-4" />
-                  <p className="text-light-gray mb-2">Click to upload project images</p>
-                  <p className="text-muted-foreground text-sm">or drag and drop</p>
-                  <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
-                </label>
               )}
             </div>
+          </div>
 
-            {/* Basic Info Section */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div className="bg-card border border-border rounded-2xl p-8">
-                <h3 className="h3 mb-6 flex items-center gap-2">
-                  <Tag className="w-5 h-5 text-primary" />
+          {/* Right Side - Form */}
+          <div className="overflow-y-auto p-6 space-y-6">
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Basic Info */}
+              <div>
+                <h3 className="h4 mb-4 flex items-center gap-2">
+                  <Tag className="w-4 h-4 text-primary" />
                   Basic Information
                 </h3>
-
-                <div className="space-y-4">
+                <div className="space-y-3">
                   <div>
                     <label className="text-light-gray/70 text-xs uppercase mb-2 block font-medium">Title *</label>
                     <input
@@ -452,7 +438,6 @@ const ProjectEditor = () => {
                       required
                     />
                   </div>
-
                   <div>
                     <label className="text-light-gray/70 text-xs uppercase mb-2 block font-medium">Category</label>
                     <select
@@ -469,13 +454,25 @@ const ProjectEditor = () => {
                 </div>
               </div>
 
-              <div className="bg-card border border-border rounded-2xl p-8">
-                <h3 className="h3 mb-6 flex items-center gap-2">
-                  <LinkIcon className="w-5 h-5 text-primary" />
-                  Project Links
-                </h3>
+              {/* Description */}
+              <div>
+                <h3 className="h4 mb-4">Description</h3>
+                <textarea
+                  name="description"
+                  value={formData.description}
+                  onChange={handleInputChange}
+                  className="form-input min-h-[120px] resize-y"
+                  placeholder="Describe your project in detail..."
+                />
+              </div>
 
-                <div className="space-y-4">
+              {/* Links */}
+              <div>
+                <h3 className="h4 mb-4 flex items-center gap-2">
+                  <LinkIcon className="w-4 h-4 text-primary" />
+                  Links
+                </h3>
+                <div className="space-y-3">
                   <div>
                     <label className="text-light-gray/70 text-xs uppercase mb-2 block font-medium">Live Project</label>
                     <input
@@ -487,9 +484,8 @@ const ProjectEditor = () => {
                       placeholder="https://..."
                     />
                   </div>
-
                   <div>
-                    <label className="text-light-gray/70 text-xs uppercase mb-2 block font-medium">GitHub Repository</label>
+                    <label className="text-light-gray/70 text-xs uppercase mb-2 block font-medium">GitHub</label>
                     <input
                       type="url"
                       name="github"
@@ -501,69 +497,36 @@ const ProjectEditor = () => {
                   </div>
                 </div>
               </div>
-            </div>
 
-            {/* Descriptions Section */}
-            <div className="bg-card border border-border rounded-2xl p-8">
-              <h3 className="h3 mb-6">Descriptions</h3>
-
-              <div className="space-y-4">
-                <div>
-                  <label className="text-light-gray/70 text-xs uppercase mb-2 block font-medium">Short Description</label>
-                  <textarea
-                    name="description"
-                    value={formData.description}
-                    onChange={handleInputChange}
-                    className="form-input min-h-[100px] resize-y"
-                    placeholder="Brief description of the project"
-                  />
-                </div>
-
-                <div>
-                  <label className="text-light-gray/70 text-xs uppercase mb-2 block font-medium">Full Description</label>
-                  <textarea
-                    name="full_description"
-                    value={formData.full_description}
-                    onChange={handleInputChange}
-                    className="form-input min-h-[150px] resize-y"
-                    placeholder="Detailed description of the project"
-                  />
-                </div>
-              </div>
-            </div>
-
-            {/* Technologies Section */}
-            <div className="bg-card border border-border rounded-2xl p-8">
-              <h3 className="h3 mb-6 flex items-center gap-2">
-                <Code className="w-5 h-5 text-primary" />
-                Technologies Used
-              </h3>
-
-              <div className="space-y-4">
-                <div className="flex gap-2">
+              {/* Technologies */}
+              <div>
+                <h3 className="h4 mb-4 flex items-center gap-2">
+                  <Code className="w-4 h-4 text-primary" />
+                  Technologies
+                </h3>
+                <div className="flex gap-2 mb-3">
                   <input
                     type="text"
                     value={techInput}
                     onChange={(e) => setTechInput(e.target.value)}
                     onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTechnology())}
                     className="form-input flex-1"
-                    placeholder="Enter technology name"
+                    placeholder="Add technology..."
                   />
                   <button
                     type="button"
                     onClick={addTechnology}
-                    className="form-btn !w-auto !px-6"
+                    className="form-btn !w-auto !px-4"
                   >
                     <Plus className="w-4 h-4" />
                   </button>
                 </div>
-
                 {formData.technologies.length > 0 && (
                   <div className="flex flex-wrap gap-2">
                     {formData.technologies.map((tech, index) => (
                       <span
                         key={index}
-                        className="px-3 py-1.5 bg-onyx border border-border rounded-full text-sm text-light-gray flex items-center gap-2 hover:border-primary transition-colors"
+                        className="px-3 py-1 bg-onyx border border-border rounded-full text-xs text-light-gray flex items-center gap-2 hover:border-primary transition-colors"
                       >
                         {tech}
                         <button
@@ -578,110 +541,82 @@ const ProjectEditor = () => {
                   </div>
                 )}
               </div>
-            </div>
 
-            {/* Team Members Section */}
-            <div className="bg-card border border-border rounded-2xl p-8">
-              <h3 className="h3 mb-6 flex items-center gap-2">
-                <Users className="w-5 h-5 text-primary" />
-                Team Members
-              </h3>
+              {/* Team Members */}
+              <div>
+                <h3 className="h4 mb-4 flex items-center gap-2">
+                  <Users className="w-4 h-4 text-primary" />
+                  Team Members
+                </h3>
 
-              {formData.team_members.length > 0 && (
-                <div className="mb-6 flex flex-wrap gap-2">
-                  {formData.team_members.map((memberId) => (
-                    <span
-                      key={memberId}
-                      className="px-3 py-1.5 bg-primary/20 border border-primary rounded-full text-sm text-primary flex items-center gap-2"
-                    >
-                      {getTeamMemberName(memberId)}
-                      <button
-                        type="button"
-                        onClick={() => removeTeamMember(memberId)}
-                        className="hover:text-destructive"
+                {formData.team_members.length > 0 && (
+                  <div className="mb-3 flex flex-wrap gap-2">
+                    {formData.team_members.map((memberId) => (
+                      <span
+                        key={memberId}
+                        className="px-3 py-1 bg-primary/20 border border-primary rounded-full text-xs text-primary flex items-center gap-2"
                       >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              <div className="relative">
-                <button
-                  type="button"
-                  onClick={() => setTeamSearchOpen(!teamSearchOpen)}
-                  className="form-input flex items-center justify-between w-full"
-                >
-                  <span className="text-muted-foreground">
-                    {filteredTeamMembers.length > 0 ? 'Search and add team members...' : 'No more members available'}
-                  </span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${teamSearchOpen ? 'rotate-180' : ''}`} />
-                </button>
-
-                {teamSearchOpen && (
-                  <div className="absolute top-full left-0 right-0 mt-2 bg-onyx border border-border rounded-lg z-20 shadow-xl">
-                    <input
-                      type="text"
-                      placeholder="Search team member..."
-                      value={teamSearchQuery}
-                      onChange={(e) => setTeamSearchQuery(e.target.value)}
-                      className="form-input !border-0 !rounded-t-lg !rounded-b-none !mb-0"
-                      autoFocus
-                    />
-                    <div className="max-h-64 overflow-y-auto">
-                      {filteredTeamMembers.length > 0 ? (
-                        filteredTeamMembers.map((member) => (
-                          <button
-                            key={member.id}
-                            type="button"
-                            onClick={() => addTeamMember(member.id)}
-                            className="w-full text-left px-4 py-3 hover:bg-primary/20 transition-colors border-b border-border last:border-b-0 group"
-                          >
-                            <div className="font-medium text-white-2 group-hover:text-primary">{member.name}</div>
-                            <div className="text-xs text-light-gray/60">{member.track}</div>
-                          </button>
-                        ))
-                      ) : (
-                        <div className="px-4 py-6 text-center text-sm text-muted-foreground">
-                          No team members found
-                        </div>
-                      )}
-                    </div>
+                        {getTeamMemberName(memberId)}
+                        <button
+                          type="button"
+                          onClick={() => removeTeamMember(memberId)}
+                          className="hover:text-destructive"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </span>
+                    ))}
                   </div>
                 )}
-              </div>
-            </div>
 
-            {/* Action Buttons */}
-            <div className="flex gap-4 sticky bottom-0 bg-gradient-to-t from-onyx via-onyx to-transparent pt-8 pb-4">
-              <button
-                type="button"
-                onClick={() => navigate('/admin/portfolio')}
-                className="flex-1 px-6 py-3 rounded-xl bg-onyx border border-border text-light-gray hover:bg-onyx/80 transition-colors font-medium"
-              >
-                Cancel
-              </button>
-              <button
-                type="submit"
-                disabled={saving}
-                className="flex-1 form-btn !w-auto flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
-              >
-                {saving ? (
-                  <>
-                    <div className="w-4 h-4 border-2 border-primary border-t-transparent rounded-full animate-spin" />
-                    Saving...
-                  </>
-                ) : (
-                  <>
-                    <Save className="w-5 h-5" />
-                    {isEditMode ? 'Update Project' : 'Create Project'}
-                  </>
-                )}
-              </button>
-            </div>
-          </form>
-        )}
+                <div className="relative">
+                  <button
+                    type="button"
+                    onClick={() => setTeamSearchOpen(!teamSearchOpen)}
+                    className="form-input flex items-center justify-between w-full"
+                  >
+                    <span className="text-muted-foreground text-sm">
+                      {filteredTeamMembers.length > 0 ? 'Add team members...' : 'No more members'}
+                    </span>
+                    <ChevronDown className={`w-4 h-4 transition-transform ${teamSearchOpen ? 'rotate-180' : ''}`} />
+                  </button>
+
+                  {teamSearchOpen && (
+                    <div className="absolute top-full left-0 right-0 mt-2 bg-onyx border border-border rounded-lg z-20 shadow-xl">
+                      <input
+                        type="text"
+                        placeholder="Search..."
+                        value={teamSearchQuery}
+                        onChange={(e) => setTeamSearchQuery(e.target.value)}
+                        className="form-input !border-0 !rounded-t-lg !rounded-b-none !mb-0"
+                        autoFocus
+                      />
+                      <div className="max-h-48 overflow-y-auto">
+                        {filteredTeamMembers.length > 0 ? (
+                          filteredTeamMembers.map((member) => (
+                            <button
+                              key={member.id}
+                              type="button"
+                              onClick={() => addTeamMember(member.id)}
+                              className="w-full text-left px-4 py-2 hover:bg-primary/20 transition-colors border-b border-border last:border-b-0"
+                            >
+                              <div className="text-sm font-medium text-white-2">{member.name}</div>
+                              <div className="text-xs text-light-gray/60">{member.track}</div>
+                            </button>
+                          ))
+                        ) : (
+                          <div className="px-4 py-3 text-center text-xs text-muted-foreground">
+                            No members found
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
     </div>
   );
