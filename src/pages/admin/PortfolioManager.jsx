@@ -46,37 +46,6 @@ const PortfolioManager = () => {
     setFilteredProjects(filtered);
   };
 
-  const handleToggleStatus = async (project) => {
-    const newStatus = project.status === 1 ? 0 : 1;
-    try {
-      await apiPut(API_PORTFOLIO_UPDATE(project.id), { ...project, status: newStatus });
-      
-      // Update local state
-      const updatedProjects = portfolio.projects.map(p => 
-        p.id === project.id ? { ...p, status: newStatus } : p
-      );
-      
-      setPortfolio(prev => ({ ...prev, projects: updatedProjects }));
-      setFilteredProjects(prev => prev.map(p => 
-        p.id === project.id ? { ...p, status: newStatus } : p
-      ));
-
-      Swal.fire({
-        icon: 'success',
-        title: 'Status Updated',
-        text: `Project marked as ${newStatus === 1 ? 'Completed' : 'Uncomplete'}`,
-        timer: 1500,
-        showConfirmButton: false,
-      });
-    } catch (error) {
-      console.error('Error updating status:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Failed to update project status',
-      });
-    }
-  };
 
   const handleDelete = async (id) => {
     const result = await Swal.fire({
@@ -198,38 +167,11 @@ const PortfolioManager = () => {
               <h3 className="text-foreground font-medium mb-1">{project.title}</h3>
               <p className="text-vegas-gold text-sm capitalize mb-2">{project.category}</p>
               
-              {/* Status Toggle */}
-              <div className="mb-3">
-                <button
-                  onClick={() => handleToggleStatus(project)}
-                  className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${
-                    project.status === 1 
-                      ? 'bg-primary/10 text-primary border border-primary/20' 
-                      : 'bg-vegas-gold/10 text-vegas-gold border border-vegas-gold/20'
-                  }`}
-                >
-                  {project.status === 1 ? (
-                    <CheckCircle2 className="w-3 h-3" />
-                  ) : (
-                    <Circle className="w-3 h-3" />
-                  )}
-                  <span>{project.status === 1 ? 'Completed' : 'Uncomplete'}</span>
-                </button>
-              </div>
+            
 
-              {/* Team Members Badge */}
-              {project.team_members && project.team_members.length > 0 && (
-                <div className="flex items-center gap-1 text-xs text-light-gray bg-onyx/50 w-fit px-2 py-1 rounded">
-                  <span>👥 {project.team_members.length} member{project.team_members.length > 1 ? 's' : ''}</span>
-                </div>
-              )}
+           
 
-              {/* Images Badge */}
-              {project.images && project.images.length > 1 && (
-                <div className="flex items-center gap-1 text-xs text-light-gray bg-onyx/50 w-fit px-2 py-1 rounded mt-1">
-                  <span>🖼️ {project.images.length} images</span>
-                </div>
-              )}
+             
             </div>
           </div>
         ))}
