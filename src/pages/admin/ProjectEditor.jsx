@@ -194,7 +194,11 @@ const ProjectEditor = () => {
     }));
   };
 
-  const addTeamMember = (memberId) => {
+  const addTeamMember = (e, memberId) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     if (!formData.team_members.includes(memberId)) {
       setFormData(prev => ({
         ...prev,
@@ -478,10 +482,14 @@ const ProjectEditor = () => {
                       setTeamSearchQuery(e.target.value);
                       setTeamSearchOpen(true);
                     }}
-                    onFocus={() => setTeamSearchOpen(true)}
+                    onFocus={(e) => {
+                      e.preventDefault();
+                      setTeamSearchOpen(true);
+                    }}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
                         e.preventDefault();
+                        e.stopPropagation();
                       }
                     }}
                     placeholder="Search and add members..."
@@ -507,10 +515,7 @@ const ProjectEditor = () => {
                         <button
                           key={member.id}
                           type="button"
-                          onClick={(e) => {
-                            e.preventDefault();
-                            addTeamMember(member.id);
-                          }}
+                          onClick={(e) => addTeamMember(e, member.id)}
                           className="w-full text-left px-4 py-2 hover:bg-primary/10 border-b border-border last:border-0"
                         >
                           <div className="text-xs font-medium text-white-2">{member.name}</div>
