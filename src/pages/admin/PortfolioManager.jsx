@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiGet } from '../../api/request';
+import { apiGet, apiDelete } from '../../api/request';
+import { API_PORTFOLIO_DELETE } from '../../api/endpoints';
 import { Plus, Edit2, Trash2, Search, Eye } from 'lucide-react';
 import Swal from '../../lib/swal';
 
@@ -58,10 +59,12 @@ const PortfolioManager = () => {
     if (!result.isConfirmed) return;
 
     try {
+      await apiDelete(API_PORTFOLIO_DELETE(id));
       setPortfolio(prev => ({
         ...prev,
         projects: prev.projects.filter(p => p.id !== id)
       }));
+      setFilteredProjects(prev => prev.filter(p => p.id !== id));
       Swal.fire({
         icon: 'success',
         title: 'Deleted!',

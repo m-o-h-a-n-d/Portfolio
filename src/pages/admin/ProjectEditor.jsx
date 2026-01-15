@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { apiGet, apiPost } from '../../api/request';
+import { apiGet, apiPost, apiPut } from '../../api/request';
+import { API_PORTFOLIO_CREATE, API_PORTFOLIO_UPDATE } from '../../api/endpoints';
 import { 
   ArrowLeft, Plus, X, Save, Upload, Image, ChevronDown, 
   Trash2, Code, Link as LinkIcon, Users, Tag, GripVertical
@@ -20,6 +21,7 @@ const ProjectEditor = () => {
   const [teamSearchQuery, setTeamSearchQuery] = useState('');
   const [techInput, setTechInput] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const teamDropdownRef = useState(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -36,7 +38,15 @@ const ProjectEditor = () => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+    
+    const handleClickOutside = (event) => {
+      if (teamSearchOpen && !event.target.closest('.team-search-container')) {
+        setTeamSearchOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [teamSearchOpen]);
 
   useEffect(() => {
     if (isEditMode && portfolio) {
@@ -143,12 +153,37 @@ const ProjectEditor = () => {
   };
 
   const addTechnology = () => {
-    if (techInput.trim() && !formData.technologies.includes(techInput.trim())) {
+    const trimmedTech = techInput.trim().toLowerCase();
+    
+    if (!trimmedTech) return;
+
+    // Check if it's English only (letters, numbers, and common symbols like . # - +)
+    const isEnglish = /^[a-zA-Z0-9.#\-+ ]+$/.test(trimmedTech);
+    if (!isEnglish) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Invalid Input',
+        text: 'Please use English characters only for technologies',
+        timer: 2000,
+        showConfirmButton: false
+      });
+      return;
+    }
+
+    if (!formData.technologies.map(t => t.toLowerCase()).includes(trimmedTech)) {
       setFormData(prev => ({
         ...prev,
-        technologies: [...prev.technologies, techInput.trim()]
+        technologies: [...prev.technologies, trimmedTech]
       }));
       setTechInput('');
+    } else {
+      Swal.fire({
+        icon: 'info',
+        title: 'Already Exists',
+        text: 'This technology is already added',
+        timer: 1500,
+        showConfirmButton: false
+      });
     }
   };
 
@@ -181,7 +216,8 @@ const ProjectEditor = () => {
   const getTeamMemberTrack = (memberId) => team?.team?.find(m => m.id === memberId)?.track || '';
 
   const filteredTeamMembers = team?.team?.filter(member =>
-    member.name.toLowerCase().includes(teamSearchQuery.toLowerCase()) &&
+    (member.name.toLowerCase().includes(teamSearchQuery.toLowerCase()) ||
+     member.track.toLowerCase().includes(teamSearchQuery.toLowerCase())) &&
     !formData.team_members.includes(member.id)
   ) || [];
 
@@ -201,11 +237,15 @@ const ProjectEditor = () => {
       const projectData = {
         ...formData,
         full_description: formData.description,
-        id: isEditMode ? parseInt(id) : Date.now(),
         slug: formData.title.toLowerCase().replace(/\s+/g, '-'),
         image: formData.images[0]
       };
-      await apiPost('/portfolio', projectData);
+      
+      if (isEditMode) {
+        await apiPut(API_PORTFOLIO_UPDATE(id), projectData);
+      } else {
+        await apiPost(API_PORTFOLIO_CREATE, projectData);
+      }
       Swal.fire({ icon: 'success', title: 'Success!', text: `Project ${isEditMode ? 'updated' : 'added'} successfully!`, timer: 2000, showConfirmButton: false });
       setTimeout(() => navigate('/admin/portfolio'), 2000);
     } catch (error) {
@@ -426,28 +466,44 @@ const ProjectEditor = () => {
                 <h3 className="h3 text-white-2">Team Members</h3>
               </div>
               
-              <div className="relative mb-4">
-                <button
-                  type="button"
-                  onClick={() => setTeamSearchOpen(!teamSearchOpen)}
-                  className="form-input text-sm py-2 flex items-center justify-between w-full"
-                >
-                  <span className="text-muted-foreground">Add members...</span>
-                  <ChevronDown className={`w-4 h-4 transition-transform ${teamSearchOpen ? 'rotate-180' : ''}`} />
-                </button>
+              <div className="relative mb-4 team-search-container">
+                <div className="relative">
+                  <input
+                    type="text"
+                    value={teamSearchQuery}
+                    onChange={(e) => {
+                      setTeamSearchQuery(e.target.value);
+                      setTeamSearchOpen(true);
+                    }}
+                    onFocus={() => setTeamSearchOpen(true)}
+                    placeholder="Search and add members..."
+                    className="form-input text-sm py-2 pr-10"
+                  />
+                  <ChevronDown 
+                    className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground transition-transform cursor-pointer ${teamSearchOpen ? 'rotate-180' : ''}`}
+                    onClick={() => setTeamSearchOpen(!teamSearchOpen)}
+                  />
+                </div>
+                
                 {teamSearchOpen && (
                   <div className="absolute top-full left-0 right-0 mt-2 bg-onyx border border-border rounded-xl z-50 shadow-2xl max-h-48 overflow-y-auto has-scrollbar">
-                    {filteredTeamMembers.map(member => (
-                      <button
-                        key={member.id}
-                        type="button"
-                        onClick={() => addTeamMember(member.id)}
-                        className="w-full text-left px-4 py-2 hover:bg-primary/10 border-b border-border last:border-0"
-                      >
-                        <div className="text-xs font-medium text-white-2">{member.name}</div>
-                        <div className="text-[10px] text-light-gray/60">{member.track}</div>
-                      </button>
-                    ))}
+                    {filteredTeamMembers.length > 0 ? (
+                      filteredTeamMembers.map(member => (
+                        <button
+                          key={member.id}
+                          type="button"
+                          onClick={() => addTeamMember(member.id)}
+                          className="w-full text-left px-4 py-2 hover:bg-primary/10 border-b border-border last:border-0"
+                        >
+                          <div className="text-xs font-medium text-white-2">{member.name}</div>
+                          <div className="text-[10px] text-light-gray/60">{member.track}</div>
+                        </button>
+                      ))
+                    ) : (
+                      <div className="px-4 py-3 text-xs text-muted-foreground text-center">
+                        No members found
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

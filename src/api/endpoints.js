@@ -58,9 +58,9 @@ export const API_PORTFOLIO_LIST = `${BASE_URL}/portfolio`;
 // [POST] Add new project (FormData for Image)
 export const API_PORTFOLIO_CREATE = `${BASE_URL}/portfolio`;
 // [PUT] Update project
-export const API_PORTFOLIO_UPDATE = `${BASE_URL}/portfolio`;
+export const API_PORTFOLIO_UPDATE = (id) => `${BASE_URL}/portfolio/${id}`;
 // [DELETE] Delete project
-export const API_PORTFOLIO_DELETE = `${BASE_URL}/portfolio`;
+export const API_PORTFOLIO_DELETE = (id) => `${BASE_URL}/portfolio/${id}`;
 
 // ==========================================
 // 6. Blog Section

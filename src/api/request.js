@@ -126,6 +126,11 @@ export const apiFetch = async (endpoint, method = 'GET', body = null, isFile = f
       }
       
       // Fallback for endpoints with IDs
+      if (endpoint.includes('/portfolio/')) {
+        const id = parseInt(endpoint.split('/').pop());
+        const project = portfolioData.projects.find(p => p.id === id);
+        return { success: true, data: project };
+      }
       if (endpoint.endsWith('/resume/education')) return { success: true, data: educationData };
       if (endpoint.endsWith('/resume/experience')) return { success: true, data: experienceData };
       if (endpoint.endsWith('/resume/skills')) return { success: true, data: skillsData };
