@@ -476,6 +476,11 @@ const ProjectEditor = () => {
                       setTeamSearchOpen(true);
                     }}
                     onFocus={() => setTeamSearchOpen(true)}
+                    onKeyDown={(e) => {
+                      if (e.key === 'Enter') {
+                        e.preventDefault();
+                      }
+                    }}
                     placeholder="Search and add members..."
                     className="form-input text-sm py-2 pr-10"
                   />
