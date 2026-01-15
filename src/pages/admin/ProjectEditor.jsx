@@ -307,38 +307,6 @@ const ProjectEditor = () => {
         {/* Left Column: Images + Links (4 cols) */}
         <div className="lg:col-span-4 space-y-6">
           {/* Images Section - Drag & Drop */}
-          {/* Project Status Toggle */}
-          <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Tag className="w-5 h-5 text-primary" />
-                <h3 className="h3 text-white-2">Project Status</h3>
-              </div>
-              <button
-                type="button"
-                onClick={() => setFormData(prev => ({ ...prev, status: prev.status === 1 ? 0 : 1 }))}
-                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                  formData.status === 1 ? 'bg-primary' : 'bg-onyx border border-border'
-                }`}
-              >
-                <span
-                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    formData.status === 1 ? 'translate-x-6' : 'translate-x-1'
-                  }`}
-                />
-              </button>
-            </div>
-            <div className="flex items-center gap-2">
-              <span className={`text-sm font-medium ${formData.status === 1 ? 'text-primary' : 'text-vegas-gold'}`}>
-                {formData.status === 1 ? 'Completed' : 'Uncomplete'}
-              </span>
-              <p className="text-xs text-muted-foreground">
-                (This will be shown in project details)
-              </p>
-            </div>
-          </div>
-
-          {/* Images Section - Drag & Drop */}
           <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
             <div className="flex items-center gap-2 mb-4">
               <Image className="w-5 h-5 text-primary" />
@@ -380,6 +348,37 @@ const ProjectEditor = () => {
                   </div>
                 </div>
               ))}
+            </div>
+          </div>
+
+          {/* Project Status Toggle - MOVED HERE */}
+          <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Tag className="w-5 h-5 text-primary" />
+                <h3 className="h3 text-white-2">Project Status</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setFormData(prev => ({ ...prev, status: prev.status === 1 ? 0 : 1 }))}
+                className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
+                  formData.status === 1 ? 'bg-primary' : 'bg-onyx border border-border'
+                }`}
+              >
+                <span
+                  className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                    formData.status === 1 ? 'translate-x-6' : 'translate-x-1'
+                  }`}
+                />
+              </button>
+            </div>
+            <div className="flex items-center gap-2">
+              <span className={`text-sm font-medium ${formData.status === 1 ? 'text-primary' : 'text-vegas-gold'}`}>
+                {formData.status === 1 ? 'Completed' : 'Uncomplete'}
+              </span>
+              <p className="text-xs text-muted-foreground">
+                (This will be shown in project details)
+              </p>
             </div>
           </div>
 
@@ -451,135 +450,106 @@ const ProjectEditor = () => {
                 </select>
               </div>
               <div className="md:col-span-2">
-                <label className="text-light-gray/70 text-xs uppercase mb-2 block">Project Description</label>
+                <label className="text-light-gray/70 text-xs uppercase mb-2 block">Description</label>
                 <textarea
                   name="description"
                   value={formData.description}
                   onChange={handleInputChange}
-                  className="form-input min-h-[200px] resize-y"
-                  placeholder="Describe your project, challenges, and solutions..."
+                  className="form-input min-h-[150px] py-3"
+                  placeholder="Describe your project..."
                 />
               </div>
             </div>
           </div>
 
-          {/* Technologies & Team Card */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Technologies */}
-            <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <Code className="w-5 h-5 text-primary" />
-                <h3 className="h3 text-white-2">Technologies</h3>
-              </div>
-              <div className="flex gap-2 mb-4">
+          {/* Technologies Card */}
+          <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
+            <div className="flex items-center gap-2 mb-6">
+              <Code className="w-5 h-5 text-primary" />
+              <h3 className="h3 text-white-2">Technologies</h3>
+            </div>
+            <div className="space-y-4">
+              <div className="flex gap-2">
                 <input
                   type="text"
                   value={techInput}
                   onChange={(e) => setTechInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTechnology())}
-                  className="form-input text-sm py-2"
-                  placeholder="Add tech..."
+                  onKeyPress={(e) => e.key === 'Enter' && addTechnology()}
+                  className="form-input"
+                  placeholder="Add technology (e.g. React, Node.js)"
                 />
-                <button type="button" onClick={addTechnology} className="p-2 bg-primary/20 text-primary rounded-xl hover:bg-primary/30 transition-colors">
+                <button
+                  type="button"
+                  onClick={addTechnology}
+                  className="p-3 rounded-xl bg-onyx border border-border text-primary hover:bg-primary/10 transition-colors"
+                >
                   <Plus className="w-5 h-5" />
                 </button>
               </div>
               <div className="flex flex-wrap gap-2">
                 {formData.technologies.map((tech, index) => (
-                  <span key={index} className="px-3 py-1 bg-onyx border border-border rounded-full text-[10px] text-light-gray flex items-center gap-2">
+                  <span
+                    key={index}
+                    className="flex items-center gap-2 px-3 py-1.5 bg-onyx border border-border rounded-lg text-xs text-light-gray"
+                  >
                     {tech}
-                    <button type="button" onClick={() => removeTechnology(index)} className="hover:text-destructive"><X className="w-3 h-3" /></button>
+                    <button type="button" onClick={() => removeTechnology(index)} className="hover:text-destructive">
+                      <X className="w-3 h-3" />
+                    </button>
                   </span>
                 ))}
               </div>
             </div>
+          </div>
 
-            {/* Team Members */}
-            <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-primary" />
-                <h3 className="h3 text-white-2">Team Members</h3>
-              </div>
-              
-              <div className="relative mb-4">
-                <Select
-                  options={(Array.isArray(team) ? team : [])
-                    .filter(member => !formData.team_members.includes(member.id))
-                    .map(member => ({
-                      value: member.id,
-                      label: member.name,
-                      track: member.track
-                    }))
-                  }
-                  onChange={(option) => {
-                    if (option) {
-                      addTeamMember(null, option.value);
-                    }
-                  }
-                  }
-                  placeholder="Search and add members..."
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                  isSearchable
-                  formatOptionLabel={(member) => (
-                    <div>
-                      <div className="text-xs font-medium">{member.label}</div>
-                      <div className="text-[10px] opacity-60">{member.track}</div>
-                    </div>
-                  )}
-                  styles={{
-                    control: (base, state) => ({
-                      ...base,
-                      background: 'transparent',
-                      borderColor: state.isFocused ? 'hsl(var(--primary))' : 'hsl(var(--jet))',
-                      borderRadius: '14px',
-                      padding: '5px 10px',
-                      boxShadow: 'none',
-                      '&:hover': {
-                        borderColor: 'hsl(var(--primary))'
-                      }
-                    }),
-                    menu: (base) => ({
-                      ...base,
-                      background: 'hsl(var(--eerie-black-2))',
-                      border: '1px solid hsl(var(--jet))',
-                      borderRadius: '14px',
-                      zIndex: 50,
-                      overflow: 'hidden'
-                    }),
-                    option: (base, state) => ({
-                      ...base,
-                      background: state.isFocused ? 'rgba(255, 219, 112, 0.1)' : 'transparent',
-                      color: 'var(--white-2)',
-                      cursor: 'pointer',
-                      '&:active': {
-                        background: 'rgba(255, 219, 112, 0.2)'
-                      }
-                    }),
-                    input: (base) => ({
-                      ...base,
-                      color: 'var(--white-2)'
-                    }),
-                    singleValue: (base) => ({
-                      ...base,
-                      color: 'var(--white-2)'
-                    }),
-                    placeholder: (base) => ({
-                      ...base,
-                      color: 'hsl(var(--muted-foreground))',
-                      fontSize: '14px'
-                    })
-                  }}
-                />
-              </div>
-
-              <div className="flex flex-wrap gap-2">
+          {/* Team Members Card */}
+          <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
+            <div className="flex items-center gap-2 mb-6">
+              <Users className="w-5 h-5 text-primary" />
+              <h3 className="h3 text-white-2">Team Members</h3>
+            </div>
+            <div className="space-y-6">
+              {/* Selected Members */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 {formData.team_members.map(memberId => (
-                  <span key={memberId} className="px-3 py-1 bg-primary/10 border border-primary/30 rounded-full text-[10px] text-primary flex items-center gap-2">
-                    {getTeamMemberName(memberId)}
-                    <button type="button" onClick={() => removeTeamMember(memberId)} className="hover:text-destructive"><X className="w-3 h-3" /></button>
-                  </span>
+                  <div key={memberId} className="flex items-center justify-between p-3 bg-onyx/50 border border-border rounded-xl">
+                    <div className="flex items-center gap-3">
+                      <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-primary text-xs font-bold">
+                        {getTeamMemberName(memberId).charAt(0)}
+                      </div>
+                      <div>
+                        <p className="text-sm text-white-2 font-medium">{getTeamMemberName(memberId)}</p>
+                        <p className="text-[10px] text-vegas-gold">{getTeamMemberTrack(memberId)}</p>
+                      </div>
+                    </div>
+                    <button type="button" onClick={() => removeTeamMember(memberId)} className="p-1 text-muted-foreground hover:text-destructive">
+                      <X className="w-4 h-4" />
+                    </button>
+                  </div>
                 ))}
+              </div>
+
+              {/* Add Member Dropdown */}
+              <div className="relative group">
+                <label className="text-light-gray/70 text-xs uppercase mb-2 block">Add Team Member</label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                  {team?.filter(m => !formData.team_members.includes(m.id)).map(member => (
+                    <button
+                      key={member.id}
+                      type="button"
+                      onClick={(e) => addTeamMember(e, member.id)}
+                      className="flex items-center gap-3 p-3 bg-onyx/30 border border-border/50 rounded-xl hover:border-primary/50 hover:bg-onyx/50 transition-all text-left"
+                    >
+                      <div className="w-8 h-8 rounded-full bg-onyx flex items-center justify-center text-muted-foreground text-xs">
+                        {member.name.charAt(0)}
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-xs text-light-gray font-medium truncate">{member.name}</p>
+                        <p className="text-[9px] text-muted-foreground truncate">{member.track}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
             </div>
           </div>
