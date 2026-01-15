@@ -198,8 +198,8 @@ const PortfolioManager = () => {
               <h3 className="text-foreground font-medium mb-1">{project.title}</h3>
               <p className="text-vegas-gold text-sm capitalize mb-2">{project.category}</p>
               
-              {/* Status Toggle & Team Members */}
-              <div className="flex flex-wrap items-center gap-2 mb-2">
+              {/* Status Toggle */}
+              <div className="mb-3">
                 <button
                   onClick={() => handleToggleStatus(project)}
                   className={`flex items-center gap-1 text-xs px-2 py-1 rounded transition-colors ${
@@ -215,13 +215,14 @@ const PortfolioManager = () => {
                   )}
                   <span>{project.status === 1 ? 'Completed' : 'Uncomplete'}</span>
                 </button>
-
-                {project.team_members && project.team_members.length > 0 && (
-                  <div className="flex items-center gap-1 text-xs text-light-gray bg-onyx/50 px-2 py-1 rounded border border-border/50">
-                    <span>👥 {project.team_members.length} member{project.team_members.length > 1 ? 's' : ''}</span>
-                  </div>
-                )}
               </div>
+
+              {/* Team Members Badge */}
+              {project.team_members && project.team_members.length > 0 && (
+                <div className="flex items-center gap-1 text-xs text-light-gray bg-onyx/50 w-fit px-2 py-1 rounded">
+                  <span>👥 {project.team_members.length} member{project.team_members.length > 1 ? 's' : ''}</span>
+                </div>
+              )}
 
               {/* Images Badge */}
               {project.images && project.images.length > 1 && (
