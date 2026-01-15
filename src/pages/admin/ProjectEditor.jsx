@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiGet, apiPost, apiPut } from '../../api/request';
 import { API_PORTFOLIO_CREATE, API_PORTFOLIO_UPDATE } from '../../api/endpoints';
@@ -21,7 +21,7 @@ const ProjectEditor = () => {
   const [teamSearchQuery, setTeamSearchQuery] = useState('');
   const [techInput, setTechInput] = useState('');
   const [dragActive, setDragActive] = useState(false);
-  const teamDropdownRef = useState(null);
+  const teamDropdownRef = useRef(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -40,7 +40,7 @@ const ProjectEditor = () => {
     fetchData();
     
     const handleClickOutside = (event) => {
-      if (teamSearchOpen && !event.target.closest('.team-search-container')) {
+      if (teamSearchOpen && teamDropdownRef.current && !teamDropdownRef.current.contains(event.target)) {
         setTeamSearchOpen(false);
       }
     };
@@ -270,6 +270,7 @@ const ProjectEditor = () => {
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
+            type="button"
             onClick={() => navigate('/admin/portfolio')}
             className="p-2 rounded-lg bg-onyx border border-border text-primary hover:bg-primary/10 transition-colors"
           >
@@ -284,12 +285,14 @@ const ProjectEditor = () => {
         </div>
         <div className="flex gap-3">
           <button
+            type="button"
             onClick={() => navigate('/admin/portfolio')}
             className="px-6 py-2 rounded-xl bg-onyx border border-border text-light-gray hover:bg-onyx/80 transition-colors font-medium hidden md:block"
           >
             Cancel
           </button>
           <button
+            type="button"
             onClick={handleSubmit}
             disabled={saving}
             className="form-btn !w-auto !px-8"
@@ -466,7 +469,7 @@ const ProjectEditor = () => {
                 <h3 className="h3 text-white-2">Team Members</h3>
               </div>
               
-              <div className="relative mb-4 team-search-container">
+              <div className="relative mb-4" ref={teamDropdownRef}>
                 <div className="relative">
                   <input
                     type="text"
@@ -484,10 +487,17 @@ const ProjectEditor = () => {
                     placeholder="Search and add members..."
                     className="form-input text-sm py-2 pr-10"
                   />
-                  <ChevronDown 
-                    className={`absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground transition-transform cursor-pointer ${teamSearchOpen ? 'rotate-180' : ''}`}
-                    onClick={() => setTeamSearchOpen(!teamSearchOpen)}
-                  />
+                  <button
+                    type="button"
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground transition-transform cursor-pointer"
+                    onClick={(e) => {
+                      e.preventDefault();
+                      e.stopPropagation();
+                      setTeamSearchOpen(!teamSearchOpen);
+                    }}
+                  >
+                    <ChevronDown className={`w-4 h-4 ${teamSearchOpen ? 'rotate-180' : ''}`} />
+                  </button>
                 </div>
                 
                 {teamSearchOpen && (
@@ -497,7 +507,10 @@ const ProjectEditor = () => {
                         <button
                           key={member.id}
                           type="button"
-                          onClick={() => addTeamMember(member.id)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            addTeamMember(member.id);
+                          }}
                           className="w-full text-left px-4 py-2 hover:bg-primary/10 border-b border-border last:border-0"
                         >
                           <div className="text-xs font-medium text-white-2">{member.name}</div>
