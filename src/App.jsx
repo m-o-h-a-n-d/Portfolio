@@ -17,6 +17,7 @@ import DashboardHome from "./pages/admin/DashboardHome";
 import ProfileManager from "./pages/admin/ProfileManager";
 import ResumeManager from "./pages/admin/ResumeManager";
 import PortfolioManager from "./pages/admin/PortfolioManager";
+import ProjectEditor from "./pages/admin/ProjectEditor";
 import MessagesInbox from "./pages/admin/MessagesInbox";
 import SettingsManager from "./pages/admin/SettingsManager";
 import BlogsManager from "./pages/admin/BlogsManager";
@@ -60,6 +61,8 @@ const App = () => (
               <Route path="profile" element={<ProfileManager />} />
               <Route path="resume" element={<ResumeManager />} />
               <Route path="portfolio" element={<PortfolioManager />} />
+              <Route path="portfolio/add" element={<ProjectEditor />} />
+              <Route path="portfolio/edit/:id" element={<ProjectEditor />} />
               <Route path="messages" element={<MessagesInbox />} />
               <Route path="settings" element={<SettingsManager />} />
               <Route path="blogs" element={<BlogsManager />} />
