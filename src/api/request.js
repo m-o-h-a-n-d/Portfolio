@@ -1,8 +1,20 @@
-// API Request Wrapper with Mock Data Support
+/* src/api/request.js */
+import { BASE_URL } from './endpoints';
+
+// ============================================================
+// CONFIGURATION
+// ============================================================
 // Toggle this flag to switch between mock and real API
 export const MOCK_MODE = true;
 
-// Import mock data
+// Simulated network delay (300-800ms)
+const simulateDelay = () => new Promise(resolve => 
+  setTimeout(resolve, Math.random() * 500 + 300)
+);
+
+// ============================================================
+// MOCK DATA IMPORTS
+// ============================================================
 import profileData from './mockData/profile.json';
 import resumeOrderData from './mockData/resume.json';
 import educationData from './mockData/education.json';
@@ -32,146 +44,81 @@ const mockDataMap = {
   '/settings': settingsData,
 };
 
-// Simulated network delay (300-800ms)
-const simulateDelay = () => new Promise(resolve => 
-  setTimeout(resolve, Math.random() * 500 + 300)
-);
+// ============================================================
+// AUTHENTICATION HELPERS
+// ============================================================
+export const getAuthToken = () => localStorage.getItem('auth_token');
+export const setAuthToken = (token) => localStorage.setItem('auth_token', token);
+export const removeAuthToken = () => localStorage.removeItem('auth_token');
+export const isAuthenticated = () => !!getAuthToken();
 
-// Get auth token from localStorage
-const getAuthToken = () => {
-  return localStorage.getItem('auth_token');
-};
-
-// Set auth token in localStorage
-export const setAuthToken = (token) => {
-  localStorage.setItem('auth_token', token);
-};
-
-// Remove auth token from localStorage
-export const removeAuthToken = () => {
-  localStorage.removeItem('auth_token');
-};
-
-// Check if user is authenticated
-export const isAuthenticated = () => {
-  return !!getAuthToken();
-};
-
+// ============================================================
+// REAL API TESTING SPACE
+// ============================================================
 /**
- * Main API Fetch Wrapper
- * @param {string} endpoint - API endpoint (e.g., '/profile', '/resume')
- * @param {string} method - HTTP method (GET, POST, PUT, DELETE)
- * @param {object|FormData} body - Request body
- * @returns {Promise} - Response data
+ * Use this space to test specific real API endpoints even when MOCK_MODE is true.
+ * Add endpoint strings or regex patterns to this array.
  */
-// List of endpoints (as strings or regex) that should ALWAYS use Real API even if MOCK_MODE is true
-const REAL_API_ENDPOINTS = [
-  // '/services',
-  // '/services/store',
-  // /\/services\/\d+/, // Matches /services/{id} for PUT and DELETE
+const FORCE_REAL_API_ENDPOINTS = [
+  // '/auth/login',
+  // '/portfolio',
+  // /\/portfolio\/\d+/,
 ];
 
-import { BASE_URL } from './endpoints';
-
-export const apiFetch = async (endpoint, method = 'GET', body = null, isFile = false) => {
-  // Check if this specific endpoint should use Real API
-  const shouldForceRealAPI = REAL_API_ENDPOINTS.some(pattern => {
-    if (pattern instanceof RegExp) {
-      return pattern.test(endpoint);
-    }
+// ============================================================
+// MAIN API FETCH WRAPPER
+// ============================================================
+export const apiFetch = async (endpoint, method = 'GET', body = null) => {
+  // 1. Determine if we should use Real API
+  const shouldForceRealAPI = FORCE_REAL_API_ENDPOINTS.some(pattern => {
+    if (pattern instanceof RegExp) return pattern.test(endpoint);
     return endpoint.endsWith(pattern);
   });
 
-  // Construct full URL for Real API
-  const fullUrl = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
+  const useRealAPI = !MOCK_MODE || shouldForceRealAPI;
 
-  // Mock Mode Logic
-  if (MOCK_MODE && !shouldForceRealAPI) {
+  // 2. Handle Mock Mode
+  if (!useRealAPI) {
     await simulateDelay();
-    
-    // Handle authentication
+    console.log(`[Mock API] ${method} ${endpoint}`, body || '');
+
+    // Mock Login Logic
     if (endpoint.includes('/auth/login')) {
-      const credentials = body;
-      // Mock login validation
-      if (credentials?.email === 'admin@example.com' && credentials?.password === 'password') {
+      if (body?.email === 'admin@example.com' && body?.password === 'password') {
         const mockToken = 'mock_jwt_token_' + Date.now();
         setAuthToken(mockToken);
-        return {
-          success: true,
-          token: mockToken,
-          user: {
-            id: 1,
-            name: 'Richard Hanrick',
-            email: 'admin@example.com',
-            role: 'admin'
-          }
-        };
-      } else {
-        throw new Error('Invalid credentials');
+        return { success: true, token: mockToken, user: { id: 1, name: 'Admin', email: 'admin@example.com' } };
       }
+      throw new Error('Invalid credentials');
     }
 
-    if (endpoint.includes('/auth/logout')) {
-      removeAuthToken();
-      return { success: true };
-    }
-
-    // Handle GET requests
+    // Mock GET Logic
     if (method === 'GET') {
-      // Find matching mock data
       for (const [path, data] of Object.entries(mockDataMap)) {
-        if (endpoint.endsWith(path)) {
-          return { success: true, data };
-        }
+        if (endpoint.endsWith(path)) return { success: true, data };
       }
-      
-      // Fallback for endpoints with IDs
+      // Fallback for ID-based GET
       if (endpoint.includes('/portfolio/')) {
         const id = parseInt(endpoint.split('/').pop());
         const project = portfolioData.projects.find(p => p.id === id);
         return { success: true, data: project };
       }
-      if (endpoint.endsWith('/resume/education')) return { success: true, data: educationData };
-      if (endpoint.endsWith('/resume/experience')) return { success: true, data: experienceData };
-      if (endpoint.endsWith('/resume/skills')) return { success: true, data: skillsData };
-      if (endpoint.includes('/resume/education/')) return { success: true, data: educationData[0] };
-      if (endpoint.includes('/resume/experience/')) return { success: true, data: experienceData[0] };
-      if (endpoint.includes('/resume/skills/')) return { success: true, data: skillsData[0] };
-
-      throw new Error('Endpoint not found: ' + endpoint);
+      return { success: true, data: {} };
     }
 
-    // Handle POST/PUT requests (Create/Update)
-    if (method === 'POST' || method === 'PUT') {
-      console.log(`[Mock API] ${method} to ${endpoint}:`, body);
-      return { 
-        success: true, 
-        message: 'Operation completed successfully',
-        data: body 
-      };
-    }
-
-    // Handle DELETE requests
-    if (method === 'DELETE') {
-      console.log(`[Mock API] DELETE ${endpoint}`);
-      return { success: true, message: 'Item deleted successfully' };
-    }
-
-    throw new Error('Unknown request method');
+    // Mock POST/PUT/DELETE Logic
+    return { success: true, message: 'Operation successful (Mock)', data: body };
   }
 
-  // Real API Mode
+  // 3. Handle Real API Mode
+  const fullUrl = endpoint.startsWith('http') ? endpoint : `${BASE_URL}${endpoint}`;
   const headers = {
     'Accept': 'application/json',
   };
 
-  // Add auth token if available
   const token = getAuthToken();
-  if (token) {
-    headers['Authorization'] = `Bearer ${token}`;
-  }
+  if (token) headers['Authorization'] = `Bearer ${token}`;
 
-  // Don't set Content-Type for FormData (browser will set it with boundary)
   if (body && !(body instanceof FormData)) {
     headers['Content-Type'] = 'application/json';
   }
@@ -179,44 +126,29 @@ export const apiFetch = async (endpoint, method = 'GET', body = null, isFile = f
   const config = {
     method,
     headers,
+    body: body ? (body instanceof FormData ? body : JSON.stringify(body)) : null,
   };
 
-  if (body) {
-    config.body = body instanceof FormData ? body : JSON.stringify(body);
-  }
-
   try {
-    console.log(`[API Request] ${method} ${fullUrl}`, config);
+    console.log(`[Real API Request] ${method} ${fullUrl}`, config);
     const response = await fetch(fullUrl, config);
-    console.log(`[API Response] Status: ${response.status}`);
     
-    // Handle unauthorized response
     if (response.status === 401) {
       removeAuthToken();
-      window.location.href = '/admin/login';
-      throw new Error('Session expired. Please login again.');
+      if (typeof window !== 'undefined') window.location.href = '/admin/login';
+      throw new Error('Session expired');
     }
 
-    let data;
     const contentType = response.headers.get("content-type");
-    if (contentType && contentType.indexOf("application/json") !== -1) {
-      data = await response.json();
-    } else {
-      data = await response.text();
-    }
-    
-    console.log(`[API Data]`, data);
+    const data = contentType?.includes("application/json") ? await response.json() : await response.text();
 
     if (!response.ok) {
-      const errorMessage = (data && typeof data === 'object' && data.message) 
-        ? data.message 
-        : (typeof data === 'string' ? data : 'Something went wrong');
-      throw new Error(errorMessage);
+      throw new Error(data?.message || data || 'API Error');
     }
 
     return data;
   } catch (error) {
-    console.error('Detailed API Error:', error);
+    console.error('[Real API Error]', error);
     throw error;
   }
 };
@@ -226,10 +158,3 @@ export const apiGet = (endpoint) => apiFetch(endpoint, 'GET');
 export const apiPost = (endpoint, body) => apiFetch(endpoint, 'POST', body);
 export const apiPut = (endpoint, body) => apiFetch(endpoint, 'PUT', body);
 export const apiDelete = (endpoint) => apiFetch(endpoint, 'DELETE');
-
-// File upload helper
-export const apiUpload = async (endpoint, file, fieldName = 'file') => {
-  const formData = new FormData();
-  formData.append(fieldName, file);
-  return apiFetch(endpoint, 'POST', formData);
-};
