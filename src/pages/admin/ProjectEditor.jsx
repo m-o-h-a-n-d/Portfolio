@@ -264,6 +264,9 @@ const ProjectEditor = () => {
       setSaving(true);
       const projectData = {
         ...formData,
+        // If status is 0 (Uncomplete), clear the links before sending to backend
+        link: formData.status === 1 ? formData.link : '',
+        github: formData.status === 1 ? formData.github : '',
         full_description: formData.description,
         slug: formData.title.toLowerCase().replace(/\s+/g, '-'),
         image: formData.images[0]
