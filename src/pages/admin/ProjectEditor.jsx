@@ -304,7 +304,7 @@ const ProjectEditor = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Status + Images (4 cols) */}
+        {/* Left Column: Status + Images + Links (4 cols) */}
         <div className="lg:col-span-4 space-y-6">
           {/* Project Status Toggle */}
           <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
@@ -381,9 +381,43 @@ const ProjectEditor = () => {
               ))}
             </div>
           </div>
+
+          {/* Links Section - Conditional Rendering based on Status */}
+          {formData.status === 1 && (
+            <div className="bg-card border border-border rounded-[20px] p-6 space-y-4" style={{ background: 'var(--bg-gradient-jet)' }}>
+              <div className="flex items-center gap-2 mb-2">
+                <LinkIcon className="w-5 h-5 text-primary" />
+                <h3 className="h3 text-white-2">Project Links</h3>
+              </div>
+              <div className="space-y-4">
+                <div>
+                  <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">Live Project URL</label>
+                  <input
+                    type="url"
+                    name="link"
+                    value={formData.link}
+                    onChange={handleInputChange}
+                    className="form-input text-sm py-2"
+                    placeholder="https://..."
+                  />
+                </div>
+                <div>
+                  <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">GitHub Repository</label>
+                  <input
+                    type="url"
+                    name="github"
+                    value={formData.github}
+                    onChange={handleInputChange}
+                    className="form-input text-sm py-2"
+                    placeholder="https://github.com/..."
+                  />
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Right Column: Info + Links + Tech + Team (8 cols) */}
+        {/* Right Column: Info + Tech + Team (8 cols) */}
         <div className="lg:col-span-8 space-y-6">
           {/* Basic Info Card */}
           <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
@@ -429,40 +463,6 @@ const ProjectEditor = () => {
               </div>
             </div>
           </div>
-
-          {/* Links Section - Conditional Rendering based on Status */}
-          {formData.status === 1 && (
-            <div className="bg-card border border-border rounded-[20px] p-6 space-y-4" style={{ background: 'var(--bg-gradient-jet)' }}>
-              <div className="flex items-center gap-2 mb-2">
-                <LinkIcon className="w-5 h-5 text-primary" />
-                <h3 className="h3 text-white-2">Project Links</h3>
-              </div>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div>
-                  <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">Live Project URL</label>
-                  <input
-                    type="url"
-                    name="link"
-                    value={formData.link}
-                    onChange={handleInputChange}
-                    className="form-input text-sm py-2"
-                    placeholder="https://..."
-                  />
-                </div>
-                <div>
-                  <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">GitHub Repository</label>
-                  <input
-                    type="url"
-                    name="github"
-                    value={formData.github}
-                    onChange={handleInputChange}
-                    className="form-input text-sm py-2"
-                    placeholder="https://github.com/..."
-                  />
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* Technologies & Team Card */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
