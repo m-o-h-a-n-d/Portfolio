@@ -112,9 +112,37 @@ const ProjectEditor = () => {
   };
 
   const processImages = (files) => {
-    const newFiles = [...imageFiles, ...files];
+    const MAX_IMAGES = 6;
+    const MAX_SIZE_MB = 2; // 2MB per image
+    const currentImagesCount = formData.images.length;
+    
+    if (currentImagesCount + files.length > MAX_IMAGES) {
+      Swal.fire({
+        icon: 'warning',
+        title: 'Limit Exceeded',
+        text: `You can only upload up to ${MAX_IMAGES} images.`,
+      });
+      return;
+    }
+
+    const validFiles = [];
+    for (const file of files) {
+      if (file.size > MAX_SIZE_MB * 1024 * 1024) {
+        Swal.fire({
+          icon: 'error',
+          title: 'File Too Large',
+          text: `Image "${file.name}" exceeds the ${MAX_SIZE_MB}MB limit.`,
+        });
+        continue;
+      }
+      validFiles.push(file);
+    }
+
+    if (validFiles.length === 0) return;
+
+    const newFiles = [...imageFiles, ...validFiles];
     setImageFiles(newFiles);
-    const readers = files.map(file => {
+    const readers = validFiles.map(file => {
       return new Promise((resolve) => {
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
@@ -356,7 +384,7 @@ const ProjectEditor = () => {
               <label className="cursor-pointer block">
                 <Upload className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
                 <p className="text-light-gray text-xs mb-1">Drag & Drop or Click</p>
-                <p className="text-muted-foreground text-[10px]">Main image will be the first one</p>
+                <p className="text-muted-foreground text-[10px]">Max 6 images, 2MB each</p>
                 <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
               </label>
             </div>
