@@ -1,10 +1,25 @@
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { useProfile } from '../../context/DataContext';
-import { Mail, Phone, Calendar, MapPin, Facebook, Twitter, Instagram, Linkedin, Github, ChevronDown } from 'lucide-react';
+import { 
+  Mail, 
+  Phone, 
+  Calendar, 
+  MapPin, 
+  Facebook, 
+  Twitter, 
+  Instagram, 
+  Linkedin, 
+  Github, 
+  ChevronDown,
+  X,
+  ZoomIn
+} from 'lucide-react';
 
 const Sidebar = () => {
   // حالة التحكم في الفتح والإغلاق
   const [isExpanded, setIsExpanded] = useState(false);
+  const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const profile = useProfile();
 
   if (!profile) return null;
@@ -50,12 +65,22 @@ function limitWords(text, limit = 2) {
         {/* Header Layout (Avatar + Name) */}
         <div className="flex items-center gap-4 lg:flex-col lg:gap-6 w-full">
             {/* Avatar */}
-            <figure className="bg-gradient-onyx rounded-[20px] lg:rounded-[30px] overflow-hidden flex-shrink-0">
-            <img 
-                src={profile.avatar} 
-                alt={profile.name} 
-                className="w-[80px] lg:w-[150px] object-cover" 
-            />
+            <figure 
+              className="bg-gradient-onyx rounded-[20px] lg:rounded-[30px] overflow-hidden flex-shrink-0 relative group cursor-pointer"
+              onClick={() => setIsAvatarModalOpen(true)}
+            >
+              <img 
+                  src={profile.avatar} 
+                  alt={profile.name} 
+                  className="w-[80px] lg:w-[150px] object-cover group-hover:scale-110 transition-transform duration-300" 
+              />
+              
+              {/* Overlay on hover */}
+              <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
+                <div className="bg-primary/90 rounded-full p-2 lg:p-3 transform scale-0 group-hover:scale-100 transition-transform duration-300">
+                  <ZoomIn className="w-4 h-4 lg:w-6 lg:h-6 text-white" />
+                </div>
+              </div>
             </figure>
 
             {/* Name & Title */}
@@ -178,6 +203,42 @@ function limitWords(text, limit = 2) {
           })}
         </ul>
       </div>
+
+      {/* Avatar Modal (Same style as certificates) */}
+      {isAvatarModalOpen && createPortal(
+        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-4">
+          <div 
+            className="absolute inset-0 bg-black/80 backdrop-blur-[3px] animate-fade-in"
+            onClick={() => setIsAvatarModalOpen(false)}
+          ></div>
+
+          <div className="relative bg-eerie-black-2 border border-jet rounded-[24px] shadow-portfolio-5 w-full max-w-[600px] p-[20px] md:p-[40px] animate-scale-up z-10 max-h-[90vh] overflow-y-auto">
+            <button 
+              onClick={() => setIsAvatarModalOpen(false)}
+              className="absolute top-5 right-5 bg-onyx hover:bg-jet text-white-2 rounded-[12px] w-12 h-12 flex items-center justify-center transition-all duration-200 shadow-lg z-50 group border border-jet/50"
+            >
+              <X className="w-6 h-6 opacity-70 group-hover:opacity-100 group-hover:scale-110 transition-transform" />
+            </button>
+
+            <div className="flex flex-col gap-6 relative z-10">
+              <div className="w-full bg-gradient-onyx rounded-[20px] p-[5px] shadow-portfolio-2 overflow-hidden">
+                <img 
+                  src={profile.avatar} 
+                  alt={profile.name}
+                  className="w-full h-auto object-contain rounded-[14px]"
+                />
+              </div>
+              <div className="text-center">
+                <h3 className="text-[24px] md:text-[32px] text-white-2 font-bold mb-2 tracking-tight">
+                  {profile.name}
+                </h3>
+                <p className="text-primary font-medium">{profile.title}</p>
+              </div>
+            </div>
+          </div>
+        </div>,
+        document.body
+      )}
     </aside>
   );
 };
