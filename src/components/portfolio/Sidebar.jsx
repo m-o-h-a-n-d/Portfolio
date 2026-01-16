@@ -72,7 +72,7 @@ function limitWords(text, limit = 2) {
               <img 
                   src={profile.avatar} 
                   alt={profile.name} 
-                  className="w-[80px] lg:w-[150px] object-cover group-hover:scale-110 transition-transform duration-300" 
+                  className="w-[100px] lg:w-[180px] object-cover group-hover:scale-110 transition-transform duration-300" 
               />
               
               {/* Overlay on hover */}
