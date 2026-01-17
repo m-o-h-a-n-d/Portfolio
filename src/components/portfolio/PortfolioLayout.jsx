@@ -67,7 +67,7 @@ const PortfolioLayout = () => {
   };
 
   return (
-    <main className="m-[15px_12px_100px] md:my-[60px] md:mb-[120px] min-w-[259px]">
+    <main className="m-[15px_12px_80px] md:my-[60px] md:mb-[120px] min-w-[259px]">
         <div className="max-w-[1200px] mx-auto xl:flex xl:items-stretch xl:gap-[25px]">
           
           {/* Sidebar Area */}
@@ -82,7 +82,7 @@ const PortfolioLayout = () => {
             <Navbar activePage={activePage} onPageChange={handlePageChange} />
 
             {/* Content Pages */}
-            <div className="mt-4 md:mt-0 pb-16 md:pb-0">
+            <div className="mt-4 md:mt-0 pb-20 md:pb-0">
                {renderPage()}
             </div>
             
