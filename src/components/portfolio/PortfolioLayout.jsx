@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
-// Removed redundant DataProvider import
 import Sidebar from './Sidebar';
+import Navbar from './Navbar';
 import AboutSection from './AboutSection';
 import ResumeSection from './ResumeSection';
 import PortfolioSection from './PortfolioSection';
@@ -10,8 +10,33 @@ import LoadingScreen from './LoadingScreen';
 import ProjectDetails from './ProjectDetails';
 import { useLocation, useNavigate } from 'react-router-dom';
 
-const PortfolioLayout = ({ activePage, handlePageChange }) => {
+const PortfolioLayout = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const [activePage, setActivePage] = useState('about');
   const [isTransitioning, setIsTransitioning] = useState(false);
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/project/')) {
+      setActivePage('project-details');
+    }
+  }, [location]);
+
+  const handlePageChange = (page) => {
+    if (page === activePage) return;
+    
+    if (page !== 'project-details' && location.pathname !== '/') {
+      navigate('/');
+    }
+
+    setIsTransitioning(true);
+    
+    // Simulate a short loading time for the transition effect
+    setTimeout(() => {
+      setActivePage(page);
+      setIsTransitioning(false);
+    }, 400);
+  };
 
   const renderPage = () => {
     if (isTransitioning) {
@@ -49,15 +74,18 @@ const PortfolioLayout = ({ activePage, handlePageChange }) => {
             <Sidebar />
           </div>
 
-	          {/* Main Content Area */}
-	          <div className="flex-1 min-w-0 bg-card/80 backdrop-blur-md border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative">
-	            
-	            {/* Content Pages */}
-	            <div className="mt-4 md:mt-0 pb-24 md:pb-0">
-	               {renderPage()}
-	            </div>
-	            
-	          </div>
+          {/* Main Content Area */}
+          <div className="flex-1 min-w-0 bg-card/80 backdrop-blur-md border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative">
+            
+            {/* Navbar */}
+            <Navbar activePage={activePage} onPageChange={handlePageChange} />
+
+            {/* Content Pages */}
+            <div className="mt-4 md:mt-0 pb-24 md:pb-0">
+               {renderPage()}
+            </div>
+            
+          </div>
         </div>
     </main>
   );

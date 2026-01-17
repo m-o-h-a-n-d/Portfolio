@@ -17,7 +17,7 @@ const Navbar = ({ activePage, onPageChange }) => {
         bg-[#1e1e1f]/95 backdrop-blur-xl border-t border-border/40 
         rounded-t-[20px] shadow-[0_-10px_30px_rgba(0,0,0,0.5)]
         
-        /* Desktop Styles (Positioned inside the Card) */
+        /* Desktop Styles (Reset to be inside the Card) */
         md:absolute md:bottom-auto md:top-0 md:left-auto md:right-0 
         md:w-max md:rounded-none md:rounded-bl-[20px] md:rounded-tr-[20px]
         md:border-b md:border-l md:border-t-0 md:border-r-0 md:bg-onyx/75
