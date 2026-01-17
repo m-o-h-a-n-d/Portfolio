@@ -4,8 +4,9 @@ import './SpaceBackground.css';
 const SpaceBackground = () => {
   const [stars, setStars] = useState([]);
   const [meteors, setMeteors] = useState([]);
+  const [floatingIcons, setFloatingIcons] = useState([]);
   
-    const icons = [
+  const icons = [
     'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/laravel/laravel-original.svg',
     'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/react/react-original.svg',
     'https://cdn.jsdelivr.net/gh/devicons/devicon/icons/flutter/flutter-original.svg',
@@ -36,7 +37,7 @@ const SpaceBackground = () => {
     setStars(newStars);
 
     // Generate floating icons
-    const floatingIcons = Array.from({ length: 12 }).map((_, i) => ({
+    const initialFloatingIcons = Array.from({ length: 12 }).map((_, i) => ({
       id: `icon-${i}`,
       icon: icons[i % icons.length],
       left: Math.random() * 90 + 5,
@@ -45,63 +46,65 @@ const SpaceBackground = () => {
       duration: Math.random() * 20 + 10,
       delay: Math.random() * 5,
     }));
-    
-    // Add floating icons to state if needed, but here we can just use them in the render
-    // For simplicity, I'll just use a static-ish set of floating icons
-    setFloatingIcons(floatingIcons);
+    setFloatingIcons(initialFloatingIcons);
 
-    // Meteor generator with random directions
+    // Meteor generator with random directions and 1-minute interval
     const createMeteor = () => {
       const id = Date.now();
       
-      // Random spawn position (any edge of screen)
-      const edge = Math.floor(Math.random() * 4);
+      // Random spawn position (anywhere on the edges)
+      const side = Math.floor(Math.random() * 4);
       let startPos = { x: 0, y: 0 };
-      let endPos = { x: 0, y: 0 };
       
-      switch(edge) {
-        case 0: // Top-left to bottom-right
-          startPos = { x: -10, y: -10 };
-          endPos = { x: 110, y: 110 };
+      switch(side) {
+        case 0: // Top
+          startPos = { x: Math.random() * 100, y: -10 };
           break;
-        case 1: // Top-right to bottom-left
-          startPos = { x: 110, y: -10 };
-          endPos = { x: -10, y: 110 };
+        case 1: // Right
+          startPos = { x: 110, y: Math.random() * 100 };
           break;
-        case 2: // Bottom-left to top-right
-          startPos = { x: -10, y: 110 };
-          endPos = { x: 110, y: -10 };
+        case 2: // Bottom
+          startPos = { x: Math.random() * 100, y: 110 };
           break;
-        case 3: // Bottom-right to top-left
-          startPos = { x: 110, y: 110 };
-          endPos = { x: -10, y: -10 };
+        case 3: // Left
+          startPos = { x: -10, y: Math.random() * 100 };
           break;
-        default:
-          startPos = { x: Math.random() * 120 - 10, y: -10 };
-          endPos = { x: Math.random() * 120 - 10, y: 110 };
       }
+
+      // Random target position (anywhere on the opposite edges)
+      const endPos = {
+        x: Math.random() * 120 - 10,
+        y: Math.random() * 120 - 10
+      };
+
+      // Calculate rotation angle based on direction
+      const angle = Math.atan2(endPos.y - startPos.y, endPos.x - startPos.x) * (180 / Math.PI);
       
       const newMeteor = {
         id,
         icon: icons[Math.floor(Math.random() * icons.length)],
         startPos,
         endPos,
-        duration: Math.random() * 4 + 3,
-        rotation: Math.random() * 360,
+        duration: Math.random() * 5 + 5, // Slower, more majestic movement
+        rotation: angle,
       };
       
       setMeteors(prev => [...prev, newMeteor]);
       
+      // Remove meteor after animation completes
       setTimeout(() => {
         setMeteors(prev => prev.filter(m => m.id !== id));
-      }, 7000);
+      }, 11000);
     };
 
-    const meteorInterval = setInterval(createMeteor, 4000);
+    // Create first meteor immediately
+    createMeteor();
+
+    // Set interval to 1 minute (60000ms)
+    const meteorInterval = setInterval(createMeteor, 60000);
+    
     return () => clearInterval(meteorInterval);
   }, []);
-
-  const [floatingIcons, setFloatingIcons] = useState([]);
 
   return (
     <div className="space-background">
@@ -160,7 +163,7 @@ const SpaceBackground = () => {
           </div>
           <div className="meteor-tail" />
         </div>
-      ))
+      ))}
     </div>
   );
 };
