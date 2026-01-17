@@ -1,4 +1,9 @@
+
+
+
+
 import { useState, useEffect } from 'react';
+// Removed redundant DataProvider import
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import AboutSection from './AboutSection';
@@ -66,7 +71,7 @@ const PortfolioLayout = () => {
   };
 
   return (
-    <main className="m-[15px_12px_100px] md:my-[60px] md:mb-[120px] min-w-[259px]">
+    <main className="m-[15px_12px_75px] md:my-[60px] md:mb-[100px] min-w-[259px]">
         <div className="max-w-[1200px] mx-auto xl:flex xl:items-stretch xl:gap-[25px]">
           
           {/* Sidebar Area */}
@@ -75,13 +80,13 @@ const PortfolioLayout = () => {
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 min-w-0 bg-card/80 backdrop-blur-md border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative">
+          <div className="flex-1 min-w-0 bg-card border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative">
             
             {/* Navbar */}
             <Navbar activePage={activePage} onPageChange={handlePageChange} />
 
             {/* Content Pages */}
-            <div className="mt-4 md:mt-0 pb-24 md:pb-0">
+            <div className="mt-4 md:mt-0">
                {renderPage()}
             </div>
             
@@ -92,3 +97,9 @@ const PortfolioLayout = () => {
 };
 
 export default PortfolioLayout;
+
+
+
+
+
+

@@ -12,16 +12,15 @@ const Navbar = ({ activePage, onPageChange }) => {
   return (
     <nav 
       className={`
-        /* Mobile Styles (Fixed to Viewport Bottom) */
-        fixed bottom-0 left-0 w-full z-[9999]
-        bg-[#1e1e1f]/95 backdrop-blur-xl border-t border-border/40 
-        rounded-t-[20px] shadow-[0_-10px_30px_rgba(0,0,0,0.5)]
+        /* Mobile Styles (Fixed Bottom) */
+        fixed bottom-0 left-0 w-full z-50
+        bg-onyx/75 backdrop-blur-md border-t border-border rounded-t-[12px] shadow-portfolio-2
         
-        /* Desktop Styles (Reset to be inside the Card) */
+        /* Desktop Styles (Top Right Corner inside Card) */
         md:absolute md:bottom-auto md:top-0 md:left-auto md:right-0 
         md:w-max md:rounded-none md:rounded-bl-[20px] md:rounded-tr-[20px]
         md:border-b md:border-l md:border-t-0 md:border-r-0 md:bg-onyx/75
-        md:px-5 md:shadow-none md:z-50
+        md:px-5 md:shadow-none
       `}
     >
       <ul className="flex flex-wrap justify-center items-center px-5 md:gap-9 md:px-0">
@@ -30,7 +29,7 @@ const Navbar = ({ activePage, onPageChange }) => {
             <button
               onClick={() => handleNavClick(page)}
               className={`
-                relative px-2 py-4 md:py-5 text-[13px] md:text-[16px] font-medium transition-colors
+                relative px-2 py-4 md:py-5 text-[12px] md:text-[16px] font-medium transition-colors
                 ${
                   activePage === page.toLowerCase() || (activePage === 'project-details' && page.toLowerCase() === 'portfolio')
                     ? 'text-primary'
@@ -48,3 +47,4 @@ const Navbar = ({ activePage, onPageChange }) => {
 };
 
 export default Navbar;
+
