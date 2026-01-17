@@ -14,12 +14,12 @@ const Navbar = ({ activePage, onPageChange }) => {
       className={`
         /* Mobile Styles (Fixed Bottom) */
         fixed bottom-0 left-0 w-full z-50
-        bg-onyx/75 backdrop-blur-md border-t border-border rounded-t-[12px] shadow-portfolio-2
+        bg-onyx/50 backdrop-blur-md border-t border-border rounded-t-[12px] shadow-portfolio-2
         
         /* Desktop Styles (Top Right Corner inside Card) */
         md:absolute md:bottom-auto md:top-0 md:left-auto md:right-0 
         md:w-max md:rounded-none md:rounded-bl-[20px] md:rounded-tr-[20px]
-        md:border-b md:border-l md:border-t-0 md:border-r-0 md:bg-onyx/75
+        md:border-b md:border-l md:border-t-0 md:border-r-0 md:bg-onyx/50
         md:px-5 md:shadow-none
       `}
     >

@@ -46,7 +46,7 @@ function limitWords(text, limit = 2) {
   return (
     <aside 
       className={`
-        bg-card border border-border rounded-[20px] shadow-portfolio-1 z-10 
+        bg-card/80 backdrop-blur-md border border-border rounded-[20px] shadow-portfolio-1 z-10 
         p-[15px] md:p-[30px] lg:p-[40px]
         overflow-hidden transition-all duration-500 ease-in-out relative
         lg:sticky lg:top-[60px]

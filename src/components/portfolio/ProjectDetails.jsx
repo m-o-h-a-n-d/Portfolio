@@ -234,7 +234,7 @@ const ProjectDetails = () => {
             </div>
 
             {/* Project Details Card */}
-            <div className="bg-card border border-border rounded-2xl p-6 mt-8">
+            <div className="bg-card/80 backdrop-blur-md border border-border rounded-2xl p-6 mt-8">
               <h4 className="h4 mb-4 text-sm uppercase tracking-wider text-light-gray/50">Project Details</h4>
               <ul className="space-y-4">
                 <li className="flex justify-between items-center text-sm">

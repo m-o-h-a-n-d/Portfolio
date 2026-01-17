@@ -76,7 +76,7 @@ const PortfolioLayout = () => {
           </div>
 
           {/* Main Content Area */}
-          <div className="flex-1 min-w-0 bg-card border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative">
+          <div className="flex-1 min-w-0 bg-card/80 backdrop-blur-md border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative">
             
             {/* Navbar */}
             <Navbar activePage={activePage} onPageChange={handlePageChange} />

@@ -1,0 +1,93 @@
+.space-background {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
+  z-index: -1;
+  overflow: hidden;
+}
+
+.star {
+  position: absolute;
+  background: white;
+  border-radius: 50%;
+  animation: twinkle linear infinite;
+}
+
+@keyframes twinkle {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+
+.floating-icon {
+  position: absolute;
+  opacity: 0.4;
+  filter: grayscale(100%) brightness(150%);
+  animation: float linear infinite alternate;
+  pointer-events: none;
+}
+
+.floating-icon img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+@keyframes float {
+  0% { transform: translate(0, 0) rotate(0deg); }
+  100% { transform: translate(20px, 20px) rotate(10deg); }
+}
+
+.meteor {
+  position: absolute;
+  display: flex;
+  align-items: center;
+  transform: rotate(-45deg);
+  animation: meteor-move linear forwards;
+  pointer-events: none;
+  z-index: -1;
+}
+
+.meteor-head {
+  width: 40px;
+  height: 40px;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: 0 0 20px 5px rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(2px);
+}
+
+.meteor-head img {
+  width: 70%;
+  height: 70%;
+  filter: brightness(2);
+}
+
+.meteor-tail {
+  width: 100px;
+  height: 2px;
+  background: linear-gradient(to right, rgba(255, 255, 255, 0.7), transparent);
+  margin-left: -5px;
+}
+
+@keyframes meteor-move {
+  0% {
+    transform: translate(0, 0) rotate(-45deg);
+    opacity: 0;
+  }
+  10% {
+    opacity: 1;
+  }
+  90% {
+    opacity: 1;
+  }
+  100% {
+    transform: translate(-150vw, 150vh) rotate(-45deg);
+    opacity: 0;
+  }
+}

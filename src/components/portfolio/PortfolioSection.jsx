@@ -49,19 +49,19 @@ const PortfolioSection = () => {
         <div className="md:hidden relative mb-6">
           <button 
             onClick={() => setIsSelectOpen(!isSelectOpen)}
-            className="bg-card text-light-gray flex justify-between items-center w-full px-4 py-3 border border-border rounded-[14px] text-sm font-light"
+            className="bg-card/80 backdrop-blur-sm text-light-gray flex justify-between items-center w-full px-4 py-3 border border-border rounded-[14px] text-sm font-light"
           >
             <span className="capitalize">{activeFilter === 'all' ? 'Select category' : activeFilter}</span>
             <ChevronDown className={`w-4 h-4 transition-transform ${isSelectOpen ? 'rotate-180' : ''}`} />
           </button>
 
           {isSelectOpen && (
-            <ul className="absolute top-full left-0 right-0 mt-[6px] bg-card border border-border rounded-[14px] p-[6px] z-10">
+            <ul className="absolute top-full left-0 right-0 mt-[6px] bg-card/90 backdrop-blur-sm border border-border rounded-[14px] p-[6px] z-10">
               {categories.map((category) => (
                 <li key={category}>
                   <button
                     onClick={() => handleFilterChange(category)}
-                    className="bg-card text-light-gray text-sm font-light capitalize w-full text-left px-[10px] py-2 rounded-lg hover:bg-onyx transition-colors"
+                    className="bg-transparent text-light-gray text-sm font-light capitalize w-full text-left px-[10px] py-2 rounded-lg hover:bg-onyx/50 transition-colors"
                   >
                     {category}
                   </button>
