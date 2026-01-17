@@ -50,17 +50,44 @@ const SpaceBackground = () => {
     // For simplicity, I'll just use a static-ish set of floating icons
     setFloatingIcons(floatingIcons);
 
-    // Meteor generator
+    // Meteor generator with random directions
     const createMeteor = () => {
       const id = Date.now();
+      
+      // Random spawn position (any edge of screen)
+      const edge = Math.floor(Math.random() * 4);
+      let startPos = { x: 0, y: 0 };
+      let endPos = { x: 0, y: 0 };
+      
+      switch(edge) {
+        case 0: // Top-left to bottom-right
+          startPos = { x: -10, y: -10 };
+          endPos = { x: 110, y: 110 };
+          break;
+        case 1: // Top-right to bottom-left
+          startPos = { x: 110, y: -10 };
+          endPos = { x: -10, y: 110 };
+          break;
+        case 2: // Bottom-left to top-right
+          startPos = { x: -10, y: 110 };
+          endPos = { x: 110, y: -10 };
+          break;
+        case 3: // Bottom-right to top-left
+          startPos = { x: 110, y: 110 };
+          endPos = { x: -10, y: -10 };
+          break;
+        default:
+          startPos = { x: Math.random() * 120 - 10, y: -10 };
+          endPos = { x: Math.random() * 120 - 10, y: 110 };
+      }
+      
       const newMeteor = {
         id,
         icon: icons[Math.floor(Math.random() * icons.length)],
-        startPos: {
-          x: Math.random() * 50 + 50, // Start from top-right area (50% to 100%)
-          y: -10
-        },
+        startPos,
+        endPos,
         duration: Math.random() * 4 + 3,
+        rotation: Math.random() * 360,
       };
       
       setMeteors(prev => [...prev, newMeteor]);
@@ -113,13 +140,18 @@ const SpaceBackground = () => {
       ))}
 
       {/* Meteors */}
-      {meteors.map(meteor => (
+      {meteors.map((meteor) => (
         <div 
           key={meteor.id}
           className="meteor"
           style={{
             left: `${meteor.startPos.x}%`,
             top: `${meteor.startPos.y}%`,
+            '--start-x': `${meteor.startPos.x}%`,
+            '--start-y': `${meteor.startPos.y}%`,
+            '--end-x': `${meteor.endPos.x}%`,
+            '--end-y': `${meteor.endPos.y}%`,
+            '--rotation': `${meteor.rotation}deg`,
             animationDuration: `${meteor.duration}s`
           }}
         >
@@ -128,7 +160,7 @@ const SpaceBackground = () => {
           </div>
           <div className="meteor-tail" />
         </div>
-      ))}
+      ))
     </div>
   );
 };

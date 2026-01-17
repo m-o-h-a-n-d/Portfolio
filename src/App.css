@@ -40,3 +40,27 @@
 .read-the-docs {
   color: #888;
 }
+
+/* Navbar Glow Effect */
+.navbar-glow {
+  box-shadow: 
+    0 -2px 20px rgba(45, 100, 71%, 0.3),
+    0 -1px 10px rgba(45, 100%, 71%, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  animation: navbar-glow-pulse 3s ease-in-out infinite;
+}
+
+@keyframes navbar-glow-pulse {
+  0%, 100% {
+    box-shadow: 
+      0 -2px 20px rgba(45, 100%, 71%, 0.3),
+      0 -1px 10px rgba(45, 100%, 71%, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+  50% {
+    box-shadow: 
+      0 -2px 30px rgba(45, 100%, 71%, 0.5),
+      0 -1px 15px rgba(45, 100%, 71%, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+}
