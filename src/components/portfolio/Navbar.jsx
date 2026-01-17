@@ -12,9 +12,9 @@ const Navbar = ({ activePage, onPageChange }) => {
   return (
     <nav 
       className={`
-        /* Fixed Bottom with safe area for mobile */
-        fixed bottom-4 left-1/2 -translate-x-1/2 w-[95%] max-w-[400px] md:max-w-none md:w-full md:bottom-0 md:left-0 md:translate-x-0 z-50
-        bg-onyx/80 backdrop-blur-lg border border-border/50 md:border-t md:border-x-0 md:border-b-0 shadow-2xl rounded-2xl md:rounded-none
+        /* Fixed Bottom Full Width for all screens */
+        fixed bottom-0 left-0 w-full z-50
+        bg-onyx/90 backdrop-blur-xl border-t border-border/50 shadow-[0_-10px_20px_rgba(0,0,0,0.5)]
         navbar-glow
       `}
     >

@@ -82,7 +82,7 @@ const PortfolioLayout = () => {
             <Navbar activePage={activePage} onPageChange={handlePageChange} />
 
             {/* Content Pages */}
-            <div className="mt-4 md:mt-0">
+            <div className="mt-4 md:mt-0 pb-16 md:pb-0">
                {renderPage()}
             </div>
             
