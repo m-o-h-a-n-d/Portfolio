@@ -100,8 +100,8 @@ const SpaceBackground = () => {
     // Create first meteor immediately
     createMeteor();
 
-    // Set interval to 1 minute (60000ms)
-    const meteorInterval = setInterval(createMeteor, 60000);
+    // Set interval to 1 minute (30000ms)
+    const meteorInterval = setInterval(createMeteor, 30000);
     
     return () => clearInterval(meteorInterval);
   }, []);
