@@ -117,13 +117,15 @@ const CertificatesManager = () => {
 
       if (modalMode === 'add') {
         setCertificates(prev => {
-          const newList = [...prev, savedCertificate];
-          return newList.sort((a, b) => (a.order || 0) - (b.order || 0));
+          const newList = [...prev, savedCertificate].sort((a, b) => (a.order || 0) - (b.order || 0));
+          setFilteredCertificates(newList); // Force immediate render
+          return newList;
         });
       } else {
         setCertificates(prev => {
-          const newList = prev.map(c => c.id === (editingItem?.id || savedCertificate.id) ? savedCertificate : c);
-          return newList.sort((a, b) => (a.order || 0) - (b.order || 0));
+          const newList = prev.map(c => c.id === (editingItem?.id || savedCertificate.id) ? savedCertificate : c).sort((a, b) => (a.order || 0) - (b.order || 0));
+          setFilteredCertificates(newList); // Force immediate render
+          return newList;
         });
       }
 

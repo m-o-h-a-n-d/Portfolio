@@ -61,11 +61,14 @@ const PortfolioManager = () => {
 
     try {
       await apiDelete(API_PORTFOLIO_DELETE(id));
-      setPortfolio(prev => ({
-        ...prev,
-        projects: prev.projects.filter(p => p.id !== id)
-      }));
-      setFilteredProjects(prev => prev.filter(p => p.id !== id));
+      setPortfolio(prev => {
+        const updatedProjects = prev.projects.filter(p => p.id !== id);
+        setFilteredProjects(updatedProjects); // Force immediate render
+        return {
+          ...prev,
+          projects: updatedProjects
+        };
+      });
       Swal.fire({
         icon: 'success',
         title: 'Deleted!',

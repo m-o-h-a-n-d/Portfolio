@@ -100,12 +100,17 @@ const TeamManager = () => {
       const savedMember = response.member || response.data || submissionData;
 
       if (modalMode === 'add') {
-        setTeam(prev => [...prev, savedMember]);
-        setFilteredTeam(prev => [...prev, savedMember]);
+        setTeam(prev => {
+          const updated = [...prev, savedMember];
+          setFilteredTeam(updated); // Force immediate render
+          return updated;
+        });
       } else {
-        const updated = team.map(c => c.id === (editingItem?.id || savedMember.id) ? savedMember : c);
-        setTeam(updated);
-        setFilteredTeam(updated);
+        setTeam(prev => {
+          const updated = prev.map(c => c.id === (editingItem?.id || savedMember.id) ? savedMember : c);
+          setFilteredTeam(updated); // Force immediate render
+          return updated;
+        });
       }
 
       closeModal();

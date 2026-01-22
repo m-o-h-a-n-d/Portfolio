@@ -134,9 +134,17 @@ const ServicesManager = () => {
       const savedService = response.service || response.data || submissionData;
 
       if (modalMode === 'add') {
-        setServices(prev => [...prev, savedService]);
+        setServices(prev => {
+          const updated = [...prev, savedService];
+          setFilteredServices(updated); // Force immediate render of the list
+          return updated;
+        });
       } else {
-        setServices(prev => prev.map(s => s.id === (editingItem?.id || savedService.id) ? savedService : s));
+        setServices(prev => {
+          const updated = prev.map(s => s.id === (editingItem?.id || savedService.id) ? savedService : s);
+          setFilteredServices(updated); // Force immediate render of the list
+          return updated;
+        });
       }
 
       closeModal();

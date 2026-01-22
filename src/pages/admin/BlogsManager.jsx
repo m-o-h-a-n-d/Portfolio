@@ -128,6 +128,8 @@ const BlogsManager = () => {
       } else {
         setBlogs(prev => prev.map(b => b.id === (editingItem?.id || savedBlog.id) ? savedBlog : b));
       }
+      // Reset search query to ensure the new/updated item is visible
+      setSearchQuery('');
 
       closeModal();
       Swal.fire({
