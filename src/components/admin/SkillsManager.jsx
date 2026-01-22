@@ -53,12 +53,12 @@ const SkillsManager = ({ skills = [], onUpdate }) => {
       let updatedSkills;
       if (modalMode === 'add') {
         const response = await apiPost(API_SKILLS_CREATE, formData);
-        const newSkill = response.data || { ...formData, id: `skill_${Date.now()}` };
+        const newSkill = response.skill || response.data || { ...formData, id: `skill_${Date.now()}` };
         updatedSkills = [...skills, newSkill];
       } else {
         const response = await apiPut(`${API_SKILLS_UPDATE}/${editingSkill.id}`, formData);
-        const updatedSkill = response.data || { ...editingSkill, ...formData };
-        updatedSkills = skills.map(s => s.id === editingSkill.id ? updatedSkill : s);
+        const updatedSkill = response.skill || response.data || { ...editingSkill, ...formData };
+        updatedSkills = skills.map(s => s.id === (editingSkill?.id || updatedSkill.id) ? updatedSkill : s);
       }
       onUpdate(updatedSkills);
       closeModal();

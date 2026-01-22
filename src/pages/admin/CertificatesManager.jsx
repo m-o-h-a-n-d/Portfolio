@@ -110,16 +110,19 @@ const CertificatesManager = () => {
         ...formData,
         id: editingItem?.id || Date.now()
       };
-      await apiPost('/certificates', submissionData);
+      const response = await apiPost('/certificates', submissionData);
+      
+      // Use returned data for real-time update
+      const savedCertificate = response.certificate || response.data || submissionData;
 
       if (modalMode === 'add') {
         setCertificates(prev => {
-          const newList = [...prev, submissionData];
+          const newList = [...prev, savedCertificate];
           return newList.sort((a, b) => (a.order || 0) - (b.order || 0));
         });
       } else {
         setCertificates(prev => {
-          const newList = prev.map(c => c.id === editingItem.id ? submissionData : c);
+          const newList = prev.map(c => c.id === (editingItem?.id || savedCertificate.id) ? savedCertificate : c);
           return newList.sort((a, b) => (a.order || 0) - (b.order || 0));
         });
       }

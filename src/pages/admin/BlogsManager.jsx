@@ -113,12 +113,22 @@ const BlogsManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      let response;
       if (modalMode === 'add') {
-        await apiPost(API_BLOG_CREATE, formData);
+        response = await apiPost(API_BLOG_CREATE, formData);
       } else {
-        await apiPut(`${API_BLOG_UPDATE}/${editingItem.id}`, formData);
+        response = await apiPut(`${API_BLOG_UPDATE}/${editingItem.id}`, formData);
       }
-      fetchBlogs();
+      
+      // Use returned data for real-time update without full refresh
+      const savedBlog = response.post || response.blog || response.data || (modalMode === 'add' ? { ...formData, id: Date.now() } : { ...editingItem, ...formData });
+      
+      if (modalMode === 'add') {
+        setBlogs(prev => [savedBlog, ...prev]);
+      } else {
+        setBlogs(prev => prev.map(b => b.id === (editingItem?.id || savedBlog.id) ? savedBlog : b));
+      }
+
       closeModal();
       Swal.fire({
         icon: 'success',
@@ -126,7 +136,8 @@ const BlogsManager = () => {
         timer: 1500,
         showConfirmButton: false
       });
-    } catch {
+    } catch (error) {
+      console.error('Error saving blog:', error);
       Swal.fire('Error', 'Something went wrong', 'error');
     }
   };

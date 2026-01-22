@@ -188,13 +188,13 @@ const ResumeManager = () => {
         }
       }
 
-      const updatedItem = response.data || { ...submissionData, id: submissionData.id || Date.now().toString() };
+      const updatedItem = response.education || response.experience || response.data || { ...submissionData, id: submissionData.id || Date.now().toString() };
       
       setSectionsData(prev => ({
         ...prev,
         [sectionKey]: modalMode === 'add' 
           ? [...prev[sectionKey], updatedItem]
-          : prev[sectionKey].map(item => item.id === editingItem.id ? updatedItem : item)
+          : prev[sectionKey].map(item => item.id === (editingItem?.id || updatedItem.id) ? updatedItem : item)
       }));
 
       closeModal();

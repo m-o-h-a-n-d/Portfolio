@@ -128,12 +128,15 @@ const ServicesManager = () => {
       
       // Use the appropriate endpoint based on mode
       const endpoint = '/services';
-      await apiPost(endpoint, submissionData);
+      const response = await apiPost(endpoint, submissionData);
+      
+      // Use the data returned from the backend for real-time update
+      const savedService = response.service || response.data || submissionData;
 
       if (modalMode === 'add') {
-        setServices(prev => [...prev, submissionData]);
+        setServices(prev => [...prev, savedService]);
       } else {
-        setServices(prev => prev.map(s => s.id === editingItem.id ? submissionData : s));
+        setServices(prev => prev.map(s => s.id === (editingItem?.id || savedService.id) ? savedService : s));
       }
 
       closeModal();

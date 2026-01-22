@@ -94,13 +94,16 @@ const TeamManager = () => {
         ...formData,
         id: editingItem?.id || Date.now()
       };
-      await apiPost('/team', submissionData);
+      const response = await apiPost('/team', submissionData);
+      
+      // Use returned data for real-time update
+      const savedMember = response.member || response.data || submissionData;
 
       if (modalMode === 'add') {
-        setTeam(prev => [...prev, submissionData]);
-        setFilteredTeam(prev => [...prev, submissionData]);
+        setTeam(prev => [...prev, savedMember]);
+        setFilteredTeam(prev => [...prev, savedMember]);
       } else {
-        const updated = team.map(c => c.id === editingItem.id ? submissionData : c);
+        const updated = team.map(c => c.id === (editingItem?.id || savedMember.id) ? savedMember : c);
         setTeam(updated);
         setFilteredTeam(updated);
       }
