@@ -35,11 +35,20 @@ export const AuthProvider = ({ children }) => {
   const login = async (email, password) => {
     try {
       const response = await apiFetch('/auth/login', 'POST', { email, password });
-      if (response.success) {
-        setUser(response.user);
+      const token =
+        response?.token ||
+        response?.access_token ||
+        response?.data?.token ||
+        response?.data?.access_token;
+      const userData = response?.user || response?.data?.user || response?.data;
+      if (token) {
+        setAuthToken(token);
+      }
+      if (userData && (response?.success ?? true)) {
+        setUser(userData);
         return { success: true };
       }
-      return { success: false, message: 'Login failed' };
+      return { success: false, message: response?.message || 'Login failed' };
     } catch (error) {
       return { success: false, message: error.message };
     }
