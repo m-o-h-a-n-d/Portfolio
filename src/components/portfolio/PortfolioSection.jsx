@@ -1,24 +1,28 @@
 import { useState } from 'react';
 import { usePortfolio, useServices } from '../../context/DataContext';
 import { Eye, ChevronDown } from 'lucide-react';
+
 const PortfolioSection = () => {
   const portfolio = usePortfolio();
-  const services = useServices();
+  const servicesData = useServices();
   const [activeFilter, setActiveFilter] = useState('all');
   const [isSelectOpen, setIsSelectOpen] = useState(false);
 
   if (!portfolio) return null;
 
-  const categories = services 
+  // Extract services array safely
+  const services = Array.isArray(servicesData) ? servicesData : (servicesData?.services || []);
+
+  // Generate categories from services or fallback to portfolio categories
+  const categories = services.length > 0 
     ? ['all', ...services.map(s => s.title)]
     : (portfolio.categories || ['all', 'Frontend Development', 'Backend Development', 'IOT']);
   
- const filteredProjects = activeFilter === 'all' 
-  ? portfolio.projects 
-  : portfolio.projects?.filter(
-      p => p.category.toLowerCase() === activeFilter.toLowerCase()
-    );
-
+  const filteredProjects = activeFilter === 'all' 
+    ? portfolio.projects 
+    : portfolio.projects?.filter(
+        p => p.category && p.category.toLowerCase() === activeFilter.toLowerCase()
+      );
 
   const handleFilterChange = (category) => {
     setActiveFilter(category);
