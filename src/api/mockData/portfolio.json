@@ -34,7 +34,7 @@
       "id": 3,
       "slug": "egycare",
       "title": "Egycare",
-      "category": "Frontend Development",
+      "category": "Front-end Development",
       "image": "/images/egycare.webp",
       "images": ["/images/egycare.webp"],
       "description": "Healthcare platform with intuitive UI, patient management features, and responsive design.",
@@ -49,7 +49,7 @@
       "id": 4,
       "slug": "systemmo",
       "title": "SystemMO",
-      "category": "Frontend Development",
+      "category": "Front-end Development",
       "image": "/images/systemmo.webp",
       "images": ["/images/systemmo.webp"],
       "description": "Interactive frontend dashboard for monitoring data and system metrics in real-time.",
@@ -64,7 +64,7 @@
       "id": 5,
       "slug": "smart-parking-iot",
       "title": "Parking System",
-      "category": "IOT",
+      "category": "IoT Solutions",
       "image": "/images/iot.webp",
       "images": ["/images/iot.webp", "/images/parkingmo.webp"],
       "description": "IoT-enabled parking system with smart sensors and automated parking management.",
@@ -94,7 +94,7 @@
       "id": 7,
       "slug": "education-platform",
       "title": "Education Platform",
-      "category": "Frontend Development",
+      "category": "Front-end Development",
       "image": "/images/education.webp",
       "images": ["/images/education.webp", "/images/education2.webp"],
       "description": "Interactive learning platform with responsive design and rich educational content.",
@@ -109,7 +109,7 @@
       "id": 8,
       "slug": "education-platform-v2",
       "title": "Education Platform",
-      "category": "Frontend Development",
+      "category": "Front-end Development",
       "image": "/images/education2.webp",
       "images": ["/images/education2.webp", "/images/education.webp"],
       "description": "Interactive learning platform with responsive design and rich educational content.",
@@ -121,5 +121,5 @@
       "status": 1
     }
   ],
-  "categories": ["all", "Backend Development", "Frontend Development", "IOT"]
+  "categories": ["all", "Front-end Development", "Backend Development", "IoT Solutions", "UI & UX Design"]
 }

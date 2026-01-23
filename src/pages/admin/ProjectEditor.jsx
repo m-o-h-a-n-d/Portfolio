@@ -16,6 +16,7 @@ const ProjectEditor = () => {
 
   const [portfolio, setPortfolio] = useState(null);
   const [team, setTeam] = useState(null);
+  const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [techInput, setTechInput] = useState('');
@@ -61,15 +62,20 @@ const ProjectEditor = () => {
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [portfolioRes, teamRes] = await Promise.all([
+      const [portfolioRes, teamRes, servicesRes] = await Promise.all([
         apiGet('/portfolio'),
-        apiGet('/team')
+        apiGet('/team'),
+        apiGet('/services')
       ]);
       setPortfolio(portfolioRes.data);
       
       // Ensure team data is always an array
       const teamData = teamRes.data.team || teamRes.data;
       setTeam(Array.isArray(teamData) ? teamData : []);
+
+      // Ensure services data is always an array
+      const servicesData = servicesRes.data.services || servicesRes.data;
+      setServices(Array.isArray(servicesData) ? servicesData : []);
     } catch (error) {
       console.error('Error fetching data:', error);
       Swal.fire({
@@ -470,16 +476,22 @@ const ProjectEditor = () => {
                 />
               </div>
               <div>
-                <label className="text-light-gray/70 text-xs uppercase mb-2 block">Category</label>
+                <label className="text-light-gray/70 text-xs uppercase mb-2 block">Category (from Services)</label>
                 <select
                   name="category"
                   value={formData.category}
                   onChange={handleInputChange}
                   className="form-input"
                 >
-                  {portfolio?.categories?.filter(c => c !== 'all').map(cat => (
-                    <option key={cat} value={cat}>{cat}</option>
-                  ))}
+                  {services.length > 0 ? (
+                    services.map(service => (
+                      <option key={service.id} value={service.title}>{service.title}</option>
+                    ))
+                  ) : (
+                    portfolio?.categories?.filter(c => c !== 'all').map(cat => (
+                      <option key={cat} value={cat}>{cat}</option>
+                    ))
+                  )}
                 </select>
               </div>
               <div className="md:col-span-2">

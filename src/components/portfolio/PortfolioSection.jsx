@@ -1,14 +1,17 @@
 import { useState } from 'react';
-import { usePortfolio } from '../../context/DataContext';
+import { usePortfolio, useServices } from '../../context/DataContext';
 import { Eye, ChevronDown } from 'lucide-react';
 const PortfolioSection = () => {
   const portfolio = usePortfolio();
+  const services = useServices();
   const [activeFilter, setActiveFilter] = useState('all');
   const [isSelectOpen, setIsSelectOpen] = useState(false);
 
   if (!portfolio) return null;
 
-  const categories = portfolio.categories || ['all', 'Frontend Development', 'Backend Development', 'IOT'];
+  const categories = services 
+    ? ['all', ...services.map(s => s.title)]
+    : (portfolio.categories || ['all', 'Frontend Development', 'Backend Development', 'IOT']);
   
  const filteredProjects = activeFilter === 'all' 
   ? portfolio.projects 
