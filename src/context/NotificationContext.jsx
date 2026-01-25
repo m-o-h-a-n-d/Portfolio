@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import echo from '../echo';
 import { useToast } from '../hooks/use-toast';
+import { useAuth } from './AuthContext';
 
 const NotificationContext = createContext();
 
@@ -9,15 +10,31 @@ export const NotificationProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const { toast } = useToast();
+  const { user } = useAuth();
 
   const fetchNotifications = async () => {
     try {
+      if (!user?.id) {
+        setNotifications([]);
+        setUnreadCount(0);
+        return;
+      }
       setLoading(true);
-      const { apiGet } = await import('../api/request');
-      const response = await apiGet('/messages');
-      const messages = response.data.messages || [];
+      const { apiGet, CONTACT_US_ENDPOINTS } = await import('../api/request');
+      const response = await apiGet(CONTACT_US_ENDPOINTS.list);
+      const payload = response?.data?.data ?? response?.data ?? [];
+      const rawMessages = Array.isArray(payload) ? payload : payload ? [payload] : [];
+      const messages = rawMessages.map((item) => ({
+        id: item.id || Date.now(),
+        name: item.name || item.sender_name || 'New Visitor',
+        email: item.email || item.sender_email || '',
+        subject: item.subject || '',
+        message: item.message || 'New message received',
+        created_at: item.created_at || item.date || new Date().toISOString(),
+        read: item.read ?? false
+      }));
       setNotifications(messages);
-      setUnreadCount(messages.filter(m => !m.read).length);
+      setUnreadCount(messages.filter((m) => !m.read).length);
     } catch (error) {
       console.error('Error fetching notifications:', error);
     } finally {
@@ -26,19 +43,23 @@ export const NotificationProvider = ({ children }) => {
   };
 
   useEffect(() => {
+    if (!user?.id) {
+      return undefined;
+    }
+
     fetchNotifications();
 
-    const channel = echo.private('admin-notifications');
+const channelName = `App.Models.User.${user.id}`;
+const channel = echo.private(channelName);
 
-    channel.listen('.NewContactMessage', (data) => {
-      console.log('New contact message received:', data);
-      
+    channel.notification((notification) => {
       const newNotification = {
-        id: data.id || Date.now(),
-        name: data.sender_name || 'New Visitor',
-        email: data.sender_email || '',
-        message: data.message || 'New message received',
-        date: new Date().toISOString(),
+        id: notification.id || Date.now(),
+        name: notification.name || notification.sender_name || 'New Visitor',
+        email: notification.email || notification.sender_email || '',
+        subject: notification.subject || '',
+        message: notification.message || 'New message received',
+        created_at: notification.created_at || new Date().toISOString(),
         read: false
       };
 
@@ -47,21 +68,20 @@ export const NotificationProvider = ({ children }) => {
       
       toast({
         title: "New Message",
-        description: `New message from ${data.sender_name || 'a visitor'}`,
+        description: `New message from ${notification.name || 'a visitor'}`,
       });
     });
 
     return () => {
-      echo.leave('admin-notifications');
+      echo.leave(channelName);
     };
-  }, [toast]);
+  }, [toast, user?.id]);
 
   const markAsRead = async (id) => {
     try {
-      // In a real app, call API here
-      // const { apiPost } = await import('../api/request');
-      // await apiPost(`/messages/${id}/read`);
-      
+      const { apiPatch, CONTACT_US_ENDPOINTS } = await import('../api/request');
+      await apiPatch(CONTACT_US_ENDPOINTS.markRead(id));
+
       setNotifications(prev => prev.map(n => 
         n.id === id ? { ...n, read: true } : n
       ));
@@ -73,10 +93,9 @@ export const NotificationProvider = ({ children }) => {
 
   const deleteNotification = async (id) => {
     try {
-      // In a real app, call API here
-      // const { apiDelete } = await import('../api/request');
-      // await apiDelete(`/messages/${id}`);
-      
+      const { apiDelete, CONTACT_US_ENDPOINTS } = await import('../api/request');
+      await apiDelete(CONTACT_US_ENDPOINTS.delete(id));
+
       const notificationToDelete = notifications.find(n => n.id === id);
       if (notificationToDelete && !notificationToDelete.read) {
         setUnreadCount(prev => Math.max(0, prev - 1));

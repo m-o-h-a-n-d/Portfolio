@@ -39,6 +39,23 @@ const DashboardLayout = () => {
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
+  const formatRelativeTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return '';
+    const diffSeconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (diffSeconds < 60) return 'just now';
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 30) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    const diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths < 12) return `${diffMonths} month${diffMonths === 1 ? '' : 's'} ago`;
+    const diffYears = Math.floor(diffMonths / 12);
+    return `${diffYears} year${diffYears === 1 ? '' : 's'} ago`;
+  };
 
   const navItems = [
     { path: '/admin', icon: LayoutDashboard, label: 'Dashboard', exact: true },
@@ -256,12 +273,12 @@ const DashboardLayout = () => {
                                 </button>
                               </div>
                               <p className="text-xs text-muted-foreground line-clamp-2 mt-0.5">
-                                {notif.message}
+                                {notif.subject || notif.message}
                               </p>
                               <div className="flex items-center gap-2 mt-2">
                                 <span className="text-[10px] text-muted-foreground flex items-center gap-1">
                                   <Clock className="w-3 h-3" />
-                                  {new Date(notif.date).toLocaleDateString()}
+                                  {formatRelativeTime(notif.created_at)}
                                 </span>
                                 {!notif.read && (
                                   <button 

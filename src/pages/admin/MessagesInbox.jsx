@@ -17,15 +17,22 @@ const MessagesInbox = () => {
     fetchNotifications();
   }, []);
 
-  const formatDate = (dateString) => {
+  const formatRelativeTime = (dateString) => {
+    if (!dateString) return '';
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+    if (Number.isNaN(date.getTime())) return '';
+    const diffSeconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (diffSeconds < 60) return 'just now';
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 30) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    const diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths < 12) return `${diffMonths} month${diffMonths === 1 ? '' : 's'} ago`;
+    const diffYears = Math.floor(diffMonths / 12);
+    return `${diffYears} year${diffYears === 1 ? '' : 's'} ago`;
   };
 
   const handleDelete = async (id) => {
@@ -41,7 +48,7 @@ const MessagesInbox = () => {
     if (!result.isConfirmed) return;
     
     try {
-      deleteNotification(id);
+      await deleteNotification(id);
       if (selectedMessage?.id === id) {
         setSelectedMessage(null);
       }
@@ -62,10 +69,10 @@ const MessagesInbox = () => {
     }
   };
 
-  const openMessage = (message) => {
+  const openMessage = async (message) => {
     setSelectedMessage(message);
     if (!message.read) {
-      markAsRead(message.id);
+      await markAsRead(message.id);
     }
   };
 
@@ -126,11 +133,13 @@ const MessagesInbox = () => {
                           {message.name}
                         </h4>
                         <span className="text-xs text-muted-foreground whitespace-nowrap">
-                          {formatDate(message.date).split(',')[0]}
+                          {formatRelativeTime(message.created_at)}
                         </span>
                       </div>
                       <p className="text-xs text-muted-foreground truncate">{message.email}</p>
-                      <p className="text-sm text-light-gray truncate mt-1">{message.message}</p>
+                      <p className="text-sm text-light-gray truncate mt-1">
+                        {message.subject || message.message}
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -150,6 +159,9 @@ const MessagesInbox = () => {
               <div className="flex items-start justify-between mb-6">
                 <div>
                   <h3 className="h3 text-white-2 mb-1">{selectedMessage.name}</h3>
+                  {selectedMessage.subject && (
+                    <p className="text-sm text-muted-foreground">{selectedMessage.subject}</p>
+                  )}
                   <a 
                     href={`mailto:${selectedMessage.email}`}
                     className="text-primary text-sm hover:underline"
@@ -170,7 +182,7 @@ const MessagesInbox = () => {
               {/* Date */}
               <div className="flex items-center gap-2 text-muted-foreground text-sm mb-6">
                 <Clock className="w-4 h-4" />
-                <span>{formatDate(selectedMessage.date)}</span>
+                <span>{formatRelativeTime(selectedMessage.created_at)}</span>
                 {selectedMessage.read && (
                   <span className="flex items-center gap-1 text-green-500 ml-4">
                     <Check className="w-4 h-4" />

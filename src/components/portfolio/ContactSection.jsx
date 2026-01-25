@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { useProfile } from '../../context/DataContext';
 import { Send } from 'lucide-react';
 import Swal from '../../lib/swal';
+import { apiPost, CONTACT_US_ENDPOINTS } from '../../api/request';
 
 const ContactSection = () => {
   const profile = useProfile();
   const [formData, setFormData] = useState({
     fullname: '',
     email: '',
+    subject: '',
     message: ''
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -19,9 +21,14 @@ const ContactSection = () => {
     setFormData(newFormData);
     
     // Check form validity
-    const { fullname, email, message } = newFormData;
+    const { fullname, email, subject, message } = newFormData;
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    setIsValid(fullname.trim() !== '' && emailRegex.test(email) && message.trim() !== '');
+    setIsValid(
+      fullname.trim() !== '' &&
+      emailRegex.test(email) &&
+      subject.trim() !== '' &&
+      message.trim() !== ''
+    );
   };
 
   const handleSubmit = async (e) => {
@@ -29,24 +36,35 @@ const ContactSection = () => {
     if (!isValid) return;
 
     setIsSubmitting(true);
-    
-    // Simulate API call
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    console.log('Form submitted:', formData);
-    
-    // Reset form
-    setFormData({ fullname: '', email: '', message: '' });
-    setIsValid(false);
-    setIsSubmitting(false);
-    
-    Swal.fire({
-      icon: 'success',
-      title: 'Success!',
-      text: 'Message sent successfully!',
-      timer: 3000,
-      timerProgressBar: true,
-    });
+
+    try {
+      await apiPost(CONTACT_US_ENDPOINTS.store, {
+        name: formData.fullname,
+        email: formData.email,
+        subject: formData.subject,
+        message: formData.message
+      });
+
+      setFormData({ fullname: '', email: '', subject: '', message: '' });
+      setIsValid(false);
+
+      Swal.fire({
+        icon: 'success',
+        title: 'Success!',
+        text: 'Message sent successfully!',
+        timer: 3000,
+        timerProgressBar: true,
+      });
+    } catch (error) {
+      console.error('Message send failed:', error);
+      Swal.fire({
+        icon: 'error',
+        title: 'Error',
+        text: error?.message || 'Failed to send message. Please try again.',
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
@@ -96,6 +114,17 @@ const ContactSection = () => {
               onChange={handleChange}
             />
           </div>
+
+          {/* Subject */}
+          <input 
+            type="text" 
+            name="subject" 
+            className="form-input mb-[25px]" 
+            placeholder="Subject" 
+            required
+            value={formData.subject}
+            onChange={handleChange}
+          />
 
           {/* Message */}
           <textarea 
