@@ -71,10 +71,12 @@ export const isAuthenticated = () => !!getAuthToken();
  */
 const FORCE_REAL_API_ENDPOINTS = [
  
-  CONTACT_US_ENDPOINTS.list,
-  "/admin/contact-us/read",
-  "/admin/contact-us/delete",
-  CONTACT_US_ENDPOINTS.store,
+  // CONTACT_US_ENDPOINTS.list,
+  // "/admin/contact-us/read",
+  // "/admin/contact-us/delete",
+  // CONTACT_US_ENDPOINTS.store,
+ 
+
   
 ];
 
