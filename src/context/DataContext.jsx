@@ -160,10 +160,28 @@ export const DataProvider = ({ children }) => {
 
         // 7. Normalize Portfolio
         const portfolioDataRaw = portfolioRes?.data ?? portfolioRes ?? {};
+        const serviceTitleById = new Map(
+          (Array.isArray(servicesList) ? servicesList : []).map(service => [
+            String(service?.id),
+            service?.title || service?.name || service?.slug || ''
+          ])
+        );
+        const resolveCategory = (project) => {
+          const direct = project?.category;
+          if (typeof direct === 'string' && direct.trim() !== '') return direct;
+          if (project?.service_name) return project.service_name;
+          if (project?.service_title) return project.service_title;
+          if (project?.service?.title) return project.service.title;
+          if (project?.service?.name) return project.service.name;
+          if (typeof project?.service === 'string') return project.service;
+          const serviceId = project?.service_id ?? project?.service?.id;
+          const mapped = serviceId != null ? serviceTitleById.get(String(serviceId)) : '';
+          return mapped || '';
+        };
         const projectsList = normalizeList(portfolioDataRaw, ['projects', 'portfolios', 'portfolio']).map(project => ({
           ...project,
-          image: project.image || project.image_cover || '',
-          category: project.category || project.service_name || '',
+          image: project.image || project.image_cover || (Array.isArray(project?.images) ? project.images[0] : ''),
+          category: resolveCategory(project),
           description: project.description || project.short_desc || project.desc || '',
           full_description: project.full_description || project.description || ''
         }));

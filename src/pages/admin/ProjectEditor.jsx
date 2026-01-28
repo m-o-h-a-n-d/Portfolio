@@ -366,23 +366,28 @@ const ProjectEditor = () => {
       projectData.append('service', String(formData.service || ''));
       projectData.append('slug', basePayload.slug);
       basePayload.technologies.forEach((tech) => projectData.append('technologies[]', tech));
-      if (isEditMode && basePayload.teams.length === 0) {
-        projectData.append('teams[]', '');
-        projectData.append('team_members[]', '');
-      } else {
-        basePayload.teams.forEach((memberId) => {
-          projectData.append('teams[]', String(memberId));
-          projectData.append('team_members[]', String(memberId));
-        });
-      }
+      projectData.append('teams_present', '1');
+      basePayload.teams.forEach((memberId) => {
+        projectData.append('teams[]', String(memberId));
+        projectData.append('team_members[]', String(memberId));
+      });
       if (isEditMode) {
+      // old images urls (strings) -> images[]
+      if (orderedImageUrls.length > 0) {
         orderedImageUrls.forEach((url) => projectData.append('images[]', url));
-        for (const img of orderedImages) {
-          if (typeof img === 'string' && img.startsWith('data:')) {
-            const file = getFileFromDataUrl(img);
-            if (file) projectData.append('images_files[]', file);
-          }
+      } else {
+        // Keep key present so backend detects removals.
+        projectData.append('images[]', ' ');
+      }
+
+      // new images files -> images_files[]
+      for (const img of orderedImages) {
+        if (typeof img === 'string' && img.startsWith('data:')) {
+          const file = getFileFromDataUrl(img);
+          if (file) projectData.append('images_files[]', file);
         }
+      }
+
         projectData.append('_method', 'PUT');
         await apiPost(DASHBOARD_ENDPOINTS.portfolio.update(id), projectData);
       } else {
