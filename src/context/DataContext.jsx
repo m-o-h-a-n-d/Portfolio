@@ -79,13 +79,11 @@ export const DataProvider = ({ children }) => {
             results[endpoint.key] = { data: null };
           } finally {
             completed++;
-            // Only update progress if it's a significant change to reduce re-renders
             const newProgress = 10 + Math.floor((completed / endpoints.length) * 90);
             setProgress(prev => Math.max(prev, newProgress));
           }
         });
 
-        // Add a safety timeout of 8 seconds
         const timeoutPromise = new Promise((_, reject) => 
           setTimeout(() => reject(new Error('Timeout')), 8000)
         );
@@ -97,7 +95,6 @@ export const DataProvider = ({ children }) => {
         }
         
         setProgress(100);
-        // Small delay to ensure 100% is visible
         await new Promise(resolve => setTimeout(resolve, 200));
 
         const {
@@ -114,86 +111,93 @@ export const DataProvider = ({ children }) => {
           settings: settingsRes
         } = results;
 
-        const normalizeProfile = (res) =>
-          res?.data?.user || res?.user || res?.data || res || null;
-        const normalizeSettings = (res) => {
-          const data = res?.data ?? res;
-          if (Array.isArray(data)) return data[0] || null;
-          if (Array.isArray(data?.settings)) return data.settings[0] || null;
-          return data || null;
-        };
+        // Helper to extract list from various response structures
         const normalizeList = (res, keys = []) => {
-          if (Array.isArray(res)) return res;
-          if (Array.isArray(res?.data)) return res.data;
-          if (Array.isArray(res?.data?.data)) return res.data.data;
-          if (Array.isArray(res?.data?.items)) return res.data.items;
+          const data = res?.data ?? res;
+          if (Array.isArray(data)) return data;
+          if (Array.isArray(data?.data)) return data.data;
+          if (Array.isArray(data?.items)) return data.items;
+          
           for (const key of keys) {
-            if (Array.isArray(res?.data?.[key])) return res.data[key];
-            if (Array.isArray(res?.[key])) return res[key];
+            if (Array.isArray(data?.[key])) return data[key];
           }
           return [];
         };
 
-        const normalizePortfolio = (res) => {
-          const data = res?.data ?? res ?? {};
-          const projects = normalizeList(data, ['projects', 'portfolios', 'portfolio']);
-          const categories =
-            Array.isArray(data?.categories) && data.categories.length > 0
-              ? data.categories
-              : ['all', ...new Set(projects.map((p) => p.category).filter(Boolean))];
+        // 1. Normalize Profile
+        const profileData = profileRes?.data?.user || profileRes?.user || profileRes?.data || profileRes || null;
+        setProfile(profileData);
 
-          if (Array.isArray(data)) {
-            return { projects, categories };
-          }
+        // 2. Normalize Settings
+        const rawSettings = settingsRes?.data ?? settingsRes;
+        const settingsData = Array.isArray(rawSettings) ? rawSettings[0] : (rawSettings?.settings?.[0] || rawSettings || null);
+        setSettings(settingsData);
 
-          return { ...data, projects, categories };
-        };
+        // 3. Normalize Services
+        const servicesList = normalizeList(servicesRes, ['services', 'service']);
+        setServices({ services: servicesList });
 
-        const normalizeServices = (res) => ({
-          services: normalizeList(res, ['services', 'service'])
+        // 4. Normalize Certificates
+        const certsList = normalizeList(certificatesRes, ['certificates', 'certificate', 'certifications']).map(cert => ({
+          ...cert,
+          avatar: cert.avatar || cert.image || '', // Handle both field names
+        }));
+        setCertificates({ certificates: certsList });
+
+        // 5. Normalize Team
+        const teamList = normalizeList(teamRes, ['team', 'teams']).map(member => ({
+          ...member,
+          logo: member.logo || member.image || member.avatar || '', // Handle multiple field names
+        }));
+        setTeam({ team: teamList });
+
+        // 6. Normalize Blog
+        const blogList = normalizeList(blogRes, ['posts', 'blogs', 'blog']).map(post => ({
+          ...post,
+          excerpt: post.excerpt || post.short_desc || post.description || '',
+        }));
+        setBlog({ posts: blogList });
+
+        // 7. Normalize Portfolio
+        const portfolioDataRaw = portfolioRes?.data ?? portfolioRes ?? {};
+        const projectsList = normalizeList(portfolioDataRaw, ['projects', 'portfolios', 'portfolio']).map(project => ({
+          ...project,
+          image: project.image || project.image_cover || '',
+          category: project.category || project.service_name || '',
+          description: project.description || project.short_desc || project.desc || '',
+          full_description: project.full_description || project.description || ''
+        }));
+        
+        const categories = Array.isArray(portfolioDataRaw?.categories) && portfolioDataRaw.categories.length > 0
+          ? portfolioDataRaw.categories
+          : ['all', ...new Set(projectsList.map((p) => p.category).filter(Boolean))];
+        
+        setPortfolio({ 
+          ...portfolioDataRaw, 
+          projects: projectsList, 
+          categories 
         });
 
-        const normalizeCertificates = (res) => ({
-          certificates: normalizeList(res, ['certificates', 'certificate'])
-        });
-
-        const normalizeTeam = (res) => ({
-          team: normalizeList(res, ['team', 'teams'])
-        });
-
-        const normalizeBlog = (res) => ({
-          posts: normalizeList(res, ['posts', 'blogs', 'blog'])
-        });
-
-        // Reconstruct the resume object based on the order array and individual data
+        // 8. Normalize Resume (Education, Experience, Skills)
         const rawOrder = Array.isArray(resumeOrderRes?.data)
           ? resumeOrderRes.data
           : Array.isArray(resumeOrderRes?.data?.order)
             ? resumeOrderRes.data.order
-            : Array.isArray(resumeOrderRes?.data?.data)
-              ? resumeOrderRes.data.data
-              : ["education", "experience", "skills"];
+            : ["education", "experience", "skills"];
+        
         const order = rawOrder
-          .map((item) =>
-            typeof item === 'string' ? item : item?.type || item?.name || ''
-          )
+          .map((item) => typeof item === 'string' ? item : item?.type || item?.name || '')
           .filter(Boolean);
+        
         const normalizedOrder = order.length > 0 ? order : ["education", "experience", "skills"];
+        
         const reconstructedResume = normalizedOrder.map(type => {
           if (type === 'education') return { type: 'education', data: normalizeList(eduRes, ['educations', 'education']) };
           if (type === 'experience') return { type: 'experience', data: normalizeList(expRes, ['experiences', 'experience']) };
           if (type === 'skills') return { type: 'skills', data: normalizeList(skillsRes, ['skills', 'skill']) };
           return { type, data: [] };
         });
-
-        setProfile(normalizeProfile(profileRes));
         setResume(reconstructedResume);
-        setPortfolio(normalizePortfolio(portfolioRes));
-        setBlog(normalizeBlog(blogRes));
-        setCertificates(normalizeCertificates(certificatesRes));
-        setTeam(normalizeTeam(teamRes));
-        setServices(normalizeServices(servicesRes));
-        setSettings(normalizeSettings(settingsRes));
 
       } catch (err) {
         console.error('Error fetching data:', err);
