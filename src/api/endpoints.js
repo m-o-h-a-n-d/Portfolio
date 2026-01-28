@@ -16,7 +16,7 @@ export const PORTFOLIO_ENDPOINTS = {
     store: `${BASE_URL}/contact-us/store`
   },
   profile: {
-    get: `${BASE_URL}/user`
+    get: `${BASE_URL}/user/data`
   },
   services: {
     list: `${BASE_URL}/service`

@@ -135,8 +135,8 @@ function limitWords(text, limit = 2) {
             </div>
             <div className="flex-1 truncate text-left">
               <p className="text-light-gray/70 text-xs uppercase mb-1">Email</p>
-              <a href={`mailto:${profile.email}`} className="text-white-2 text-sm hover:text-primary transition-colors block truncate" title={profile.email}>
-                {profile.email}
+              <a href={`mailto:${profile.contact_email}`} className="text-white-2 text-sm hover:text-primary transition-colors block truncate" title={profile.email}>
+                {profile.contact_email}
               </a>
             </div>
           </li>

@@ -26,6 +26,15 @@ const ResumeSection = () => {
       if (start && end) return `${start} / ${end}`;
       if (start) return start;
     }
+    if (typeof item.period === 'string') {
+      const parts = item.period.split('/');
+      const startPart = formatMonthYear((parts[0] || '').trim());
+      const endRaw = (parts[1] || '').trim();
+      const isPresent = endRaw.toLowerCase() === 'present';
+      const endPart = isPresent ? 'Present' : formatMonthYear(endRaw);
+      if (startPart && endPart) return `${startPart} / ${endPart}`;
+      if (startPart) return startPart;
+    }
     return item.period || '';
   };
 
