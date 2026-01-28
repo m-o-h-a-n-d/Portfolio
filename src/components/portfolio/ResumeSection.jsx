@@ -8,6 +8,27 @@ const ResumeSection = () => {
 
   if (!resume || !Array.isArray(resume)) return null;
 
+  const formatMonthYear = (value) => {
+    if (!value) return null;
+    const normalized = typeof value === 'string' ? value.replace(' ', 'T') : value;
+    const date = normalized instanceof Date ? normalized : new Date(normalized);
+    if (Number.isNaN(date.getTime())) return null;
+    return new Intl.DateTimeFormat('en-US', { month: 'long', year: 'numeric' }).format(date);
+  };
+
+  const formatItemPeriod = (item) => {
+    if (!item) return '';
+    const hasDates = item.start_date || item.end_date || item.is_present !== undefined;
+    if (hasDates) {
+      const start = formatMonthYear(item.start_date);
+      const isPresent = item.is_present === 1 || item.is_present === true;
+      const end = isPresent ? 'Present' : formatMonthYear(item.end_date);
+      if (start && end) return `${start} / ${end}`;
+      if (start) return start;
+    }
+    return item.period || '';
+  };
+
   const renderEducation = (data) => (
     <section className="mb-8" key="education">
       <div className="flex items-center gap-4 mb-6">
@@ -25,7 +46,7 @@ const ResumeSection = () => {
           >
             <h4 className="h4 mb-2 leading-tight">{item.title}</h4>
             <span className="text-vegas-gold font-normal leading-relaxed block mb-2">
-              {item.period}
+              {formatItemPeriod(item)}
             </span>
             <p className="text-light-gray font-light leading-relaxed text-sm">
               {item.description}
@@ -53,7 +74,7 @@ const ResumeSection = () => {
           >
             <h4 className="h4 mb-2 leading-tight">{item.title}</h4>
             <span className="text-vegas-gold font-normal leading-relaxed block mb-2">
-              {item.period}
+              {formatItemPeriod(item)}
             </span>
             <p className="text-light-gray font-light leading-relaxed text-sm">
               {item.description}

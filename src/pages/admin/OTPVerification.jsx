@@ -1,11 +1,15 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { ShieldCheck, ArrowLeft, CheckCircle } from 'lucide-react';
+import { apiPost } from '../../api/request';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
+import { extractFieldErrors } from '../../lib/validationErrors';
 import Swal from '../../lib/swal';
 
 const OTPVerification = () => {
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
   const email = location.state?.email || 'your email';
@@ -47,8 +51,9 @@ const OTPVerification = () => {
 
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      setFieldErrors({});
+      const response = await apiPost(DASHBOARD_ENDPOINTS.auth.verifyOtp, { email, otp: otpValue });
+      const resetToken = response?.data?.reset_token || response?.reset_token;
       
       Swal.fire({
         icon: 'success',
@@ -58,8 +63,18 @@ const OTPVerification = () => {
         showConfirmButton: false
       });
       
-      navigate('/admin/reset-password', { state: { email, otp: otpValue } });
+      if (!resetToken) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Missing Token',
+          text: 'Reset token was not provided by the server. Please try again.'
+        });
+        return;
+      }
+
+      navigate('/admin/reset-password', { state: { email, token: resetToken } });
     } catch (error) {
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
         title: 'Invalid OTP',
@@ -101,6 +116,9 @@ const OTPVerification = () => {
                 />
               ))}
             </div>
+            {fieldErrors.otp && (
+              <p className="mt-1 text-xs text-destructive">{fieldErrors.otp}</p>
+            )}
 
             <button
               type="submit"

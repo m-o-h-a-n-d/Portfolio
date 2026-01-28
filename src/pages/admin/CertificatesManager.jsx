@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { apiGet, apiPost } from '../../api/request';
+import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
 import { Plus, Edit2, Trash2, X, Save, Award, Search, ZoomIn } from 'lucide-react';
 import Swal from '../../lib/swal';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
+import { extractFieldErrors } from '../../lib/validationErrors';
 
 const CertificatesManager = () => {
   const [certificates, setCertificates] = useState([]);
@@ -12,9 +14,11 @@ const CertificatesManager = () => {
   const [modalMode, setModalMode] = useState('add');
   const [editingItem, setEditingItem] = useState(null);
   const [previewImage, setPreviewImage] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [formData, setFormData] = useState({
     name: '',
-    avatar: '',
+    imagePreview: '',
+    imageFile: null,
     text: '',
     date: new Date().toISOString().split('T')[0],
     order: 0
@@ -29,8 +33,8 @@ const CertificatesManager = () => {
   const fetchCertificates = async () => {
     try {
       setLoading(true);
-      const response = await apiGet('/certificates');
-      const data = response.data.certificates || response.data;
+      const response = await apiGet(DASHBOARD_ENDPOINTS.certification.list);
+      const data = response.data.certifications || response.data;
       const certificatesList = Array.isArray(data) ? data : [];
       const sortedList = [...certificatesList].sort((a, b) => (a.order || 0) - (b.order || 0));
       setCertificates(sortedList);
@@ -46,9 +50,11 @@ const CertificatesManager = () => {
     setModalMode('add');
     setEditingItem(null);
     setPreviewImage(null);
+    setFieldErrors({});
     setFormData({ 
       name: '', 
-      avatar: '', 
+      imagePreview: '',
+      imageFile: null,
       text: '', 
       date: new Date().toISOString().split('T')[0],
       order: certificates.length > 0 ? Math.max(...certificates.map(c => c.order || 0)) + 1 : 1
@@ -59,10 +65,12 @@ const CertificatesManager = () => {
   const openEditModal = (certificate) => {
     setModalMode('edit');
     setEditingItem(certificate);
-    setPreviewImage(certificate.avatar);
+    setPreviewImage(certificate.image);
+    setFieldErrors({});
     setFormData({
       name: certificate.name,
-      avatar: certificate.avatar,
+      imagePreview: certificate.image || '',
+      imageFile: null,
       text: certificate.text,
       date: certificate.date || new Date().toISOString().split('T')[0],
       order: certificate.order || 0
@@ -94,39 +102,36 @@ const CertificatesManager = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, avatar: reader.result }));
-        setPreviewImage(reader.result);
-      };
-      reader.readAsDataURL(file);
+      const previewUrl = URL.createObjectURL(file);
+      setFormData(prev => ({ ...prev, imagePreview: previewUrl, imageFile: file }));
+      setPreviewImage(previewUrl);
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const submissionData = {
-        ...formData,
-        id: editingItem?.id || Date.now()
-      };
-      const response = await apiPost('/certificates', submissionData);
-      
-      // Use returned data for real-time update
-      const savedCertificate = response.certificate || response.data || submissionData;
+      setFieldErrors({});
+      const formPayload = new FormData();
+      formPayload.append('name', formData.name);
+      formPayload.append('text', formData.text || '');
+      formPayload.append('date', formData.date || '');
+      formPayload.append('order', String(formData.order ?? 0));
+      if (formData.imageFile) {
+        formPayload.append('image', formData.imageFile);
+      }
 
-      if (modalMode === 'add') {
-        setCertificates(prev => {
-          const newList = [...prev, savedCertificate].sort((a, b) => (a.order || 0) - (b.order || 0));
-          setFilteredCertificates(newList); // Force immediate render
-          return newList;
-        });
+      const response = modalMode === 'add'
+        ? await apiPost(DASHBOARD_ENDPOINTS.certification.store, formPayload)
+        : await apiPut(DASHBOARD_ENDPOINTS.certification.update(editingItem.id), formPayload);
+      
+      const responseList = response?.data?.certifications;
+      if (Array.isArray(responseList)) {
+        const sortedList = [...responseList].sort((a, b) => (a.order || 0) - (b.order || 0));
+        setCertificates(sortedList);
+        setFilteredCertificates(sortedList);
       } else {
-        setCertificates(prev => {
-          const newList = prev.map(c => c.id === (editingItem?.id || savedCertificate.id) ? savedCertificate : c).sort((a, b) => (a.order || 0) - (b.order || 0));
-          setFilteredCertificates(newList); // Force immediate render
-          return newList;
-        });
+        await fetchCertificates();
       }
 
       closeModal();
@@ -139,6 +144,7 @@ const CertificatesManager = () => {
       });
     } catch (error) {
       console.error('Error saving certificate:', error);
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -160,7 +166,12 @@ const CertificatesManager = () => {
     if (!result.isConfirmed) return;
 
     try {
-      setCertificates(prev => prev.filter(c => c.id !== id));
+      await apiDelete(DASHBOARD_ENDPOINTS.certification.delete(id));
+      setCertificates(prev => {
+        const updated = prev.filter(c => c.id !== id);
+        setFilteredCertificates(updated);
+        return updated;
+      });
       Swal.fire({
         icon: 'success',
         title: 'Deleted!',
@@ -210,7 +221,13 @@ const CertificatesManager = () => {
     
     try {
       setIsReordering(true);
-      await apiPost('/certificates/reorder', certificates);
+      await Promise.all(
+        certificates.map((certificate) => {
+          const formPayload = new FormData();
+          formPayload.append('order', String(certificate.order ?? 0));
+          return apiPut(DASHBOARD_ENDPOINTS.certification.update(certificate.id), formPayload);
+        })
+      );
       
       Swal.fire({
         icon: 'success',
@@ -289,9 +306,9 @@ const CertificatesManager = () => {
             style={{ background: 'var(--bg-gradient-jet)' }}
           >
             <div className="relative w-full aspect-[16/9] overflow-hidden bg-onyx">
-              {certificate.avatar ? (
+              {certificate.image ? (
                 <img 
-                  src={certificate.avatar} 
+                  src={certificate.image} 
                   alt={certificate.name} 
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
                 />
@@ -363,6 +380,9 @@ const CertificatesManager = () => {
                     <input type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
                   </label>
                 </div>
+                {fieldErrors.image && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.image}</p>
+                )}
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -377,6 +397,9 @@ const CertificatesManager = () => {
                     placeholder="e.g., AWS Certified Solutions Architect"
                     required 
                   />
+                  {fieldErrors.name && (
+                    <p className="mt-1 text-xs text-destructive">{fieldErrors.name}</p>
+                  )}
                 </div>
                 <div>
                   <label className="text-light-gray/70 text-xs uppercase mb-2 block">Date Obtained</label>
@@ -388,6 +411,9 @@ const CertificatesManager = () => {
                     className="form-input" 
                     required 
                   />
+                  {fieldErrors.date && (
+                    <p className="mt-1 text-xs text-destructive">{fieldErrors.date}</p>
+                  )}
                 </div>
               </div>
 
@@ -400,6 +426,9 @@ const CertificatesManager = () => {
                   className="form-input min-h-[100px] resize-y" 
                   placeholder="Add any notes or details about this certificate..."
                 />
+                {fieldErrors.text && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.text}</p>
+                )}
               </div>
 
               <div className="flex gap-4 mt-6">

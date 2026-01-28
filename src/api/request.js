@@ -5,7 +5,7 @@ import { BASE_URL } from "./endpoints";
 // CONFIGURATION
 // ============================================================
 // Toggle this flag to switch between mock and real API
-export const MOCK_MODE = true;
+export const MOCK_MODE = false;
 
 // ============================================================
 // CONTACT US ENDPOINTS (REAL API TESTING)
@@ -39,18 +39,18 @@ import settingsData from "./mockData/settings.json";
 
 // Mock data mapping
 const mockDataMap = {
-  "/profile": profileData,
-  "/resume/education": educationData,
-  "/resume/experience": experienceData,
-  "/resume/skills": skillsData,
+  "/user": profileData,
+  "/education": educationData,
+  "/experience": experienceData,
+  "/skill": skillsData,
   "/resume": resumeOrderData,
   "/portfolio": portfolioData,
   "/blog": blogData,
   "/messages": messagesData,
-  "/services": servicesData,
-  "/certificates": certificatesData,
+  "/service": servicesData,
+  "/certificate": certificatesData,
   "/team": teamData,
-  "/settings": settingsData
+  "/setting": settingsData
 };
 
 // ============================================================
@@ -70,14 +70,40 @@ export const isAuthenticated = () => !!getAuthToken();
  * Add endpoint strings or regex patterns to this array.
  */
 const FORCE_REAL_API_ENDPOINTS = [
- 
-  // CONTACT_US_ENDPOINTS.list,
-  // "/admin/contact-us/read",
-  // "/admin/contact-us/delete",
-  // CONTACT_US_ENDPOINTS.store,
- 
+  CONTACT_US_ENDPOINTS.list,
+  "/admin/contact-us/read",
+  "/admin/contact-us/delete",
+  CONTACT_US_ENDPOINTS.store, 
+  "/auth/login",
+  "/auth/forgot-password",
+  "/auth/verify-otp",
+  "/auth/reset-password",
+  "/admin/auth/logout",
+  "/user",
+  "/service",
+  "/portfolio",
+  "/setting",
+  "/team",
+  "/certificate",
+  "/blog",
+  "/resume",
+  "/skill",
+  "/experience",
+  "/education",
+  "/admin/user",
+  "/admin/user/update",
+  "/admin/education",
+  "/admin/experience",
+  "/admin/skill",
+  "/admin/blog",
+  "/admin/certification",
+  "/admin/portfolio",
+  "/admin/setting",
+  "/admin/team",
+  "/admin/service",
+  "/admin/resume",
+  "/admin/contact-us"
 
-  
 ];
 
 // ============================================================
@@ -177,11 +203,17 @@ export const apiFetch = async (endpoint, method = "GET", body = null) => {
           window.location.href = "/admin/login";
         }
       }
-      throw new Error(data?.message || data || "Session expired");
+      const authError = new Error(data?.message || data || "Session expired");
+      authError.status = response.status;
+      authError.data = data;
+      throw authError;
     }
 
     if (!response.ok) {
-      throw new Error(data?.message || data || "API Error");
+      const apiError = new Error(data?.message || data || "API Error");
+      apiError.status = response.status;
+      apiError.data = data;
+      throw apiError;
     }
 
     return data;

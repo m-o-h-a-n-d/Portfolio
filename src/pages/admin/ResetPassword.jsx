@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { Lock, Eye, EyeOff, Save, CheckCircle } from 'lucide-react';
+import { apiPost } from '../../api/request';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
+import { extractFieldErrors } from '../../lib/validationErrors';
 import Swal from '../../lib/swal';
 
 const ResetPassword = () => {
@@ -8,11 +11,12 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const navigate = useNavigate();
   const location = useLocation();
 
   useEffect(() => {
-    if (!location.state?.email || !location.state?.otp) {
+    if (!location.state?.email || !location.state?.token) {
       navigate('/admin/forget-password');
     }
   }, [location, navigate]);
@@ -40,8 +44,13 @@ const ResetPassword = () => {
 
     setLoading(true);
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 2000));
+      setFieldErrors({});
+      await apiPost(DASHBOARD_ENDPOINTS.auth.resetPassword, {
+        email: location.state?.email,
+        token: location.state?.token,
+        password,
+        password_confirmation: confirmPassword
+      });
       
       await Swal.fire({
         icon: 'success',
@@ -53,6 +62,7 @@ const ResetPassword = () => {
       
       navigate('/admin/login');
     } catch (error) {
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -99,6 +109,9 @@ const ResetPassword = () => {
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
+              {fieldErrors.password && (
+                <p className="mt-1 text-xs text-destructive">{fieldErrors.password}</p>
+              )}
             </div>
 
             <div>
@@ -114,6 +127,9 @@ const ResetPassword = () => {
                   required
                 />
               </div>
+              {fieldErrors.password_confirmation && (
+                <p className="mt-1 text-xs text-destructive">{fieldErrors.password_confirmation}</p>
+              )}
             </div>
 
             <button

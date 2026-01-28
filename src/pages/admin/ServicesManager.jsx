@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { apiGet, apiPost } from '../../api/request';
+import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
 import { 
   Plus, 
   Edit2, 
@@ -18,6 +18,8 @@ import {
   Search
 } from 'lucide-react';
 import Swal from '../../lib/swal';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
+import { extractFieldErrors } from '../../lib/validationErrors';
 
 function limiter(name, limit = 10) {
   if (!name) return "";
@@ -47,6 +49,7 @@ const ServicesManager = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [editingItem, setEditingItem] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -60,7 +63,7 @@ const ServicesManager = () => {
   const fetchServices = async () => {
     try {
       setLoading(true);
-      const response = await apiGet('/services');
+      const response = await apiGet(DASHBOARD_ENDPOINTS.services.list);
       const data = response.data.services || response.data;
       const servicesList = Array.isArray(data) ? data : [];
       setServices(servicesList);
@@ -75,6 +78,7 @@ const ServicesManager = () => {
   const openAddModal = () => {
     setModalMode('add');
     setEditingItem(null);
+    setFieldErrors({});
     setFormData({ 
       title: '', 
       description: '', 
@@ -86,6 +90,7 @@ const ServicesManager = () => {
   const openEditModal = (service) => {
     setModalMode('edit');
     setEditingItem(service);
+    setFieldErrors({});
     setFormData({
       title: service.title,
       description: service.description,
@@ -121,14 +126,16 @@ const ServicesManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setFieldErrors({});
       const submissionData = {
         ...formData,
         id: editingItem?.id || Date.now()
       };
       
       // Use the appropriate endpoint based on mode
-      const endpoint = '/services';
-      const response = await apiPost(endpoint, submissionData);
+      const response = modalMode === 'add'
+        ? await apiPost(DASHBOARD_ENDPOINTS.services.store, submissionData)
+        : await apiPut(DASHBOARD_ENDPOINTS.services.update(editingItem.id), submissionData);
       
       // Use the data returned from the backend for real-time update
       const savedService = response.service || response.data || submissionData;
@@ -157,6 +164,7 @@ const ServicesManager = () => {
       });
     } catch (error) {
       console.error('Error saving service:', error);
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -177,9 +185,12 @@ const ServicesManager = () => {
 
     if (!result.isConfirmed) return;
     try {
-      // In a real app, you'd call apiDelete. Here we follow the project's pattern.
-      // Assuming apiPost handles delete if structured that way, or just update local state for mock
-      setServices(prev => prev.filter(s => s.id !== id));
+      await apiDelete(DASHBOARD_ENDPOINTS.services.delete(id));
+      setServices(prev => {
+        const updated = prev.filter(s => s.id !== id);
+        setFilteredServices(updated);
+        return updated;
+      });
       Swal.fire({
         icon: 'success',
         title: 'Deleted!',
@@ -284,6 +295,9 @@ const ServicesManager = () => {
                       placeholder="e.g. Web Development"
                       required 
                     />
+                    {fieldErrors.title && (
+                      <p className="mt-1 text-xs text-destructive">{fieldErrors.title}</p>
+                    )}
                   </div>
                   <div>
                     <label className="text-light-gray/70 text-xs uppercase mb-2 block">Description</label>
@@ -295,6 +309,9 @@ const ServicesManager = () => {
                       placeholder="Describe what you do..."
                       required 
                     />
+                    {fieldErrors.description && (
+                      <p className="mt-1 text-xs text-destructive">{fieldErrors.description}</p>
+                    )}
                   </div>
                   <div>
                     <label className="text-light-gray/70 text-xs uppercase mb-2 block">Icon Class (Tailwind/Custom)</label>
@@ -314,6 +331,9 @@ const ServicesManager = () => {
                         })()}
                       </div>
                     </div>
+                    {fieldErrors.icon && (
+                      <p className="mt-1 text-xs text-destructive">{fieldErrors.icon}</p>
+                    )}
                     <p className="text-[10px] text-muted-foreground mt-1">Type a class name or select from the list</p>
                   </div>
                 </div>

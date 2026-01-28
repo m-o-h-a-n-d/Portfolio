@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation } from 'react-router-dom';
 import { useNotifications } from '../../context/NotificationContext';
 import { Mail, Clock, Check, Trash2, Eye } from 'lucide-react';
 import Swal from '../../lib/swal';
@@ -12,10 +13,23 @@ const MessagesInbox = () => {
     fetchNotifications 
   } = useNotifications();
   const [selectedMessage, setSelectedMessage] = useState(null);
+  const location = useLocation();
 
   useEffect(() => {
     fetchNotifications();
   }, []);
+
+  useEffect(() => {
+    const targetId = location.state?.selectedMessageId;
+    if (!targetId || messages.length === 0) return;
+    const target = messages.find((message) => message.id === targetId);
+    if (target) {
+      setSelectedMessage(target);
+      if (!target.read) {
+        markAsRead(target.id);
+      }
+    }
+  }, [location.state, messages, markAsRead]);
 
   const formatRelativeTime = (dateString) => {
     if (!dateString) return '';

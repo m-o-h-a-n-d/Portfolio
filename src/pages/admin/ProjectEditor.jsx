@@ -1,13 +1,14 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { apiGet, apiPost, apiPut } from '../../api/request';
-import { API_PORTFOLIO_CREATE, API_PORTFOLIO_UPDATE } from '../../api/endpoints';
+import { apiGet, apiPost } from '../../api/request';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import { 
   ArrowLeft, Plus, X, Save, Upload, Image, ChevronDown, 
-  Trash2, Code, Link as LinkIcon, Users, Tag, GripVertical
+  Trash2, Code, Link as LinkIcon, Users, Tag
 } from 'lucide-react';
 import Select from 'react-select';
 import Swal from '../../lib/swal';
+import { extractFieldErrors } from '../../lib/validationErrors';
 
 const ProjectEditor = () => {
   const { id } = useParams();
@@ -21,20 +22,22 @@ const ProjectEditor = () => {
   const [saving, setSaving] = useState(false);
   const [techInput, setTechInput] = useState('');
   const [dragActive, setDragActive] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const [formData, setFormData] = useState({
     title: '',
-    category: 'Backend Development',
+    service: '',
     description: '',
     link: '',
     github: '',
     technologies: [],
     team_members: [],
     images: [],
-    status: 1
+    status: true
   });
 
   const [imageFiles, setImageFiles] = useState([]);
+  const initialCoverRef = useRef('');
 
   useEffect(() => {
     fetchData();
@@ -42,40 +45,94 @@ const ProjectEditor = () => {
 
   useEffect(() => {
     if (isEditMode && portfolio) {
-      const project = portfolio.projects.find(p => p.id === parseInt(id));
+      const project = portfolio.projects?.find(p => p.id === parseInt(id));
       if (project) {
+        const serviceId =
+          project.service ||
+          services.find(s => s.title === project.category || s.title === project.service_name)?.id ||
+          '';
+        const coverValue = project.image_cover || project.image || project.images?.[0] || '';
+        const imagesValue = Array.isArray(project.images) ? project.images : (project.image ? [project.image] : []);
+        const mergedImages = coverValue
+          ? [coverValue, ...imagesValue.filter((img) => img && img !== coverValue)]
+          : imagesValue;
         setFormData({
           title: project.title,
-          category: project.category,
-          description: project.description || project.full_description,
+          service: serviceId,
+          description: project.description || project.short_desc || project.desc || project.full_description || '',
           link: project.link || '',
           github: project.github || '',
           technologies: project.technologies || [],
           team_members: project.team_members || [],
-          images: project.images || [project.image],
-          status: project.status !== undefined ? project.status : 1
+          images: mergedImages,
+          status: project.status === true || project.status === 1 || project.status === '1'
         });
+        initialCoverRef.current = coverValue;
       }
     }
-  }, [portfolio, id, isEditMode]);
+  }, [portfolio, id, isEditMode, services]);
 
   const fetchData = async () => {
     try {
       setLoading(true);
-      const [portfolioRes, teamRes, servicesRes] = await Promise.all([
-        apiGet('/portfolio'),
-        apiGet('/team'),
-        apiGet('/services')
+      const [portfolioRes, teamRes, servicesRes] = await Promise.allSettled([
+        apiGet(DASHBOARD_ENDPOINTS.portfolio.list),
+        apiGet(DASHBOARD_ENDPOINTS.team.list),
+        apiGet(DASHBOARD_ENDPOINTS.services.list)
       ]);
-      setPortfolio(portfolioRes.data);
-      
+      const getValue = (res) => (res?.status === 'fulfilled' ? res.value : null);
+      const portfolioValue = getValue(portfolioRes);
+      const teamValue = getValue(teamRes);
+      const servicesValue = getValue(servicesRes);
+      const normalizeProject = (project) => {
+        const image = project.image || project.image_cover || '';
+        const images = Array.isArray(project.images) && project.images.length > 0
+          ? project.images
+          : (image ? [image] : []);
+        return {
+          ...project,
+          category: project.category || project.service_name || '',
+          description: project.description || project.short_desc || project.desc || '',
+          full_description: project.full_description || project.desc || project.description || '',
+          image,
+          images
+        };
+      };
+      const portfolioData = portfolioValue?.data || portfolioValue || {};
+      const projects = Array.isArray(portfolioData.projects)
+        ? portfolioData.projects
+        : Array.isArray(portfolioData.portfolios)
+          ? portfolioData.portfolios
+          : (Array.isArray(portfolioData) ? portfolioData : []);
+      const normalizedPortfolio = {
+        ...portfolioData,
+        projects: projects.map(normalizeProject)
+      };
+      setPortfolio(normalizedPortfolio);
+
+      const normalizeList = (res, keys = []) => {
+        if (!res) return [];
+        if (Array.isArray(res)) return res;
+        if (Array.isArray(res?.data)) return res.data;
+        if (Array.isArray(res?.data?.data)) return res.data.data;
+        if (Array.isArray(res?.data?.items)) return res.data.items;
+        for (const key of keys) {
+          if (Array.isArray(res?.data?.[key])) return res.data[key];
+        }
+        return [];
+      };
+
       // Ensure team data is always an array
-      const teamData = teamRes.data.team || teamRes.data;
-      setTeam(Array.isArray(teamData) ? teamData : []);
+      const teamData = normalizeList(teamValue, ['teams', 'team']);
+      setTeam(teamData);
 
       // Ensure services data is always an array
-      const servicesData = servicesRes.data.services || servicesRes.data;
-      setServices(Array.isArray(servicesData) ? servicesData : []);
+      const normalizedServices = normalizeList(servicesValue, ['services', 'service']);
+      setServices(normalizedServices);
+      setFormData(prev => ({
+        ...prev,
+        service: prev.service || normalizedServices[0]?.id || ''
+      }));
     } catch (error) {
       console.error('Error fetching data:', error);
       Swal.fire({
@@ -164,21 +221,21 @@ const ProjectEditor = () => {
   };
 
   const removeImage = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      images: prev.images.filter((_, i) => i !== index)
-    }));
-    setImageFiles(prev => prev.filter((_, i) => i !== index));
-  };
-
-  const moveImage = (index, direction) => {
-    const newImages = [...formData.images];
-    if (direction === 'up' && index > 0) {
-      [newImages[index], newImages[index - 1]] = [newImages[index - 1], newImages[index]];
-    } else if (direction === 'down' && index < newImages.length - 1) {
-      [newImages[index], newImages[index + 1]] = [newImages[index + 1], newImages[index]];
-    }
-    setFormData(prev => ({ ...prev, images: newImages }));
+    setFormData(prev => {
+      const removedImage = prev.images[index];
+      if (typeof removedImage === 'string' && removedImage.startsWith('data:')) {
+        const dataUrlIndex = prev.images
+          .filter(img => typeof img === 'string' && img.startsWith('data:'))
+          .indexOf(removedImage);
+        if (dataUrlIndex >= 0) {
+          setImageFiles(prevFiles => prevFiles.filter((_, i) => i !== dataUrlIndex));
+        }
+      }
+      return {
+        ...prev,
+        images: prev.images.filter((_, i) => i !== index)
+      };
+    });
   };
 
   const addTechnology = () => {
@@ -261,32 +318,87 @@ const ProjectEditor = () => {
       Swal.fire({ icon: 'warning', title: 'Required Field', text: 'Project title is required' });
       return;
     }
-    if (formData.images.length === 0) {
+    if (!isEditMode && imageFiles.length === 0) {
+      Swal.fire({ icon: 'warning', title: 'Required Field', text: 'At least one project image is required' });
+      return;
+    }
+    if (isEditMode && formData.images.length === 0 && imageFiles.length === 0) {
       Swal.fire({ icon: 'warning', title: 'Required Field', text: 'At least one project image is required' });
       return;
     }
 
     try {
       setSaving(true);
-      const projectData = {
-        ...formData,
-        // If status is 0 (Uncomplete), clear the links before sending to backend
-        link: formData.status === 1 ? formData.link : '',
-        github: formData.status === 1 ? formData.github : '',
-        full_description: formData.description,
+      setFieldErrors({});
+      const statusValue = formData.status === true || formData.status === 1;
+      const basePayload = {
+        title: formData.title,
+        short_desc: formData.description || '',
+        desc: formData.description || '',
+        link: statusValue ? (formData.link || '') : '',
+        github: statusValue ? (formData.github || '') : '',
+        status: statusValue,
+        service_id: formData.service ? Number(formData.service) : undefined,
         slug: formData.title.toLowerCase().replace(/\s+/g, '-'),
-        image: formData.images[0]
+        technologies: formData.technologies,
+        teams: formData.team_members
       };
-      
-      if (isEditMode) {
-        await apiPut(API_PORTFOLIO_UPDATE(id), projectData);
+
+      const orderedImages = Array.isArray(formData.images) ? formData.images : [];
+      const dataUrls = orderedImages.filter(img => typeof img === 'string' && img.startsWith('data:'));
+      const orderedImageUrls = orderedImages.filter(
+        (img) => typeof img === 'string' && !img.startsWith('data:')
+      );
+      const getFileFromDataUrl = (dataUrl) => {
+        const dataUrlIndex = dataUrls.indexOf(dataUrl);
+        return dataUrlIndex >= 0 ? imageFiles[dataUrlIndex] : null;
+      };
+
+      const projectData = new FormData();
+      projectData.append('title', basePayload.title);
+      projectData.append('short_desc', basePayload.short_desc);
+      projectData.append('desc', basePayload.desc);
+      projectData.append('link', basePayload.link);
+      projectData.append('github', basePayload.github);
+      projectData.append('status', basePayload.status ? '1' : '0');
+      // Backend expects service_id (and teams[]), keep service as fallback for older APIs.
+      projectData.append('service_id', String(formData.service || ''));
+      projectData.append('service', String(formData.service || ''));
+      projectData.append('slug', basePayload.slug);
+      basePayload.technologies.forEach((tech) => projectData.append('technologies[]', tech));
+      if (isEditMode && basePayload.teams.length === 0) {
+        projectData.append('teams[]', '');
+        projectData.append('team_members[]', '');
       } else {
-        await apiPost(API_PORTFOLIO_CREATE, projectData);
+        basePayload.teams.forEach((memberId) => {
+          projectData.append('teams[]', String(memberId));
+          projectData.append('team_members[]', String(memberId));
+        });
+      }
+      if (isEditMode) {
+        orderedImageUrls.forEach((url) => projectData.append('images[]', url));
+        for (const img of orderedImages) {
+          if (typeof img === 'string' && img.startsWith('data:')) {
+            const file = getFileFromDataUrl(img);
+            if (file) projectData.append('images_files[]', file);
+          }
+        }
+        projectData.append('_method', 'PUT');
+        await apiPost(DASHBOARD_ENDPOINTS.portfolio.update(id), projectData);
+      } else {
+        for (const img of orderedImages) {
+          if (typeof img === 'string' && img.startsWith('data:')) {
+            const file = getFileFromDataUrl(img);
+            if (file) projectData.append('images[]', file);
+          }
+        }
+        await apiPost(DASHBOARD_ENDPOINTS.portfolio.store, projectData);
       }
       Swal.fire({ icon: 'success', title: 'Success!', text: `Project ${isEditMode ? 'updated' : 'added'} successfully!`, timer: 2000, showConfirmButton: false });
       setTimeout(() => navigate('/admin/portfolio'), 2000);
     } catch (error) {
       console.error('Error saving project:', error);
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire({ icon: 'error', title: 'Error', text: 'Error saving project' });
     } finally {
       setSaving(false);
@@ -352,21 +464,21 @@ const ProjectEditor = () => {
               </div>
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, status: prev.status === 1 ? 0 : 1 }))}
+                onClick={() => setFormData(prev => ({ ...prev, status: !prev.status }))}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
-                  formData.status === 1 ? 'bg-primary' : 'bg-onyx border border-border'
+                  formData.status ? 'bg-primary' : 'bg-onyx border border-border'
                 }`}
               >
                 <span
                   className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
-                    formData.status === 1 ? 'translate-x-6' : 'translate-x-1'
+                    formData.status ? 'translate-x-6' : 'translate-x-1'
                   }`}
                 />
               </button>
             </div>
             <div className="flex items-center gap-2">
-              <span className={`text-sm font-medium ${formData.status === 1 ? 'text-primary' : 'text-vegas-gold'}`}>
-                {formData.status === 1 ? 'Completed' : 'Uncomplete'}
+              <span className={`text-sm font-medium ${formData.status ? 'text-primary' : 'text-vegas-gold'}`}>
+                {formData.status ? 'Completed' : 'Uncomplete'}
               </span>
               <p className="text-xs text-muted-foreground">
                 (This will be shown in project details)
@@ -397,6 +509,9 @@ const ProjectEditor = () => {
                 <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
               </label>
             </div>
+            {fieldErrors.images && (
+              <p className="mt-1 text-xs text-destructive">{fieldErrors.images}</p>
+            )}
 
             {/* Images List with Reorder */}
             <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 has-scrollbar">
@@ -410,8 +525,6 @@ const ProjectEditor = () => {
                     <p className="text-[10px] text-light-gray truncate">Image {index + 1}</p>
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button type="button" onClick={() => moveImage(index, 'up')} className="p-1 hover:text-primary text-muted-foreground">↑</button>
-                    <button type="button" onClick={() => moveImage(index, 'down')} className="p-1 hover:text-primary text-muted-foreground">↓</button>
                     <button type="button" onClick={() => removeImage(index)} className="p-1 hover:text-destructive text-muted-foreground"><X className="w-3 h-3" /></button>
                   </div>
                 </div>
@@ -420,7 +533,7 @@ const ProjectEditor = () => {
           </div>
 
           {/* Links Section - Conditional Rendering based on Status */}
-          {formData.status === 1 && (
+          {formData.status && (
             <div className="bg-card border border-border rounded-[20px] p-6 space-y-4" style={{ background: 'var(--bg-gradient-jet)' }}>
               <div className="flex items-center gap-2 mb-2">
                 <LinkIcon className="w-5 h-5 text-primary" />
@@ -437,6 +550,9 @@ const ProjectEditor = () => {
                     className="form-input text-sm py-2"
                     placeholder="https://..."
                   />
+                  {fieldErrors.link && (
+                    <p className="mt-1 text-xs text-destructive">{fieldErrors.link}</p>
+                  )}
                 </div>
                 <div>
                   <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">GitHub Repository</label>
@@ -448,6 +564,9 @@ const ProjectEditor = () => {
                     className="form-input text-sm py-2"
                     placeholder="https://github.com/..."
                   />
+                  {fieldErrors.github && (
+                    <p className="mt-1 text-xs text-destructive">{fieldErrors.github}</p>
+                  )}
                 </div>
               </div>
             </div>
@@ -474,18 +593,21 @@ const ProjectEditor = () => {
                   placeholder="Enter project name"
                   required
                 />
+                {fieldErrors.title && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.title}</p>
+                )}
               </div>
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Category (from Services)</label>
                 <select
-                  name="category"
-                  value={formData.category}
+                  name="service"
+                  value={formData.service}
                   onChange={handleInputChange}
                   className="form-input"
                 >
                   {services.length > 0 ? (
                     services.map(service => (
-                      <option key={service.id} value={service.title}>{service.title}</option>
+                      <option key={service.id} value={service.id}>{service.title}</option>
                     ))
                   ) : (
                     portfolio?.categories?.filter(c => c !== 'all').map(cat => (
@@ -493,6 +615,9 @@ const ProjectEditor = () => {
                     ))
                   )}
                 </select>
+                {(fieldErrors.service || fieldErrors.category) && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.service || fieldErrors.category}</p>
+                )}
               </div>
               <div className="md:col-span-2">
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Project Description</label>
@@ -503,6 +628,9 @@ const ProjectEditor = () => {
                   className="form-input min-h-[200px] resize-y"
                   placeholder="Describe your project, challenges, and solutions..."
                 />
+                {fieldErrors.description && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.description}</p>
+                )}
               </div>
             </div>
           </div>
@@ -536,6 +664,9 @@ const ProjectEditor = () => {
                   </span>
                 ))}
               </div>
+              {fieldErrors.technologies && (
+                <p className="mt-2 text-xs text-destructive">{fieldErrors.technologies}</p>
+              )}
             </div>
 
             {/* Team Members */}
@@ -625,6 +756,9 @@ const ProjectEditor = () => {
                   </span>
                 ))}
               </div>
+              {fieldErrors.team_members && (
+                <p className="mt-2 text-xs text-destructive">{fieldErrors.team_members}</p>
+              )}
             </div>
           </div>
         </div>

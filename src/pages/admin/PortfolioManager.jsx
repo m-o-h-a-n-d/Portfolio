@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { apiGet, apiDelete, apiPut } from '../../api/request';
-import { API_PORTFOLIO_DELETE, API_PORTFOLIO_UPDATE } from '../../api/endpoints';
+import { apiGet, apiDelete } from '../../api/request';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import { Plus, Edit2, Trash2, Search, Eye, CheckCircle2, Circle } from 'lucide-react';
 import Swal from '../../lib/swal';
 
@@ -19,16 +19,37 @@ const PortfolioManager = () => {
   const fetchPortfolio = async () => {
     try {
       setLoading(true);
-      const response = await apiGet('/portfolio');
-      setPortfolio(response.data);
-      setFilteredProjects(response.data.projects || []);
-    } catch (error) {
-      console.error('Error fetching portfolio:', error);
-      Swal.fire({
-        icon: 'error',
-        title: 'Error',
-        text: 'Error loading portfolio',
+      const response = await apiGet(DASHBOARD_ENDPOINTS.portfolio.list);
+      const normalizeProject = (project) => ({
+        ...project,
+        category: project.category || project.service_name || '',
+        description: project.description || project.short_desc || project.desc || project.full_description || '',
+        image: project.image || project.image_cover || ''
       });
+      const data = response?.data || {};
+      const projects = Array.isArray(data.projects)
+        ? data.projects
+        : Array.isArray(data.portfolios)
+          ? data.portfolios
+          : (Array.isArray(data) ? data : []);
+      const normalizedProjects = projects.map(normalizeProject);
+      setPortfolio({ ...data, projects: normalizedProjects });
+      setFilteredProjects(normalizedProjects);
+    } catch (error) {
+      const status = error?.response?.status || error?.status;
+      const isNotFound = status === 404;
+      console.error('Error fetching portfolio:', error);
+      if (!isNotFound) {
+        Swal.fire({
+          icon: 'error',
+          title: 'Error',
+          text: 'Error loading portfolio',
+        });
+      }
+      if (isNotFound) {
+        setPortfolio({ projects: [] });
+        setFilteredProjects([]);
+      }
     } finally {
       setLoading(false);
     }
@@ -39,8 +60,8 @@ const PortfolioManager = () => {
     setSearchQuery(query);
     if (!portfolio?.projects) return;
     const filtered = portfolio.projects.filter(p => 
-      p.title.toLowerCase().includes(query) || 
-      p.category.toLowerCase().includes(query) ||
+      p.title?.toLowerCase().includes(query) || 
+      p.category?.toLowerCase().includes(query) ||
       p.description?.toLowerCase().includes(query)
     );
     setFilteredProjects(filtered);
@@ -60,7 +81,7 @@ const PortfolioManager = () => {
     if (!result.isConfirmed) return;
 
     try {
-      await apiDelete(API_PORTFOLIO_DELETE(id));
+      await apiDelete(DASHBOARD_ENDPOINTS.portfolio.delete(id));
       setPortfolio(prev => {
         const updatedProjects = prev.projects.filter(p => p.id !== id);
         setFilteredProjects(updatedProjects); // Force immediate render
@@ -168,7 +189,7 @@ const PortfolioManager = () => {
             {/* Content */}
             <div className="p-4">
               <h3 className="text-foreground font-medium mb-1">{project.title}</h3>
-              <p className="text-vegas-gold text-sm capitalize mb-2">{project.category}</p>
+              <p className="text-vegas-gold text-sm capitalize mb-2">{project.category || 'Project'}</p>
               
             
 

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useLocation, Outlet } from 'react-router-dom';
+import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { useNotifications } from '../../context/NotificationContext';
 import { useProfile, useSettings } from '../../context/DataContext';
@@ -36,6 +36,7 @@ const DashboardLayout = () => {
     deleteNotification, 
     markAllAsRead 
   } = useNotifications();
+  const navigate = useNavigate();
   const location = useLocation();
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [notifOpen, setNotifOpen] = useState(false);
@@ -75,6 +76,35 @@ const DashboardLayout = () => {
     return location.pathname.startsWith(path);
   };
 
+  const getBreadcrumbs = () => {
+    const parts = location.pathname.split('/').filter(Boolean).slice(1);
+    const labelMap = {
+      profile: 'Profile',
+      resume: 'Resume Content',
+      portfolio: 'Portfolio',
+      services: 'Services',
+      blogs: 'Blogs',
+      team: 'Team',
+      certificates: 'Certificates',
+      messages: 'Messages',
+      settings: 'Settings & CV'
+    };
+    const actionMap = { add: 'Add', edit: 'Edit' };
+    const crumbs = [];
+    if (parts.length > 0) {
+      const section = labelMap[parts[0]] || parts[0];
+      crumbs.push({ label: section, path: `/admin/${parts[0]}` });
+      if (parts[1]) {
+        const action = actionMap[parts[1]] || parts[1];
+        const label = parts[1] === 'edit' && parts[2] ? 'Edit' : action;
+        crumbs.push({ label, path: location.pathname });
+      }
+    }
+    return crumbs;
+  };
+
+  const breadcrumbs = getBreadcrumbs();
+
   // Real-time notifications are handled in NotificationContext
 
   return (
@@ -97,21 +127,21 @@ const DashboardLayout = () => {
         {/* Logo */}
         <div className="h-16 flex items-center justify-between px-6 border-b border-border">
           <Link to="/admin" className="flex items-center gap-2">
-            {settings?.site_identity?.logo_url ? (
+            {settings?.logo ? (
               <img 
-                src={settings.site_identity.logo_url} 
+                src={settings.logo} 
                 alt="Logo" 
                 className="w-8 h-8 rounded-lg object-contain" 
               />
             ) : (
               <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center">
                 <span className="text-primary-foreground font-bold text-sm">
-                  {settings?.site_identity?.company_name?.charAt(0) || 'A'}
+                  {settings?.company?.charAt(0) || 'A'}
                 </span>
               </div>
             )}
             <span className="text-white-2 font-semibold truncate max-w-[140px]">
-              {settings?.site_identity?.company_name?.split(' ')[0] || 'Admin'}
+              {settings?.company?.split(' ')[0] || 'Admin'}
             </span>
           </Link>
           <button 
@@ -189,14 +219,18 @@ const DashboardLayout = () => {
             <Link to="/admin" className="text-muted-foreground hover:text-foreground">
               Dashboard
             </Link>
-            {location.pathname !== '/admin' && (
-              <>
+            {breadcrumbs.map((crumb, index) => (
+              <span key={`${crumb.label}-${index}`} className="flex items-center gap-2">
                 <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                <span className="text-foreground capitalize">
-                  {location.pathname.split('/').pop()}
-                </span>
-              </>
-            )}
+                {index === breadcrumbs.length - 1 ? (
+                  <span className="text-foreground">{crumb.label}</span>
+                ) : (
+                  <Link to={crumb.path} className="text-muted-foreground hover:text-foreground">
+                    {crumb.label}
+                  </Link>
+                )}
+              </span>
+            ))}
           </div>
 
           {/* Right Section */}
@@ -227,15 +261,7 @@ const DashboardLayout = () => {
                   >
                     <div className="p-4 border-b border-border flex items-center justify-between">
                       <h4 className="font-semibold text-white-2">Notifications</h4>
-                      <div className="flex gap-2">
-                        <button 
-                          onClick={markAllAsRead}
-                          className="text-xs text-primary hover:underline flex items-center gap-1"
-                        >
-                          <CheckCircle2 className="w-3 h-3" />
-                          Mark all read
-                        </button>
-                      </div>
+                      <div className="flex gap-2" />
                     </div>
 
                     <div className="max-h-[400px] overflow-y-auto custom-scrollbar">
@@ -248,7 +274,12 @@ const DashboardLayout = () => {
                         notifications.map((notif) => (
                           <div 
                             key={notif.id}
-                            className={`p-4 border-b border-border/50 flex gap-3 group transition-colors ${
+                            onClick={() => {
+                              markAsRead(notif.id);
+                              setNotifOpen(false);
+                              navigate('/admin/messages', { state: { selectedMessageId: notif.id } });
+                            }}
+                            className={`p-4 border-b border-border/50 flex gap-3 group transition-colors cursor-pointer ${
                               notif.read ? 'opacity-70 hover:bg-onyx/30' : 'bg-primary/5 hover:bg-primary/10'
                             }`}
                           >
@@ -281,12 +312,9 @@ const DashboardLayout = () => {
                                   {formatRelativeTime(notif.created_at)}
                                 </span>
                                 {!notif.read && (
-                                  <button 
-                                    onClick={() => markAsRead(notif.id)}
-                                    className="text-[10px] text-primary font-medium hover:underline"
-                                  >
-                                    Mark as read
-                                  </button>
+                                  <span className="text-[10px] text-primary font-medium">
+                                    Marked as read
+                                  </span>
                                 )}
                               </div>
                             </div>
@@ -312,18 +340,18 @@ const DashboardLayout = () => {
               {profile?.avatar ? (
                 <img 
                   src={profile.avatar} 
-                  alt="User" 
+                  alt="Profile" 
                   className="w-8 h-8 rounded-full object-cover border border-border" 
                 />
               ) : (
                 <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center">
                   <span className="text-primary-foreground font-bold text-sm">
-                    {profile?.name?.charAt(0) || user?.name?.charAt(0) || 'A'}
+                    {profile?.name?.charAt(0) || 'A'}
                   </span>
                 </div>
               )}
               <span className="hidden md:block text-sm text-foreground font-medium">
-                {profile?.name?.split(' ')[0] || user?.name?.split(' ')[0] || 'Admin'}
+                {profile?.name?.split(' ')[0] || 'Admin'}
               </span>
             </div>
           </div>

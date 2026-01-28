@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { apiGet } from '../api/request';
+import { PORTFOLIO_ENDPOINTS } from '../api/endpoints';
 
 // Optimized SEO Component for Mohanad Ahmed Portfolio
 const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
@@ -7,17 +9,22 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   const [settingsData, setSettingsData] = useState(null);
 
   useEffect(() => {
-    // Fetch profile data
-    fetch('/api/mockData/profile.json')
-      .then((res) => res.json())
-      .then((data) => setProfileData(data))
-      .catch((err) => console.error('Error fetching profile data:', err));
+    const fetchSeoData = async () => {
+      try {
+        const [profileRes, settingsRes] = await Promise.all([
+          apiGet(PORTFOLIO_ENDPOINTS.profile.get),
+          apiGet(PORTFOLIO_ENDPOINTS.settings.get)
+        ]);
+        setProfileData(profileRes?.data || profileRes || null);
+        const settingsList = settingsRes?.data?.settings || settingsRes?.data || [];
+        const settingsItem = Array.isArray(settingsList) ? settingsList[0] : settingsList;
+        setSettingsData(settingsItem || null);
+      } catch (err) {
+        console.error('Error fetching SEO data:', err);
+      }
+    };
 
-    // Fetch settings data for dynamic favicon and logo
-    fetch('/api/mockData/settings.json')
-      .then((res) => res.json())
-      .then((data) => setSettingsData(data))
-      .catch((err) => console.error('Error fetching settings data:', err));
+    fetchSeoData();
   }, []);
 
   const finalName = name || profileData?.name || 'Mohanad Ahmed Shehata';
@@ -30,10 +37,10 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   const finalWebsiteUrl = websiteUrl || 'https://mohanadportfolio.vercel.app/';
   
   // Dynamic Favicon from settings
-  const finalFavicon = settingsData?.site_identity?.favicon_url || '/favicon.ico';
+  const finalFavicon = settingsData?.favicon || '/favicon.ico';
   
   // Dynamic Preview Image (can also be linked to settings if needed)
-  const finalImageUrl = imageUrl || settingsData?.site_identity?.logo_url || 'https://mohanadportfolio.vercel.app/image.png';
+  const finalImageUrl = imageUrl || settingsData?.logo || 'https://mohanadportfolio.vercel.app/image.png';
 
   const structuredData = {
     '@context': 'https://schema.org',

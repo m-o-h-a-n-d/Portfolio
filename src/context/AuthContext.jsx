@@ -1,7 +1,9 @@
 import { useState, createContext, useContext, useEffect } from 'react';
 import LoadingScreen from '../components/portfolio/LoadingScreen';
-import { isAuthenticated, removeAuthToken, apiFetch, setAuthToken } from '../api/request';
+import { isAuthenticated, removeAuthToken, apiFetch, apiGet, setAuthToken } from '../api/request';
 import { useNavigate } from 'react-router-dom';
+import { DASHBOARD_ENDPOINTS } from '../api/endpoints';
+import { extractFieldErrors } from '../lib/validationErrors';
 
 // Auth Context
 const AuthContext = createContext(null);
@@ -18,23 +20,29 @@ export const AuthProvider = ({ children }) => {
   useEffect(() => {
     // Check if user is authenticated on mount
     const checkAuth = async () => {
-      if (isAuthenticated()) {
-        // In a real app, you'd fetch user data from API
-        setUser({
-          id: 1,
-          name: 'Richard Hanrick',
-          email: 'admin@example.com',
-          role: 'admin'
-        });
+      try {
+        if (isAuthenticated()) {
+          const response = await apiGet(DASHBOARD_ENDPOINTS.user.list);
+          const userData =
+            response?.data?.user ||
+            response?.user ||
+            response?.data ||
+            response;
+          setUser(userData || null);
+        }
+      } catch (error) {
+        console.error('Failed to fetch authenticated user:', error);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      setLoading(false);
     };
     checkAuth();
   }, []);
 
   const login = async (email, password) => {
     try {
-      const response = await apiFetch('/auth/login', 'POST', { email, password });
+      const response = await apiFetch(DASHBOARD_ENDPOINTS.auth.login, 'POST', { email, password });
       const token =
         response?.token ||
         response?.access_token ||
@@ -50,13 +58,13 @@ export const AuthProvider = ({ children }) => {
       }
       return { success: false, message: response?.message || 'Login failed' };
     } catch (error) {
-      return { success: false, message: error.message };
+      return { success: false, message: error.message, fieldErrors: extractFieldErrors(error) };
     }
   };
 
   const logout = async () => {
     try {
-      await apiFetch('/auth/logout', 'POST');
+      await apiFetch(DASHBOARD_ENDPOINTS.auth.logout, 'DELETE');
     } catch (error) {
       console.error('Logout error:', error);
     } finally {

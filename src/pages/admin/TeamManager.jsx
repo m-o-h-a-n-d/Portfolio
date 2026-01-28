@@ -1,7 +1,9 @@
 import { useState, useEffect } from 'react';
-import { apiGet, apiPost } from '../../api/request';
+import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
 import { Plus, Edit2, Trash2, X, Save, Image as ImageIcon, Link as LinkIcon, Search, Briefcase } from 'lucide-react';
 import Swal from '../../lib/swal';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
+import { extractFieldErrors } from '../../lib/validationErrors';
 
 const TeamManager = () => {
   const [team, setTeam] = useState([]);
@@ -11,10 +13,12 @@ const TeamManager = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [editingItem, setEditingItem] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
   const [formData, setFormData] = useState({
     name: '',
     track: '',
-    logo: '',
+    logoPreview: '',
+    logoFile: null,
     url: '#'
   });
 
@@ -25,8 +29,8 @@ const TeamManager = () => {
   const fetchTeam = async () => {
     try {
       setLoading(true);
-      const response = await apiGet('/team');
-      const data = response.data.team || response.data;
+      const response = await apiGet(DASHBOARD_ENDPOINTS.team.list);
+      const data = response.data?.teams || response.data?.team || response.data;
       const teamList = Array.isArray(data) ? data : [];
       setTeam(teamList);
       setFilteredTeam(teamList);
@@ -40,17 +44,20 @@ const TeamManager = () => {
   const openAddModal = () => {
     setModalMode('add');
     setEditingItem(null);
-    setFormData({ name: '', track: '', logo: '', url: '#' });
+    setFieldErrors({});
+    setFormData({ name: '', track: '', logoPreview: '', logoFile: null, url: '#' });
     setModalOpen(true);
   };
 
   const openEditModal = (member) => {
     setModalMode('edit');
     setEditingItem(member);
+    setFieldErrors({});
     setFormData({
       name: member.name,
       track: member.track || '',
-      logo: member.logo,
+      logoPreview: member.logo,
+      logoFile: null,
       url: member.url || '#'
     });
     setModalOpen(true);
@@ -79,25 +86,40 @@ const TeamManager = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onloadend = () => {
-        setFormData(prev => ({ ...prev, logo: reader.result }));
-      };
-      reader.readAsDataURL(file);
+      const previewUrl = URL.createObjectURL(file);
+      setFormData(prev => ({ ...prev, logoPreview: previewUrl, logoFile: file }));
     }
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const submissionData = {
-        ...formData,
-        id: editingItem?.id || Date.now()
-      };
-      const response = await apiPost('/team', submissionData);
+      setFieldErrors({});
+      if (modalMode === 'add' && !formData.logoFile) {
+        setFieldErrors({ logo: 'Member photo is required.' });
+        return;
+      }
+
+      const formPayload = new FormData();
+      formPayload.append('name', formData.name);
+      formPayload.append('track', formData.track);
+      formPayload.append('url', formData.url || '#');
+      if (formData.logoFile) {
+        formPayload.append('logo', formData.logoFile);
+      }
+
+      const response = modalMode === 'add'
+        ? await apiPost(DASHBOARD_ENDPOINTS.team.store, formPayload)
+        : await apiPut(DASHBOARD_ENDPOINTS.team.update(editingItem.id), formPayload);
       
       // Use returned data for real-time update
-      const savedMember = response.member || response.data || submissionData;
+      const savedMember = response.member || response.data || {
+        id: editingItem?.id || Date.now(),
+        name: formData.name,
+        track: formData.track,
+        url: formData.url || '#',
+        logo: formData.logoPreview
+      };
 
       if (modalMode === 'add') {
         setTeam(prev => {
@@ -123,6 +145,7 @@ const TeamManager = () => {
       });
     } catch (error) {
       console.error('Error saving team member:', error);
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -143,6 +166,7 @@ const TeamManager = () => {
 
     if (!result.isConfirmed) return;
     try {
+      await apiDelete(DASHBOARD_ENDPOINTS.team.delete(id));
       const updated = team.filter(c => c.id !== id);
       setTeam(updated);
       setFilteredTeam(updated);
@@ -235,10 +259,10 @@ const TeamManager = () => {
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Member Photo</label>
                 <div className="border-2 border-dashed border-border rounded-xl p-6 text-center">
-                  {formData.logo ? (
+                {formData.logoPreview ? (
                     <div className="relative">
-                      <img src={formData.logo} alt="Preview" className="max-h-24 mx-auto rounded-lg" />
-                      <button type="button" onClick={() => setFormData(prev => ({ ...prev, logo: '' }))} className="absolute -top-2 -right-2 p-1 bg-destructive rounded-full text-white-1">
+                      <img src={formData.logoPreview} alt="Preview" className="max-h-24 mx-auto rounded-lg" />
+                      <button type="button" onClick={() => setFormData(prev => ({ ...prev, logoPreview: '', logoFile: null }))} className="absolute -top-2 -right-2 p-1 bg-destructive rounded-full text-white-1">
                         <X className="w-4 h-4" />
                       </button>
                     </div>
@@ -250,10 +274,16 @@ const TeamManager = () => {
                     </label>
                   )}
                 </div>
+                {(fieldErrors.logo || fieldErrors.logoFile) && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.logo || fieldErrors.logoFile}</p>
+                )}
               </div>
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Full Name</label>
                 <input type="text" name="name" value={formData.name} onChange={handleInputChange} className="form-input" required />
+                {fieldErrors.name && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.name}</p>
+                )}
               </div>
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Track (e.g. Full Stack Developer)</label>
@@ -261,10 +291,16 @@ const TeamManager = () => {
                   <Briefcase className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <input type="text" name="track" value={formData.track} onChange={handleInputChange} className="form-input !pl-10" placeholder="Developer Track" required />
                 </div>
+                {fieldErrors.track && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.track}</p>
+                )}
               </div>
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Portfolio / LinkedIn URL</label>
                 <input type="url" name="url" value={formData.url} onChange={handleInputChange} className="form-input" placeholder="https://..." />
+                {fieldErrors.url && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.url}</p>
+                )}
               </div>
 
               <div className="flex gap-4 mt-6">

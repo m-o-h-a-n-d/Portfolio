@@ -1,13 +1,17 @@
 import { useState, useEffect } from 'react';
-import { apiGet, apiPost } from '../../api/request';
+import { apiGet, apiPut } from '../../api/request';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import { Save, Upload, User, Share2 } from 'lucide-react';
 import Swal from '../../lib/swal';
+import { extractFieldErrors, getFieldError } from '../../lib/validationErrors';
 
 const ProfileManager = () => {
   const [profile, setProfile] = useState(null);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
+  const socialPlatforms = ['github', 'facebook', 'linkedin', 'instagram'];
 
   useEffect(() => {
     fetchProfile();
@@ -16,8 +20,18 @@ const ProfileManager = () => {
   const fetchProfile = async () => {
     try {
       setLoading(true);
-      const response = await apiGet('/profile');
-      setProfile(response.data);
+      const response = await apiGet(DASHBOARD_ENDPOINTS.user.list);
+      const profileData = response.data || {};
+      setProfile({
+        ...profileData,
+        contact_email: profileData?.contact_email || '',
+        social_links: {
+          github: profileData?.social_links?.github || '',
+          facebook: profileData?.social_links?.facebook || '',
+          linkedin: profileData?.social_links?.linkedin || '',
+          instagram: profileData?.social_links?.instagram || ''
+        }
+      });
     } catch (error) {
       console.error('Error fetching profile:', error);
     } finally {
@@ -58,7 +72,24 @@ const ProfileManager = () => {
     setSaving(true);
 
     try {
-      await apiPost('/profile/update', profile);
+      setFieldErrors({});
+      const formData = new FormData();
+      formData.append('name', profile?.name || '');
+      formData.append('title', profile?.title || '');
+      formData.append('email', profile?.email || '');
+      formData.append('contact_email', profile?.contact_email || '');
+      formData.append('phone', profile?.phone || '');
+      formData.append('birthday', profile?.birthday || '');
+      formData.append('location', profile?.location || '');
+      formData.append('about', profile?.about || '');
+      if (avatarFile) {
+        formData.append('avatar', avatarFile);
+      }
+      const socialLinks = profile?.social_links || {};
+      Object.entries(socialLinks).forEach(([key, value]) => {
+        formData.append(`social_links[${key}]`, value || '');
+      });
+      await apiPut(DASHBOARD_ENDPOINTS.user.update, formData);
       Swal.fire({
         icon: 'success',
         title: 'Success!',
@@ -68,6 +99,7 @@ const ProfileManager = () => {
       });
     } catch (error) {
       console.error('Error saving profile:', error);
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -134,6 +166,9 @@ const ProfileManager = () => {
                   onChange={handleAvatarUpload}
                 />
               </label>
+              {fieldErrors.avatar && (
+                <p className="mt-1 text-xs text-destructive">{fieldErrors.avatar}</p>
+              )}
             </div>
           </div>
 
@@ -145,16 +180,21 @@ const ProfileManager = () => {
             </div>
             
             <div className="space-y-4">
-              {profile.social_links && Object.entries(profile.social_links).map(([platform, url]) => (
+              {socialPlatforms.map((platform) => (
                 <div key={platform}>
                   <label className="text-light-gray/70 text-[10px] uppercase mb-1 block capitalize">{platform}</label>
                   <input
                     type="url"
-                    value={url}
+                    value={profile?.social_links?.[platform] || ''}
                     onChange={(e) => handleSocialChange(platform, e.target.value)}
                     className="form-input text-sm py-2"
                     placeholder={`https://${platform}.com/yourprofile`}
                   />
+                  {getFieldError(fieldErrors, `social_links.${platform}`) && (
+                    <p className="mt-1 text-xs text-destructive">
+                      {getFieldError(fieldErrors, `social_links.${platform}`)}
+                    </p>
+                  )}
                 </div>
               ))}
             </div>
@@ -177,6 +217,9 @@ const ProfileManager = () => {
                   className="form-input"
                   required
                 />
+                {fieldErrors.name && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.name}</p>
+                )}
               </div>
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Job Title</label>
@@ -188,6 +231,9 @@ const ProfileManager = () => {
                   className="form-input"
                   required
                 />
+                {fieldErrors.title && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.title}</p>
+                )}
               </div>
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Email</label>
@@ -199,6 +245,23 @@ const ProfileManager = () => {
                   className="form-input"
                   required
                 />
+                {fieldErrors.email && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.email}</p>
+                )}
+              </div>
+              <div>
+                <label className="text-light-gray/70 text-xs uppercase mb-2 block">Email Contact</label>
+                <input
+                  type="email"
+                  name="contact_email"
+                  value={profile?.contact_email || ''}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  required
+                />
+                {fieldErrors.contact_email && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.contact_email}</p>
+                )}
               </div>
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Phone</label>
@@ -209,6 +272,9 @@ const ProfileManager = () => {
                   onChange={handleInputChange}
                   className="form-input"
                 />
+                {fieldErrors.phone && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.phone}</p>
+                )}
               </div>
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Birthday</label>
@@ -219,6 +285,9 @@ const ProfileManager = () => {
                   onChange={handleInputChange}
                   className="form-input"
                 />
+                {fieldErrors.birthday && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.birthday}</p>
+                )}
               </div>
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Location</label>
@@ -229,6 +298,9 @@ const ProfileManager = () => {
                   onChange={handleInputChange}
                   className="form-input"
                 />
+                {fieldErrors.location && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.location}</p>
+                )}
               </div>
             </div>
           </div>
@@ -245,6 +317,9 @@ const ProfileManager = () => {
                 className="form-input min-h-[250px] resize-y"
                 placeholder="Write your biography here..."
               />
+              {fieldErrors.about && (
+                <p className="mt-1 text-xs text-destructive">{fieldErrors.about}</p>
+              )}
             </div>
           </div>
         </div>

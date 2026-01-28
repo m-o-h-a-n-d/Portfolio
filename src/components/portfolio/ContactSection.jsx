@@ -2,7 +2,9 @@ import { useState } from 'react';
 import { useProfile } from '../../context/DataContext';
 import { Send } from 'lucide-react';
 import Swal from '../../lib/swal';
-import { apiPost, CONTACT_US_ENDPOINTS } from '../../api/request';
+import { apiPost } from '../../api/request';
+import { PORTFOLIO_ENDPOINTS } from '../../api/endpoints';
+import { extractFieldErrors } from '../../lib/validationErrors';
 
 const ContactSection = () => {
   const profile = useProfile();
@@ -14,6 +16,7 @@ const ContactSection = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isValid, setIsValid] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -38,7 +41,8 @@ const ContactSection = () => {
     setIsSubmitting(true);
 
     try {
-      await apiPost(CONTACT_US_ENDPOINTS.store, {
+      setFieldErrors({});
+      await apiPost(PORTFOLIO_ENDPOINTS.contactUs.store, {
         name: formData.fullname,
         email: formData.email,
         subject: formData.subject,
@@ -57,6 +61,7 @@ const ContactSection = () => {
       });
     } catch (error) {
       console.error('Message send failed:', error);
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -104,6 +109,9 @@ const ContactSection = () => {
               value={formData.fullname}
               onChange={handleChange}
             />
+            {fieldErrors.name && (
+              <p className="mt-1 text-xs text-destructive">{fieldErrors.name}</p>
+            )}
             <input 
               type="email" 
               name="email" 
@@ -113,6 +121,9 @@ const ContactSection = () => {
               value={formData.email}
               onChange={handleChange}
             />
+            {fieldErrors.email && (
+              <p className="mt-1 text-xs text-destructive">{fieldErrors.email}</p>
+            )}
           </div>
 
           {/* Subject */}
@@ -125,6 +136,9 @@ const ContactSection = () => {
             value={formData.subject}
             onChange={handleChange}
           />
+          {fieldErrors.subject && (
+            <p className="mt-1 text-xs text-destructive">{fieldErrors.subject}</p>
+          )}
 
           {/* Message */}
           <textarea 
@@ -135,6 +149,9 @@ const ContactSection = () => {
             value={formData.message}
             onChange={handleChange}
           />
+          {fieldErrors.message && (
+            <p className="mt-1 text-xs text-destructive">{fieldErrors.message}</p>
+          )}
 
           {/* Submit Button */}
           <button 

@@ -1,11 +1,15 @@
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { Mail, ArrowLeft, Send } from 'lucide-react';
+import { apiPost } from '../../api/request';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
+import { extractFieldErrors } from '../../lib/validationErrors';
 import Swal from '../../lib/swal';
 
 const ForgetPassword = () => {
   const [email, setEmail] = useState('');
   const [loading, setLoading] = useState(false);
+  const [fieldErrors, setFieldErrors] = useState({});
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -13,8 +17,8 @@ const ForgetPassword = () => {
     setLoading(true);
 
     try {
-      // Simulate API call
-      await new Promise(resolve => setTimeout(resolve, 1500));
+      setFieldErrors({});
+      await apiPost(DASHBOARD_ENDPOINTS.auth.forgotPassword, { email });
       
       Swal.fire({
         icon: 'success',
@@ -26,6 +30,7 @@ const ForgetPassword = () => {
       
       navigate('/admin/otp-verification', { state: { email } });
     } catch (error) {
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -65,6 +70,9 @@ const ForgetPassword = () => {
                   required
                 />
               </div>
+              {fieldErrors.email && (
+                <p className="mt-1 text-xs text-destructive">{fieldErrors.email}</p>
+              )}
             </div>
 
             <button

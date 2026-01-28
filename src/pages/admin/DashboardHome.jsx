@@ -1,26 +1,88 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { apiGet } from '../../api/request';
-import { Users, FileText, Briefcase, MessageSquare, TrendingUp, Eye } from 'lucide-react';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
+import { useNotifications } from '../../context/NotificationContext';
+import { Users, FileText, Briefcase, MessageSquare, TrendingUp, Eye, Wrench } from 'lucide-react';
 
 const DashboardHome = () => {
+  const { notifications, unreadCount, fetchNotifications, loading: notificationsLoading } = useNotifications();
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [portfolioItems, setPortfolioItems] = useState([]);
+
+  const formatRelativeTime = (dateString) => {
+    if (!dateString) return '';
+    const date = new Date(dateString);
+    if (Number.isNaN(date.getTime())) return '';
+    const diffSeconds = Math.floor((Date.now() - date.getTime()) / 1000);
+    if (diffSeconds < 60) return 'just now';
+    const diffMinutes = Math.floor(diffSeconds / 60);
+    if (diffMinutes < 60) return `${diffMinutes} minute${diffMinutes === 1 ? '' : 's'} ago`;
+    const diffHours = Math.floor(diffMinutes / 60);
+    if (diffHours < 24) return `${diffHours} hour${diffHours === 1 ? '' : 's'} ago`;
+    const diffDays = Math.floor(diffHours / 24);
+    if (diffDays < 30) return `${diffDays} day${diffDays === 1 ? '' : 's'} ago`;
+    const diffMonths = Math.floor(diffDays / 30);
+    if (diffMonths < 12) return `${diffMonths} month${diffMonths === 1 ? '' : 's'} ago`;
+    const diffYears = Math.floor(diffMonths / 12);
+    return `${diffYears} year${diffYears === 1 ? '' : 's'} ago`;
+  };
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        // Simulate fetching stats
-        await new Promise(resolve => setTimeout(resolve, 500));
+        setLoading(true);
+        const [portfolioRes, messagesRes, servicesRes] = await Promise.allSettled([
+          apiGet(DASHBOARD_ENDPOINTS.portfolio.list),
+          apiGet(DASHBOARD_ENDPOINTS.contactUs.list),
+          apiGet(DASHBOARD_ENDPOINTS.services.list)
+        ]);
+
+        const getValue = (res) => (res?.status === 'fulfilled' ? res.value : null);
+        const portfolioValue = getValue(portfolioRes);
+        const messagesValue = getValue(messagesRes);
+
+        const extractList = (res) => {
+          if (Array.isArray(res?.data)) return res.data;
+          if (Array.isArray(res?.data?.data)) return res.data.data;
+          if (Array.isArray(res?.data?.projects)) return res.data.projects;
+          if (Array.isArray(res?.data?.portfolios)) return res.data.portfolios;
+          if (Array.isArray(res)) return res;
+          return [];
+        };
+
+        const extractCount = (res, keys = []) => {
+          const data = res?.data ?? res;
+          if (!data || typeof data !== 'object') return null;
+          for (const key of keys) {
+            if (typeof data?.[key] === 'number') return data[key];
+          }
+          return null;
+        };
+
+        const items = extractList(portfolioValue);
+        setPortfolioItems(items);
+
+        const portfolioCount =
+          extractCount(portfolioValue, ['count', 'total', 'total_projects', 'projects_count']) ??
+          items.length;
+
+        const messagesCount =
+          extractCount(messagesValue, ['count', 'total', 'total_messages', 'messages_count']) ??
+          notifications.length;
+
+        const servicesValue = getValue(servicesRes);
+        const servicesCount =
+          extractCount(servicesValue, ['count', 'total', 'total_services', 'services_count']) ??
+          extractList(servicesValue).length;
+
+        await fetchNotifications();
+
         setStats({
-          totalProjects: 9,
-          totalMessages: 5,
-          unreadMessages: 2,
-          totalViews: 1247,
-          recentActivity: [
-            { type: 'message', text: 'New message from John Smith', time: '2 hours ago' },
-            { type: 'project', text: 'Portfolio project "Finance" updated', time: '5 hours ago' },
-            { type: 'view', text: '15 new portfolio views', time: '1 day ago' },
-          ]
+          totalProjects: portfolioCount,
+          totalMessages: messagesCount,
+          unreadMessages: unreadCount,
+          totalServices: servicesCount
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -32,14 +94,44 @@ const DashboardHome = () => {
     fetchStats();
   }, []);
 
+  useEffect(() => {
+    setStats((prev) =>
+      prev
+        ? { ...prev, totalMessages: prev.totalMessages ?? notifications.length, unreadMessages: unreadCount }
+        : prev
+    );
+  }, [notifications.length, unreadCount]);
+
+  const recentActivity = useMemo(() => {
+    const messageItems = notifications.map((message) => ({
+      type: 'message',
+      text: `New message from ${message.name || 'Visitor'}`,
+      time: formatRelativeTime(message.created_at),
+      date: message.created_at
+    }));
+
+    const projectItems = portfolioItems
+      .filter((item) => item?.updated_at || item?.updatedAt)
+      .map((item) => ({
+        type: 'project',
+        text: `Portfolio project "${item.title || item.name || 'Untitled'}" updated`,
+        time: formatRelativeTime(item.updated_at || item.updatedAt),
+        date: item.updated_at || item.updatedAt
+      }));
+
+    return [...messageItems, ...projectItems]
+      .sort((a, b) => new Date(b.date || 0) - new Date(a.date || 0))
+      .slice(0, 5);
+  }, [notifications, portfolioItems]);
+
   const statCards = [
     { label: 'Portfolio Projects', value: stats?.totalProjects || 0, icon: Briefcase, color: 'text-primary' },
     { label: 'Total Messages', value: stats?.totalMessages || 0, icon: MessageSquare, color: 'text-vegas-gold' },
     { label: 'Unread Messages', value: stats?.unreadMessages || 0, icon: MessageSquare, color: 'text-destructive' },
-    { label: 'Portfolio Views', value: stats?.totalViews || 0, icon: Eye, color: 'text-green-500' },
+    { label: 'Total Services', value: stats?.totalServices || 0, icon: Wrench, color: 'text-green-500' },
   ];
 
-  if (loading) {
+  if (loading || notificationsLoading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin" />
@@ -86,7 +178,10 @@ const DashboardHome = () => {
       >
         <h2 className="h3 text-white-2 mb-4">Recent Activity</h2>
         <ul className="space-y-4">
-          {stats?.recentActivity?.map((activity, index) => (
+          {recentActivity.length === 0 && (
+            <li className="text-muted-foreground text-sm">No recent activity yet</li>
+          )}
+          {recentActivity.map((activity, index) => (
             <li 
               key={index}
               className="flex items-center gap-4 p-4 bg-onyx/30 rounded-xl"

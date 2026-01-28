@@ -3,7 +3,8 @@ import { Plus, Edit2, Trash2 } from 'lucide-react';
 import Swal from '../../lib/swal';
 import { Button } from "../ui/button";
 import { apiPost, apiPut, apiDelete } from '../../api/request';
-import { API_SKILLS_CREATE, API_SKILLS_UPDATE, API_SKILLS_DELETE } from '../../api/endpoints';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
+import { extractFieldErrors } from '../../lib/validationErrors';
 import {
   Dialog,
   DialogContent,
@@ -19,10 +20,12 @@ const SkillsManager = ({ skills = [], onUpdate }) => {
   const [modalMode, setModalMode] = useState('add');
   const [editingSkill, setEditingSkill] = useState(null);
   const [formData, setFormData] = useState({ name: '', percentage: 80 });
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const openAddModal = () => {
     setModalMode('add');
     setEditingSkill(null);
+    setFieldErrors({});
     setFormData({ name: '', percentage: 80 });
     setModalOpen(true);
   };
@@ -30,6 +33,7 @@ const SkillsManager = ({ skills = [], onUpdate }) => {
   const openEditModal = (skill) => {
     setModalMode('edit');
     setEditingSkill(skill);
+    setFieldErrors({});
     setFormData({ name: skill.name, percentage: skill.percentage });
     setModalOpen(true);
   };
@@ -50,13 +54,14 @@ const SkillsManager = ({ skills = [], onUpdate }) => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setFieldErrors({});
       let updatedSkills;
       if (modalMode === 'add') {
-        const response = await apiPost(API_SKILLS_CREATE, formData);
+        const response = await apiPost(DASHBOARD_ENDPOINTS.skills.store, formData);
         const newSkill = response.skill || response.data || { ...formData, id: `skill_${Date.now()}` };
         updatedSkills = [...skills, newSkill];
       } else {
-        const response = await apiPut(`${API_SKILLS_UPDATE}/${editingSkill.id}`, formData);
+        const response = await apiPut(DASHBOARD_ENDPOINTS.skills.update(editingSkill.id), formData);
         const updatedSkill = response.skill || response.data || { ...editingSkill, ...formData };
         updatedSkills = skills.map(s => s.id === (editingSkill?.id || updatedSkill.id) ? updatedSkill : s);
       }
@@ -64,6 +69,7 @@ const SkillsManager = ({ skills = [], onUpdate }) => {
       closeModal();
     } catch (error) {
       console.error('Error saving skill:', error);
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -84,7 +90,7 @@ const SkillsManager = ({ skills = [], onUpdate }) => {
 
     if (!result.isConfirmed) return;
     try {
-      await apiDelete(`${API_SKILLS_DELETE}/${id}`);
+      await apiDelete(DASHBOARD_ENDPOINTS.skills.delete(id));
       const updatedSkills = skills.filter(s => s.id !== id);
       onUpdate(updatedSkills);
     } catch (error) {
@@ -163,6 +169,9 @@ const SkillsManager = ({ skills = [], onUpdate }) => {
                 placeholder="e.g. Web Design"
                 required
               />
+              {fieldErrors.name && (
+                <p className="mt-1 text-xs text-destructive">{fieldErrors.name}</p>
+              )}
             </div>
             <div className="space-y-2">
               <div className="flex justify-between">
@@ -179,6 +188,9 @@ const SkillsManager = ({ skills = [], onUpdate }) => {
                 onChange={handleInputChange}
                 className="accent-primary"
               />
+              {fieldErrors.percentage && (
+                <p className="mt-1 text-xs text-destructive">{fieldErrors.percentage}</p>
+              )}
             </div>
             <DialogFooter className="pt-4">
               <Button type="button" variant="outline" onClick={closeModal} className="bg-transparent border-border hover:bg-onyx">

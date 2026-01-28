@@ -1,11 +1,6 @@
 import { useState, useEffect } from 'react';
 import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
-import {
-  API_BLOG_LIST,
-  API_BLOG_CREATE,
-  API_BLOG_UPDATE,
-  API_BLOG_DELETE
-} from '../../api/endpoints';
+import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import {
   Plus,
   Edit2,
@@ -20,6 +15,7 @@ import {
 } from 'lucide-react';
 import Swal from '../../lib/swal';
 import Pagination from '../../components/admin/Pagination';
+import { extractFieldErrors } from '../../lib/validationErrors';
 
 const BlogsManager = () => {
   const [blogs, setBlogs] = useState([]);
@@ -30,12 +26,15 @@ const BlogsManager = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [editingItem, setEditingItem] = useState(null);
+  const [fieldErrors, setFieldErrors] = useState({});
 
   const [formData, setFormData] = useState({
     title: '',
     category: '',
+    excerpt: '',
     content: '',
-    image: '',
+    imagePreview: '',
+    imageFile: null,
     link: '',
     date: new Date().toISOString().split('T')[0]
   });
@@ -49,7 +48,7 @@ const BlogsManager = () => {
 
   useEffect(() => {
     const filtered = blogs.filter(blog =>
-      [blog.title, blog.category, blog.content]
+      [blog.title, blog.category, blog.excerpt, blog.content]
         .join(' ')
         .toLowerCase()
         .includes(searchQuery.toLowerCase())
@@ -61,8 +60,8 @@ const BlogsManager = () => {
   const fetchBlogs = async () => {
     try {
       setLoading(true);
-      const res = await apiGet(API_BLOG_LIST);
-      const data = res.data.posts || res.data || [];
+      const res = await apiGet(DASHBOARD_ENDPOINTS.blog.list);
+      const data = res.data.blogs || res.data || [];
       setBlogs(data);
       setFilteredBlogs(data);
     } catch (e) {
@@ -76,11 +75,14 @@ const BlogsManager = () => {
   const openAddModal = () => {
     setModalMode('add');
     setEditingItem(null);
+    setFieldErrors({});
     setFormData({
       title: '',
       category: '',
+      excerpt: '',
       content: '',
-      image: '',
+      imagePreview: '',
+      imageFile: null,
       link: '',
       date: new Date().toISOString().split('T')[0]
     });
@@ -90,7 +92,17 @@ const BlogsManager = () => {
   const openEditModal = (blog) => {
     setModalMode('edit');
     setEditingItem(blog);
-    setFormData(blog);
+    setFieldErrors({});
+    setFormData({
+      title: blog.title || '',
+      category: blog.category || '',
+      excerpt: blog.excerpt || '',
+      content: blog.content || '',
+      imagePreview: blog.image || '',
+      imageFile: null,
+      link: blog.link || '',
+      date: blog.date || new Date().toISOString().split('T')[0]
+    });
     setModalOpen(true);
   };
 
@@ -104,32 +116,36 @@ const BlogsManager = () => {
   const handleImageUpload = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () =>
-      setFormData(p => ({ ...p, image: reader.result }));
-    reader.readAsDataURL(file);
+    const previewUrl = URL.createObjectURL(file);
+    setFormData(p => ({ ...p, imagePreview: previewUrl, imageFile: file }));
   };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      let response;
-      if (modalMode === 'add') {
-        response = await apiPost(API_BLOG_CREATE, formData);
-      } else {
-        response = await apiPut(`${API_BLOG_UPDATE}/${editingItem.id}`, formData);
+      setFieldErrors({});
+      const formPayload = new FormData();
+      formPayload.append('title', formData.title);
+      formPayload.append('category', formData.category);
+      formPayload.append('excerpt', formData.excerpt || '');
+      formPayload.append('content', formData.content);
+      formPayload.append('link', formData.link || '');
+      formPayload.append('date', formData.date || '');
+      if (formData.imageFile) {
+        formPayload.append('image', formData.imageFile);
       }
+
+      const response = modalMode === 'add'
+        ? await apiPost(DASHBOARD_ENDPOINTS.blog.store, formPayload)
+        : await apiPut(DASHBOARD_ENDPOINTS.blog.update(editingItem.id), formPayload);
       
-      // Use returned data for real-time update without full refresh
-      const savedBlog = response.post || response.blog || response.data || (modalMode === 'add' ? { ...formData, id: Date.now() } : { ...editingItem, ...formData });
-      
-      if (modalMode === 'add') {
-        setBlogs(prev => [savedBlog, ...prev]);
+      const responseList = response?.data?.blogs;
+      if (Array.isArray(responseList)) {
+        setBlogs(responseList);
+        setFilteredBlogs(responseList);
       } else {
-        setBlogs(prev => prev.map(b => b.id === (editingItem?.id || savedBlog.id) ? savedBlog : b));
+        await fetchBlogs();
       }
-      // Reset search query to ensure the new/updated item is visible
-      setSearchQuery('');
 
       closeModal();
       Swal.fire({
@@ -140,6 +156,7 @@ const BlogsManager = () => {
       });
     } catch (error) {
       console.error('Error saving blog:', error);
+      setFieldErrors(extractFieldErrors(error));
       Swal.fire('Error', 'Something went wrong', 'error');
     }
   };
@@ -151,7 +168,7 @@ const BlogsManager = () => {
       showCancelButton: true
     });
     if (!res.isConfirmed) return;
-    await apiDelete(`${API_BLOG_DELETE}/${id}`);
+    await apiDelete(DASHBOARD_ENDPOINTS.blog.delete(id));
     fetchBlogs();
   };
 
@@ -346,6 +363,9 @@ const BlogsManager = () => {
                     placeholder="Enter blog title"
                     required
                   />
+                  {fieldErrors.title && (
+                    <p className="mt-1 text-xs text-destructive">{fieldErrors.title}</p>
+                  )}
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
@@ -361,6 +381,9 @@ const BlogsManager = () => {
                       placeholder="e.g., Technology"
                       required
                     />
+                    {fieldErrors.category && (
+                      <p className="mt-1 text-xs text-destructive">{fieldErrors.category}</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-white-2 mb-2">
@@ -374,7 +397,26 @@ const BlogsManager = () => {
                       className="form-input w-full"
                       required
                     />
+                    {fieldErrors.date && (
+                      <p className="mt-1 text-xs text-destructive">{fieldErrors.date}</p>
+                    )}
                   </div>
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-white-2 mb-2">
+                    Excerpt
+                  </label>
+                  <textarea
+                    name="excerpt"
+                    value={formData.excerpt}
+                    onChange={handleInputChange}
+                    className="form-input w-full min-h-[90px] resize-none"
+                    placeholder="Short summary for the blog..."
+                  />
+                  {fieldErrors.excerpt && (
+                    <p className="mt-1 text-xs text-destructive">{fieldErrors.excerpt}</p>
+                  )}
                 </div>
 
                 <div>
@@ -389,6 +431,26 @@ const BlogsManager = () => {
                     placeholder="Write your blog content here..."
                     required
                   />
+                  {fieldErrors.content && (
+                    <p className="mt-1 text-xs text-destructive">{fieldErrors.content}</p>
+                  )}
+                </div>
+
+                <div>
+                  <label className="block text-sm font-medium text-white-2 mb-2">
+                    Link
+                  </label>
+                  <input
+                    type="url"
+                    name="link"
+                    value={formData.link}
+                    onChange={handleInputChange}
+                    className="form-input w-full"
+                    placeholder="https://..."
+                  />
+                  {fieldErrors.link && (
+                    <p className="mt-1 text-xs text-destructive">{fieldErrors.link}</p>
+                  )}
                 </div>
 
                 <div>
@@ -396,9 +458,9 @@ const BlogsManager = () => {
                     Thumbnail Image
                   </label>
                   <label className="block border-2 border-dashed border-primary/30 hover:border-primary/60 rounded-xl p-8 text-center cursor-pointer transition-colors bg-primary/5 hover:bg-primary/10">
-                    {formData.image ? (
+                    {formData.imagePreview ? (
                       <div className="space-y-2">
-                        <img src={formData.image} className="max-h-48 mx-auto rounded-lg shadow-md" alt="Preview" />
+                        <img src={formData.imagePreview} className="max-h-48 mx-auto rounded-lg shadow-md" alt="Preview" />
                         <p className="text-xs text-muted-foreground">Click to change image</p>
                       </div>
                     ) : (
@@ -410,6 +472,9 @@ const BlogsManager = () => {
                     )}
                     <input type="file" hidden onChange={handleImageUpload} accept="image/*" />
                   </label>
+                  {fieldErrors.image && (
+                    <p className="mt-1 text-xs text-destructive">{fieldErrors.image}</p>
+                  )}
                 </div>
               </div>
 
