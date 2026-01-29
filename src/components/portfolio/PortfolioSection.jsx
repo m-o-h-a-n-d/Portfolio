@@ -18,11 +18,28 @@ const PortfolioSection = () => {
     ? ['all', ...services.map(s => s.title)]
     : (portfolio.categories || ['all', 'Frontend Development', 'Backend Development', 'IOT']);
   
+  const serviceTitleById = new Map(
+    services.map((service) => [String(service?.id), service?.title || service?.name || ''])
+  );
+
+  const resolveProjectCategory = (project) => {
+    const directCategory = project?.category;
+    if (typeof directCategory === 'string' && directCategory.trim() !== '') return directCategory;
+    if (project?.service_name) return project.service_name;
+    if (project?.service_title) return project.service_title;
+    if (project?.service?.title) return project.service.title;
+    if (project?.service?.name) return project.service.name;
+    if (typeof project?.service === 'string') return project.service;
+    const serviceId = project?.service_id ?? project?.service?.id;
+    return serviceId != null ? serviceTitleById.get(String(serviceId)) || '' : '';
+  };
+
   const filteredProjects = activeFilter === 'all' 
     ? portfolio.projects 
-    : portfolio.projects?.filter(
-        p => p.category && p.category.toLowerCase() === activeFilter.toLowerCase()
-      );
+    : portfolio.projects?.filter((p) => {
+        const category = resolveProjectCategory(p);
+        return category && category.toLowerCase() === activeFilter.toLowerCase();
+      });
 
   const handleFilterChange = (category) => {
     setActiveFilter(category);
@@ -107,7 +124,7 @@ const PortfolioSection = () => {
                   {project.title}
                 </h3>
                 <p className="text-light-gray/70 text-sm font-light ml-[10px] capitalize">
-                  {project.category}
+                  {resolveProjectCategory(project) || project.category}
                 </p>
               </a>
             </li>

@@ -26,7 +26,7 @@ const ProjectEditor = () => {
 
   const [formData, setFormData] = useState({
     title: '',
-    service: '',
+    service_id: '',
     description: '',
     link: '',
     github: '',
@@ -48,7 +48,7 @@ const ProjectEditor = () => {
       const project = portfolio.projects?.find(p => p.id === parseInt(id));
       if (project) {
         const serviceId =
-          project.service ||
+          project.service_id ||
           services.find(s => s.title === project.category || s.title === project.service_name)?.id ||
           '';
         const coverValue = project.image_cover || project.image || project.images?.[0] || '';
@@ -58,7 +58,7 @@ const ProjectEditor = () => {
           : imagesValue;
         setFormData({
           title: project.title,
-          service: serviceId,
+          service_id: serviceId,
           description: project.description || project.short_desc || project.desc || project.full_description || '',
           link: project.link || '',
           github: project.github || '',
@@ -131,7 +131,7 @@ const ProjectEditor = () => {
       setServices(normalizedServices);
       setFormData(prev => ({
         ...prev,
-        service: prev.service || normalizedServices[0]?.id || ''
+        service_id: prev.service_id || normalizedServices[0]?.id || ''
       }));
     } catch (error) {
       console.error('Error fetching data:', error);
@@ -338,7 +338,7 @@ const ProjectEditor = () => {
         link: statusValue ? (formData.link || '') : '',
         github: statusValue ? (formData.github || '') : '',
         status: statusValue,
-        service_id: formData.service ? Number(formData.service) : undefined,
+        service_id: formData.service_id ? Number(formData.service_id) : undefined,
         slug: formData.title.toLowerCase().replace(/\s+/g, '-'),
         technologies: formData.technologies,
         teams: formData.team_members
@@ -361,9 +361,10 @@ const ProjectEditor = () => {
       projectData.append('link', basePayload.link);
       projectData.append('github', basePayload.github);
       projectData.append('status', basePayload.status ? '1' : '0');
-      // Backend expects service_id (and teams[]), keep service as fallback for older APIs.
-      projectData.append('service_id', String(formData.service || ''));
-      projectData.append('service', String(formData.service || ''));
+      // Backend expects service_id
+      if (formData.service_id) {
+        projectData.append('service_id', String(formData.service_id));
+      }
       projectData.append('slug', basePayload.slug);
       basePayload.technologies.forEach((tech) => projectData.append('technologies[]', tech));
       projectData.append('teams_present', '1');
@@ -605,8 +606,8 @@ const ProjectEditor = () => {
               <div>
                 <label className="text-light-gray/70 text-xs uppercase mb-2 block">Category (from Services)</label>
                 <select
-                  name="service"
-                  value={formData.service}
+                  name="service_id"
+                  value={formData.service_id}
                   onChange={handleInputChange}
                   className="form-input"
                 >
@@ -620,8 +621,8 @@ const ProjectEditor = () => {
                     ))
                   )}
                 </select>
-                {(fieldErrors.service || fieldErrors.category) && (
-                  <p className="mt-1 text-xs text-destructive">{fieldErrors.service || fieldErrors.category}</p>
+                {(fieldErrors.service_id || fieldErrors.category) && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.service_id || fieldErrors.category}</p>
                 )}
               </div>
               <div className="md:col-span-2">
