@@ -32,12 +32,12 @@ const ProjectEditor = () => {
     github: '',
     technologies: [],
     team_members: [],
-    images: [],
+    images: [], // This will hold both URLs (strings) and DataURLs (for preview)
     status: true
   });
 
+  // To keep track of actual File objects for new uploads
   const [imageFiles, setImageFiles] = useState([]);
-  const initialCoverRef = useRef('');
 
   useEffect(() => {
     fetchData();
@@ -51,11 +51,19 @@ const ProjectEditor = () => {
           project.service_id ||
           services.find(s => s.title === project.category || s.title === project.service_name)?.id ||
           '';
-        const coverValue = project.image_cover || project.image || project.images?.[0] || '';
-        const imagesValue = Array.isArray(project.images) ? project.images : (project.image ? [project.image] : []);
-        const mergedImages = coverValue
-          ? [coverValue, ...imagesValue.filter((img) => img && img !== coverValue)]
-          : imagesValue;
+        
+        // Normalize images: image_cover should be first if it exists
+        const coverValue = project.image_cover || '';
+        const imagesValue = Array.isArray(project.images) ? project.images : [];
+        
+        let mergedImages = [...imagesValue];
+        if (coverValue && !mergedImages.includes(coverValue)) {
+          mergedImages = [coverValue, ...mergedImages];
+        } else if (coverValue && mergedImages.includes(coverValue)) {
+          // Move cover to front
+          mergedImages = [coverValue, ...mergedImages.filter(img => img !== coverValue)];
+        }
+
         setFormData({
           title: project.title,
           service_id: serviceId,
@@ -67,7 +75,6 @@ const ProjectEditor = () => {
           images: mergedImages,
           status: project.status === true || project.status === 1 || project.status === '1'
         });
-        initialCoverRef.current = coverValue;
       }
     }
   }, [portfolio, id, isEditMode, services]);
@@ -84,11 +91,10 @@ const ProjectEditor = () => {
       const portfolioValue = getValue(portfolioRes);
       const teamValue = getValue(teamRes);
       const servicesValue = getValue(servicesRes);
+      
       const normalizeProject = (project) => {
-        const image = project.image || project.image_cover || '';
-        const images = Array.isArray(project.images) && project.images.length > 0
-          ? project.images
-          : (image ? [image] : []);
+        const image = project.image_cover || project.image || '';
+        const images = Array.isArray(project.images) ? project.images : (image ? [image] : []);
         return {
           ...project,
           category: project.category || project.service_name || '',
@@ -98,12 +104,14 @@ const ProjectEditor = () => {
           images
         };
       };
+
       const portfolioData = portfolioValue?.data || portfolioValue || {};
       const projects = Array.isArray(portfolioData.projects)
         ? portfolioData.projects
         : Array.isArray(portfolioData.portfolios)
           ? portfolioData.portfolios
           : (Array.isArray(portfolioData) ? portfolioData : []);
+      
       const normalizedPortfolio = {
         ...portfolioData,
         projects: projects.map(normalizeProject)
@@ -122,17 +130,18 @@ const ProjectEditor = () => {
         return [];
       };
 
-      // Ensure team data is always an array
       const teamData = normalizeList(teamValue, ['teams', 'team']);
       setTeam(teamData);
 
-      // Ensure services data is always an array
-      const normalizedServices = normalizeList(servicesValue, ['services', 'service']);
+      const normalizedServices = normalizeList(servicesRes?.status === 'fulfilled' ? servicesRes.value : null, ['services', 'service']);
       setServices(normalizedServices);
-      setFormData(prev => ({
-        ...prev,
-        service_id: prev.service_id || normalizedServices[0]?.id || ''
-      }));
+      
+      if (!isEditMode && normalizedServices.length > 0) {
+        setFormData(prev => ({
+          ...prev,
+          service_id: normalizedServices[0]?.id || ''
+        }));
+      }
     } catch (error) {
       console.error('Error fetching data:', error);
       Swal.fire({
@@ -175,8 +184,8 @@ const ProjectEditor = () => {
   };
 
   const processImages = (files) => {
-    const MAX_IMAGES = 6;
-    const MAX_SIZE_MB = 2; // 2MB per image
+    const MAX_IMAGES = 10;
+    const MAX_SIZE_MB = 2;
     const currentImagesCount = formData.images.length;
     
     if (currentImagesCount + files.length > MAX_IMAGES) {
@@ -203,8 +212,10 @@ const ProjectEditor = () => {
 
     if (validFiles.length === 0) return;
 
-    const newFiles = [...imageFiles, ...validFiles];
-    setImageFiles(newFiles);
+    // Add new files to our tracking state
+    setImageFiles(prev => [...prev, ...validFiles]);
+
+    // Create previews
     const readers = validFiles.map(file => {
       return new Promise((resolve) => {
         const reader = new FileReader();
@@ -212,6 +223,7 @@ const ProjectEditor = () => {
         reader.readAsDataURL(file);
       });
     });
+
     Promise.all(readers).then(dataUrls => {
       setFormData(prev => ({
         ...prev,
@@ -221,55 +233,34 @@ const ProjectEditor = () => {
   };
 
   const removeImage = (index) => {
-    setFormData(prev => {
-      const removedImage = prev.images[index];
-      if (typeof removedImage === 'string' && removedImage.startsWith('data:')) {
-        const dataUrlIndex = prev.images
-          .filter(img => typeof img === 'string' && img.startsWith('data:'))
-          .indexOf(removedImage);
-        if (dataUrlIndex >= 0) {
-          setImageFiles(prevFiles => prevFiles.filter((_, i) => i !== dataUrlIndex));
-        }
+    const imageToRemove = formData.images[index];
+    
+    // If it's a new image (data:), we need to remove it from imageFiles too
+    if (typeof imageToRemove === 'string' && imageToRemove.startsWith('data:')) {
+      // Find which index it is among new images
+      const newImagesOnly = formData.images.filter(img => typeof img === 'string' && img.startsWith('data:'));
+      const newImageIndex = newImagesOnly.indexOf(imageToRemove);
+      if (newImageIndex !== -1) {
+        setImageFiles(prev => prev.filter((_, i) => i !== newImageIndex));
       }
-      return {
-        ...prev,
-        images: prev.images.filter((_, i) => i !== index)
-      };
-    });
+    }
+
+    setFormData(prev => ({
+      ...prev,
+      images: prev.images.filter((_, i) => i !== index)
+    }));
   };
 
   const addTechnology = () => {
-    const trimmedTech = techInput.trim().toLowerCase();
-    
+    const trimmedTech = techInput.trim();
     if (!trimmedTech) return;
 
-    // Check if it's English only (letters, numbers, and common symbols like . # - +)
-    const isEnglish = /^[a-zA-Z0-9.#\-+ ]+$/.test(trimmedTech);
-    if (!isEnglish) {
-      Swal.fire({
-        icon: 'warning',
-        title: 'Invalid Input',
-        text: 'Please use English characters only for technologies',
-        timer: 2000,
-        showConfirmButton: false
-      });
-      return;
-    }
-
-    if (!formData.technologies.map(t => t.toLowerCase()).includes(trimmedTech)) {
+    if (!formData.technologies.includes(trimmedTech)) {
       setFormData(prev => ({
         ...prev,
         technologies: [...prev.technologies, trimmedTech]
       }));
       setTechInput('');
-    } else {
-      Swal.fire({
-        icon: 'info',
-        title: 'Already Exists',
-        text: 'This technology is already added',
-        timer: 1500,
-        showConfirmButton: false
-      });
     }
   };
 
@@ -280,11 +271,7 @@ const ProjectEditor = () => {
     }));
   };
 
-  const addTeamMember = (e, memberId) => {
-    if (e) {
-      e.preventDefault();
-      e.stopPropagation();
-    }
+  const addTeamMember = (memberId) => {
     if (!formData.team_members.includes(memberId)) {
       setFormData(prev => ({
         ...prev,
@@ -304,25 +291,16 @@ const ProjectEditor = () => {
     const member = Array.isArray(team) ? team.find(m => m.id === memberId) : null;
     return member?.name || 'Unknown';
   };
-  
-  const getTeamMemberTrack = (memberId) => {
-    const member = Array.isArray(team) ? team.find(m => m.id === memberId) : null;
-    return member?.track || '';
-  };
-
-
 
   const handleSubmit = async (e) => {
     if (e) e.preventDefault();
+    
     if (!formData.title.trim()) {
       Swal.fire({ icon: 'warning', title: 'Required Field', text: 'Project title is required' });
       return;
     }
-    if (!isEditMode && imageFiles.length === 0) {
-      Swal.fire({ icon: 'warning', title: 'Required Field', text: 'At least one project image is required' });
-      return;
-    }
-    if (isEditMode && formData.images.length === 0 && imageFiles.length === 0) {
+    
+    if (formData.images.length === 0) {
       Swal.fire({ icon: 'warning', title: 'Required Field', text: 'At least one project image is required' });
       return;
     }
@@ -330,77 +308,59 @@ const ProjectEditor = () => {
     try {
       setSaving(true);
       setFieldErrors({});
-      const statusValue = formData.status === true || formData.status === 1;
-      const basePayload = {
-        title: formData.title,
-        short_desc: formData.description || '',
-        desc: formData.description || '',
-        link: statusValue ? (formData.link || '') : '',
-        github: statusValue ? (formData.github || '') : '',
-        status: statusValue,
-        service_id: formData.service_id ? Number(formData.service_id) : undefined,
-        slug: formData.title.toLowerCase().replace(/\s+/g, '-'),
-        technologies: formData.technologies,
-        teams: formData.team_members
-      };
-
-      const orderedImages = Array.isArray(formData.images) ? formData.images : [];
-      const dataUrls = orderedImages.filter(img => typeof img === 'string' && img.startsWith('data:'));
-      const orderedImageUrls = orderedImages.filter(
-        (img) => typeof img === 'string' && !img.startsWith('data:')
-      );
-      const getFileFromDataUrl = (dataUrl) => {
-        const dataUrlIndex = dataUrls.indexOf(dataUrl);
-        return dataUrlIndex >= 0 ? imageFiles[dataUrlIndex] : null;
-      };
-
+      
       const projectData = new FormData();
-      projectData.append('title', basePayload.title);
-      projectData.append('short_desc', basePayload.short_desc);
-      projectData.append('desc', basePayload.desc);
-      projectData.append('link', basePayload.link);
-      projectData.append('github', basePayload.github);
-      projectData.append('status', basePayload.status ? '1' : '0');
-      // Backend expects service_id
-      if (formData.service_id) {
-        projectData.append('service_id', String(formData.service_id));
-      }
-      projectData.append('slug', basePayload.slug);
-      basePayload.technologies.forEach((tech) => projectData.append('technologies[]', tech));
-      projectData.append('teams_present', '1');
-      basePayload.teams.forEach((memberId) => {
-        projectData.append('teams[]', String(memberId));
-        projectData.append('team_members[]', String(memberId));
-      });
-      if (isEditMode) {
-      // old images urls (strings) -> images[]
-      if (orderedImageUrls.length > 0) {
-        orderedImageUrls.forEach((url) => projectData.append('images[]', url));
-      } else {
-        // Keep key present so backend detects removals.
-        projectData.append('images[]', ' ');
+      projectData.append('title', formData.title);
+      projectData.append('short_desc', formData.description || '');
+      projectData.append('desc', formData.description || '');
+      projectData.append('link', formData.link || '');
+      projectData.append('github', formData.github || '');
+      projectData.append('status', formData.status ? '1' : '0');
+      projectData.append('service_id', String(formData.service_id));
+      
+      formData.technologies.forEach(tech => projectData.append('technologies[]', tech));
+      formData.team_members.forEach(id => projectData.append('teams[]', String(id)));
+
+      // Separate existing URLs and new DataURLs
+      const existingImageUrls = formData.images.filter(img => typeof img === 'string' && !img.startsWith('data:'));
+      const newDataUrls = formData.images.filter(img => typeof img === 'string' && img.startsWith('data:'));
+
+      // 1. Send existing images that are still kept
+      if (existingImageUrls.length > 0) {
+        existingImageUrls.forEach(url => projectData.append('images[]', url));
+      } else if (isEditMode) {
+        // If all old images removed, send empty to let backend know
+        projectData.append('images[]', '');
       }
 
-      // new images files -> images_files[]
-      for (const img of orderedImages) {
-        if (typeof img === 'string' && img.startsWith('data:')) {
-          const file = getFileFromDataUrl(img);
-          if (file) projectData.append('images_files[]', file);
+      // 2. Send new image files
+      // We match newDataUrls with imageFiles by order
+      newDataUrls.forEach(dataUrl => {
+        // Find the file in imageFiles that matches this dataUrl
+        // Since we add them in order, we can track them
+        const fileIndex = newDataUrls.indexOf(dataUrl);
+        if (imageFiles[fileIndex]) {
+          projectData.append('images_files[]', imageFiles[fileIndex]);
         }
-      }
+      });
 
+      if (isEditMode) {
         projectData.append('_method', 'PUT');
         await apiPost(DASHBOARD_ENDPOINTS.portfolio.update(id), projectData);
       } else {
-        for (const img of orderedImages) {
-          if (typeof img === 'string' && img.startsWith('data:')) {
-            const file = getFileFromDataUrl(img);
-            if (file) projectData.append('images[]', file);
-          }
-        }
+        // For store, we can just use images[] for everything if backend supports it, 
+        // but let's stick to what works.
+        imageFiles.forEach(file => projectData.append('images[]', file));
         await apiPost(DASHBOARD_ENDPOINTS.portfolio.store, projectData);
       }
-      Swal.fire({ icon: 'success', title: 'Success!', text: `Project ${isEditMode ? 'updated' : 'added'} successfully!`, timer: 2000, showConfirmButton: false });
+
+      Swal.fire({ 
+        icon: 'success', 
+        title: 'Success!', 
+        text: `Project ${isEditMode ? 'updated' : 'added'} successfully!`, 
+        timer: 2000, 
+        showConfirmButton: false 
+      });
       setTimeout(() => navigate('/admin/portfolio'), 2000);
     } catch (error) {
       console.error('Error saving project:', error);
@@ -421,7 +381,7 @@ const ProjectEditor = () => {
 
   return (
     <div className="w-full space-y-6">
-      {/* Header - Fixed Style like Profile Manager */}
+      {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <button
@@ -459,9 +419,9 @@ const ProjectEditor = () => {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-        {/* Left Column: Status + Images + Links (4 cols) */}
+        {/* Left Column: Status + Images + Links */}
         <div className="lg:col-span-4 space-y-6">
-          {/* Project Status Toggle */}
+          {/* Project Status */}
           <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
@@ -484,15 +444,12 @@ const ProjectEditor = () => {
             </div>
             <div className="flex items-center gap-2">
               <span className={`text-sm font-medium ${formData.status ? 'text-primary' : 'text-vegas-gold'}`}>
-                {formData.status ? 'Completed' : 'Uncomplete'}
+                {formData.status ? 'Completed' : 'In Progress'}
               </span>
-              <p className="text-xs text-muted-foreground">
-                (This will be shown in project details)
-              </p>
             </div>
           </div>
 
-          {/* Images Section - Drag & Drop */}
+          {/* Images Section */}
           <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
             <div className="flex items-center gap-2 mb-4">
               <Image className="w-5 h-5 text-primary" />
@@ -511,260 +468,189 @@ const ProjectEditor = () => {
               <label className="cursor-pointer block">
                 <Upload className="w-10 h-10 mx-auto text-muted-foreground mb-2" />
                 <p className="text-light-gray text-xs mb-1">Drag & Drop or Click</p>
-                <p className="text-muted-foreground text-[10px]">Max 6 images, 2MB each</p>
+                <p className="text-muted-foreground text-[10px]">Max 10 images, 2MB each</p>
                 <input type="file" accept="image/*" multiple className="hidden" onChange={handleImageUpload} />
               </label>
             </div>
-            {fieldErrors.images && (
-              <p className="mt-1 text-xs text-destructive">{fieldErrors.images}</p>
-            )}
 
-            {/* Images List with Reorder */}
             <div className="space-y-3 max-h-[400px] overflow-y-auto pr-2 has-scrollbar">
               {formData.images.map((img, index) => (
                 <div key={index} className="flex items-center gap-3 p-2 bg-onyx/50 border border-border rounded-xl group">
                   <div className="relative w-12 h-12 flex-shrink-0">
                     <img src={img} alt="" className="w-full h-full object-cover rounded-lg" />
-                    {index === 0 && <div className="absolute -top-1 -left-1 bg-primary text-[8px] px-1 rounded text-black font-bold">MAIN</div>}
+                    {index === 0 && (
+                      <div className="absolute -top-1 -left-1 bg-primary text-[8px] px-1 rounded text-black font-bold">
+                        COVER
+                      </div>
+                    )}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="text-[10px] text-light-gray truncate">Image {index + 1}</p>
+                    <p className="text-[10px] text-light-gray truncate">
+                      {index === 0 ? 'Main Cover Image' : `Gallery Image ${index}`}
+                    </p>
                   </div>
                   <div className="flex gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button type="button" onClick={() => removeImage(index)} className="p-1 hover:text-destructive text-muted-foreground"><X className="w-3 h-3" /></button>
+                    <button 
+                      type="button" 
+                      onClick={() => removeImage(index)} 
+                      className="p-1 hover:text-destructive text-muted-foreground"
+                    >
+                      <X className="w-4 h-4" />
+                    </button>
                   </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Links Section - Conditional Rendering based on Status */}
-          {formData.status && (
-            <div className="bg-card border border-border rounded-[20px] p-6 space-y-4" style={{ background: 'var(--bg-gradient-jet)' }}>
-              <div className="flex items-center gap-2 mb-2">
-                <LinkIcon className="w-5 h-5 text-primary" />
-                <h3 className="h3 text-white-2">Project Links</h3>
+          {/* Links Section */}
+          <div className="bg-card border border-border rounded-[20px] p-6 space-y-4" style={{ background: 'var(--bg-gradient-jet)' }}>
+            <div className="flex items-center gap-2 mb-2">
+              <LinkIcon className="w-5 h-5 text-primary" />
+              <h3 className="h3 text-white-2">Project Links</h3>
+            </div>
+            <div className="space-y-4">
+              <div>
+                <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">Live Project URL</label>
+                <input
+                  type="url"
+                  name="link"
+                  value={formData.link}
+                  onChange={handleInputChange}
+                  placeholder="https://example.com"
+                  className="form-input"
+                />
               </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">Live Project URL</label>
-                  <input
-                    type="url"
-                    name="link"
-                    value={formData.link}
-                    onChange={handleInputChange}
-                    className="form-input text-sm py-2"
-                    placeholder="https://..."
-                  />
-                  {fieldErrors.link && (
-                    <p className="mt-1 text-xs text-destructive">{fieldErrors.link}</p>
-                  )}
-                </div>
-                <div>
-                  <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">GitHub Repository</label>
-                  <input
-                    type="url"
-                    name="github"
-                    value={formData.github}
-                    onChange={handleInputChange}
-                    className="form-input text-sm py-2"
-                    placeholder="https://github.com/..."
-                  />
-                  {fieldErrors.github && (
-                    <p className="mt-1 text-xs text-destructive">{fieldErrors.github}</p>
-                  )}
-                </div>
+              <div>
+                <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">GitHub Repository</label>
+                <input
+                  type="url"
+                  name="github"
+                  value={formData.github}
+                  onChange={handleInputChange}
+                  placeholder="https://github.com/username/repo"
+                  className="form-input"
+                />
               </div>
             </div>
-          )}
+          </div>
         </div>
 
-        {/* Right Column: Info + Tech + Team (8 cols) */}
+        {/* Right Column: Details + Tech + Team */}
         <div className="lg:col-span-8 space-y-6">
-          {/* Basic Info Card */}
-          <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
-            <div className="flex items-center gap-2 mb-6">
-              <Tag className="w-5 h-5 text-primary" />
-              <h3 className="h3 text-white-2">Basic Information</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div className="md:col-span-2">
-                <label className="text-light-gray/70 text-xs uppercase mb-2 block">Project Title *</label>
+          {/* Basic Info */}
+          <div className="bg-card border border-border rounded-[20px] p-8" style={{ background: 'var(--bg-gradient-jet)' }}>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+              <div className="space-y-2">
+                <label className="text-light-gray/70 text-[10px] uppercase font-bold tracking-wider">Project Title</label>
                 <input
                   type="text"
                   name="title"
                   value={formData.title}
                   onChange={handleInputChange}
-                  className="form-input"
-                  placeholder="Enter project name"
-                  required
+                  placeholder="Enter project title"
+                  className={`form-input ${fieldErrors.title ? 'border-destructive' : ''}`}
                 />
-                {fieldErrors.title && (
-                  <p className="mt-1 text-xs text-destructive">{fieldErrors.title}</p>
-                )}
+                {fieldErrors.title && <p className="text-xs text-destructive">{fieldErrors.title}</p>}
               </div>
-              <div>
-                <label className="text-light-gray/70 text-xs uppercase mb-2 block">Category (from Services)</label>
+              <div className="space-y-2">
+                <label className="text-light-gray/70 text-[10px] uppercase font-bold tracking-wider">Service Category</label>
                 <select
                   name="service_id"
                   value={formData.service_id}
                   onChange={handleInputChange}
-                  className="form-input"
+                  className="form-input appearance-none"
                 >
-                  {services.length > 0 ? (
-                    services.map(service => (
-                      <option key={service.id} value={service.id}>{service.title}</option>
-                    ))
-                  ) : (
-                    portfolio?.categories?.filter(c => c !== 'all').map(cat => (
-                      <option key={cat} value={cat}>{cat}</option>
-                    ))
-                  )}
+                  {services.map(service => (
+                    <option key={service.id} value={service.id}>{service.title}</option>
+                  ))}
                 </select>
-                {(fieldErrors.service_id || fieldErrors.category) && (
-                  <p className="mt-1 text-xs text-destructive">{fieldErrors.service_id || fieldErrors.category}</p>
-                )}
               </div>
-              <div className="md:col-span-2">
-                <label className="text-light-gray/70 text-xs uppercase mb-2 block">Project Description</label>
-                <textarea
-                  name="description"
-                  value={formData.description}
-                  onChange={handleInputChange}
-                  className="form-input min-h-[200px] resize-y"
-                  placeholder="Describe your project, challenges, and solutions..."
-                />
-                {fieldErrors.description && (
-                  <p className="mt-1 text-xs text-destructive">{fieldErrors.description}</p>
-                )}
-              </div>
+            </div>
+
+            <div className="space-y-2">
+              <label className="text-light-gray/70 text-[10px] uppercase font-bold tracking-wider">Project Description</label>
+              <textarea
+                name="description"
+                value={formData.description}
+                onChange={handleInputChange}
+                placeholder="Describe your project..."
+                rows={6}
+                className="form-input resize-none"
+              />
             </div>
           </div>
 
-          {/* Technologies & Team Card */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* Technologies */}
-            <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <Code className="w-5 h-5 text-primary" />
-                <h3 className="h3 text-white-2">Technologies</h3>
+          {/* Technologies */}
+          <div className="bg-card border border-border rounded-[20px] p-8" style={{ background: 'var(--bg-gradient-jet)' }}>
+            <div className="flex items-center gap-2 mb-6">
+              <Code className="w-5 h-5 text-primary" />
+              <h3 className="h3 text-white-2">Technologies Used</h3>
+            </div>
+            <div className="flex gap-2 mb-4">
+              <input
+                type="text"
+                value={techInput}
+                onChange={(e) => setTechInput(e.target.value)}
+                onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTechnology())}
+                placeholder="Add technology (e.g. React, Node.js)"
+                className="form-input"
+              />
+              <button
+                type="button"
+                onClick={addTechnology}
+                className="p-3 rounded-xl bg-primary text-black hover:bg-primary/90 transition-colors"
+              >
+                <Plus className="w-5 h-5" />
+              </button>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              {formData.technologies.map((tech, index) => (
+                <span key={index} className="flex items-center gap-2 px-3 py-1.5 bg-onyx border border-border rounded-lg text-sm text-light-gray">
+                  {tech}
+                  <button type="button" onClick={() => removeTechnology(index)} className="hover:text-destructive">
+                    <X className="w-3 h-3" />
+                  </button>
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Team Members */}
+          <div className="bg-card border border-border rounded-[20px] p-8" style={{ background: 'var(--bg-gradient-jet)' }}>
+            <div className="flex items-center gap-2 mb-6">
+              <Users className="w-5 h-5 text-primary" />
+              <h3 className="h3 text-white-2">Team Members</h3>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              <div className="space-y-2">
+                <label className="text-light-gray/70 text-[10px] uppercase">Select Member</label>
+                <select
+                  onChange={(e) => e.target.value && addTeamMember(parseInt(e.target.value))}
+                  className="form-input"
+                  value=""
+                >
+                  <option value="">Choose a member...</option>
+                  {Array.isArray(team) && team
+                    .filter(m => !formData.team_members.includes(m.id))
+                    .map(member => (
+                      <option key={member.id} value={member.id}>{member.name}</option>
+                    ))
+                  }
+                </select>
               </div>
-              <div className="flex gap-2 mb-4">
-                <input
-                  type="text"
-                  value={techInput}
-                  onChange={(e) => setTechInput(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), addTechnology())}
-                  className="form-input text-sm py-2"
-                  placeholder="Add tech..."
-                />
-                <button type="button" onClick={addTechnology} className="p-2 bg-primary/20 text-primary rounded-xl hover:bg-primary/30 transition-colors">
-                  <Plus className="w-5 h-5" />
-                </button>
-              </div>
-              <div className="flex flex-wrap gap-2">
-                {formData.technologies.map((tech, index) => (
-                  <span key={index} className="px-3 py-1 bg-onyx border border-border rounded-full text-[10px] text-light-gray flex items-center gap-2">
-                    {tech}
-                    <button type="button" onClick={() => removeTechnology(index)} className="hover:text-destructive"><X className="w-3 h-3" /></button>
-                  </span>
-                ))}
-              </div>
-              {fieldErrors.technologies && (
-                <p className="mt-2 text-xs text-destructive">{fieldErrors.technologies}</p>
-              )}
             </div>
 
-            {/* Team Members */}
-            <div className="bg-card border border-border rounded-[20px] p-6" style={{ background: 'var(--bg-gradient-jet)' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <Users className="w-5 h-5 text-primary" />
-                <h3 className="h3 text-white-2">Team Members</h3>
-              </div>
-              
-              <div className="relative mb-4">
-                <Select
-                  options={(Array.isArray(team) ? team : [])
-                    .filter(member => !formData.team_members.includes(member.id))
-                    .map(member => ({
-                      value: member.id,
-                      label: member.name,
-                      track: member.track
-                    }))
-                  }
-                  onChange={(option) => {
-                    if (option) {
-                      addTeamMember(null, option.value);
-                    }
-                  }
-                  }
-                  placeholder="Search and add members..."
-                  className="react-select-container"
-                  classNamePrefix="react-select"
-                  isSearchable
-                  formatOptionLabel={(member) => (
-                    <div>
-                      <div className="text-xs font-medium">{member.label}</div>
-                      <div className="text-[10px] opacity-60">{member.track}</div>
-                    </div>
-                  )}
-                  styles={{
-                    control: (base, state) => ({
-                      ...base,
-                      background: 'transparent',
-                      borderColor: state.isFocused ? 'hsl(var(--primary))' : 'hsl(var(--jet))',
-                      borderRadius: '14px',
-                      padding: '5px 10px',
-                      boxShadow: 'none',
-                      '&:hover': {
-                        borderColor: 'hsl(var(--primary))'
-                      }
-                    }),
-                    menu: (base) => ({
-                      ...base,
-                      background: 'hsl(var(--eerie-black-2))',
-                      border: '1px solid hsl(var(--jet))',
-                      borderRadius: '14px',
-                      zIndex: 50,
-                      overflow: 'hidden'
-                    }),
-                    option: (base, state) => ({
-                      ...base,
-                      background: state.isFocused ? 'rgba(255, 219, 112, 0.1)' : 'transparent',
-                      color: 'var(--white-2)',
-                      cursor: 'pointer',
-                      '&:active': {
-                        background: 'rgba(255, 219, 112, 0.2)'
-                      }
-                    }),
-                    input: (base) => ({
-                      ...base,
-                      color: 'var(--white-2)'
-                    }),
-                    singleValue: (base) => ({
-                      ...base,
-                      color: 'var(--white-2)'
-                    }),
-                    placeholder: (base) => ({
-                      ...base,
-                      color: 'hsl(var(--muted-foreground))',
-                      fontSize: '14px'
-                    })
-                  }}
-                />
-              </div>
-
-              <div className="flex flex-wrap gap-2">
-                {formData.team_members.map(memberId => (
-                  <span key={memberId} className="px-3 py-1 bg-primary/10 border border-primary/30 rounded-full text-[10px] text-primary flex items-center gap-2">
-                    {getTeamMemberName(memberId)}
-                    <button type="button" onClick={() => removeTeamMember(memberId)} className="hover:text-destructive"><X className="w-3 h-3" /></button>
-                  </span>
-                ))}
-              </div>
-              {fieldErrors.team_members && (
-                <p className="mt-2 text-xs text-destructive">{fieldErrors.team_members}</p>
-              )}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {formData.team_members.map(memberId => (
+                <div key={memberId} className="flex items-center justify-between p-3 bg-onyx border border-border rounded-xl">
+                  <span className="text-sm text-light-gray">{getTeamMemberName(memberId)}</span>
+                  <button type="button" onClick={() => removeTeamMember(memberId)} className="text-muted-foreground hover:text-destructive">
+                    <X className="w-4 h-4" />
+                  </button>
+                </div>
+              ))}
             </div>
           </div>
         </div>
