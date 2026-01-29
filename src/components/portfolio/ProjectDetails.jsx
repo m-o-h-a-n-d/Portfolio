@@ -249,9 +249,18 @@ const ProjectDetails = () => {
                     <Calendar className="w-4 h-4" />
                     Status
                   </span>
-                  <span className={`${project.status === 1 ? 'text-primary' : 'text-vegas-gold'} font-medium`}>
-                    {project.status === 1 ? 'Completed' : 'Uncomplete'}
-                  </span>
+                  {(() => {
+                    const isCompleted =
+                      project?.status === 1 ||
+                      project?.status === '1' ||
+                      project?.status === true;
+
+                    return (
+                      <span className={`${isCompleted ? 'text-primary' : 'text-vegas-gold'} font-medium`}>
+                        {isCompleted ? 'Completed' : 'In Progress'}
+                      </span>
+                    );
+                  })()}
                 </li>
                 {projectTeam.length > 0 && (
                   <li className="flex justify-between items-center text-sm">
