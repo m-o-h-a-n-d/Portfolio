@@ -11,7 +11,7 @@ const echoOptions = {
   cluster: env.VITE_PUSHER_APP_CLUSTER,
   forceTLS: (env.VITE_PUSHER_SCHEME || "https") === "https",
   enabledTransports: ["ws", "wss"],
-  authEndpoint: "https://portfolio.test/api/broadcasting/auth",
+  authEndpoint: "https://portfoliomo.up.railway.app/api/broadcasting/auth",
   auth: {
     headers: {
       Authorization: `Bearer ${getAuthToken()}`,
