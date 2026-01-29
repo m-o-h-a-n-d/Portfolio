@@ -64,6 +64,11 @@ const ProjectEditor = () => {
           mergedImages = [coverValue, ...mergedImages.filter(img => img !== coverValue)];
         }
 
+        // IMPORTANT: We need to store the relative paths for the backend, 
+        // but the full URLs for the preview.
+        // However, since the backend returns full URLs via ProjectResource, 
+        // we need to be careful when sending them back.
+        
         setFormData({
           title: project.title,
           service_id: serviceId,
@@ -334,11 +339,18 @@ const ProjectEditor = () => {
 
       // Separate existing URLs and new DataURLs
       const existingImageUrls = formData.images.filter(img => typeof img === 'string' && !img.startsWith('data:'));
-      const newDataUrls = formData.images.filter(img => typeof img === 'string' && img.startsWith('data:'));
-
+      
       // 1. Send existing images that are still kept
+      // We need to strip the BASE_URL or domain if the backend expects relative paths
       if (existingImageUrls.length > 0) {
-        existingImageUrls.forEach(url => projectData.append('images[]', url));
+        existingImageUrls.forEach(url => {
+          // If the URL is a full URL, try to extract the relative path
+          let relativePath = url;
+          if (url.includes('/uploads/')) {
+            relativePath = 'uploads/' + url.split('/uploads/')[1];
+          }
+          projectData.append('images[]', relativePath);
+        });
       } else if (isEditMode) {
         // If all old images removed, send empty to let backend know
         projectData.append('images[]', '');
