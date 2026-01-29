@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, useLocation, Link } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
+import { useProfile } from '../../context/DataContext';
 import { User, Lock, LogIn, Eye, EyeOff } from 'lucide-react';
 
 const LoginPage = () => {
@@ -11,6 +12,7 @@ const LoginPage = () => {
   const [fieldErrors, setFieldErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const { login } = useAuth();
+  const profile = useProfile();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -44,8 +46,16 @@ const LoginPage = () => {
         >
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="w-20 h-20 mx-auto mb-4 rounded-[20px] flex items-center justify-center" style={{ background: 'var(--bg-gradient-onyx)' }}>
-              <User className="w-10 h-10 text-primary" />
+            <div className="w-24 h-24 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: 'var(--bg-gradient-onyx)' }}>
+              {profile?.avatar ? (
+                <img
+                  src={profile.avatar}
+                  alt={profile.name || 'Profile'}
+                  className="w-full h-full rounded-full object-cover"
+                />
+              ) : (
+                <User className="w-10 h-10 text-primary" />
+              )}
             </div>
             <h1 className="h2 text-white-2 mb-2">Admin Login</h1>
             <p className="text-light-gray text-sm font-light">Enter your credentials to continue</p>
@@ -81,7 +91,15 @@ const LoginPage = () => {
 
             {/* Password */}
             <div className="mb-6">
-              <label className="text-light-gray/70 text-xs uppercase mb-2 block">Password</label>
+              <div className="flex items-end justify-between mb-2">
+                <label className="text-light-gray/70 text-xs uppercase">Password</label>
+                <Link 
+                  to="/admin/forget-password" 
+                  className="text-xs text-primary hover:underline"
+                >
+                  Forgot Password?
+                </Link>
+              </div>
               <div className="relative">
                 <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-muted-foreground" />
                 <input
@@ -114,27 +132,7 @@ const LoginPage = () => {
               <LogIn className="w-5 h-5" />
               <span>{loading ? 'Signing in...' : 'Sign In'}</span>
             </button>
-            
-            <div className="mt-4 text-right">
-              <Link 
-                to="/admin/forget-password" 
-                className="text-xs text-primary hover:underline"
-              >
-                Forgot Password?
-              </Link>
-            </div>
           </form>
-
-          {/* Demo Credentials */}
-          <div className="mt-6 p-4 bg-onyx/50 rounded-lg">
-            <p className="text-light-gray/70 text-xs text-center mb-2">Demo Credentials:</p>
-            <p className="text-light-gray text-sm text-center">
-              Email: <span className="text-primary">admin@example.com</span>
-            </p>
-            <p className="text-light-gray text-sm text-center">
-              Password: <span className="text-primary">password</span>
-            </p>
-          </div>
         </div>
 
         {/* Back to Portfolio Link */}
