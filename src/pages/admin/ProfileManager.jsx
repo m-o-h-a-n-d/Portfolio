@@ -82,6 +82,7 @@ const ProfileManager = () => {
       formData.append('birthday', profile?.birthday || '');
       formData.append('location', profile?.location || '');
       formData.append('about', profile?.about || '');
+      formData.append('map_embed', profile?.map_embed || '');
       if (avatarFile) {
         formData.append('avatar', avatarFile);
       }
@@ -300,6 +301,20 @@ const ProfileManager = () => {
                 />
                 {fieldErrors.location && (
                   <p className="mt-1 text-xs text-destructive">{fieldErrors.location}</p>
+                )}
+              </div>
+              <div className="md:col-span-2">
+                <label className="text-light-gray/70 text-xs uppercase mb-2 block">Map Embed</label>
+                <input
+                  type="text"
+                  name="map_embed"
+                  value={profile?.map_embed || ''}
+                  onChange={handleInputChange}
+                  className="form-input"
+                  placeholder="https://www.google.com/maps/embed?..."
+                />
+                {fieldErrors.map_embed && (
+                  <p className="mt-1 text-xs text-destructive">{fieldErrors.map_embed}</p>
                 )}
               </div>
             </div>
