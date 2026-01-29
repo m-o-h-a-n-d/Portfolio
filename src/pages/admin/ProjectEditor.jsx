@@ -237,11 +237,22 @@ const ProjectEditor = () => {
     
     // If it's a new image (data:), we need to remove it from imageFiles too
     if (typeof imageToRemove === 'string' && imageToRemove.startsWith('data:')) {
-      // Find which index it is among new images
-      const newImagesOnly = formData.images.filter(img => typeof img === 'string' && img.startsWith('data:'));
-      const newImageIndex = newImagesOnly.indexOf(imageToRemove);
-      if (newImageIndex !== -1) {
-        setImageFiles(prev => prev.filter((_, i) => i !== newImageIndex));
+      // Find the index of this specific dataUrl among all dataUrls in the current images array
+      let dataUrlCounter = 0;
+      let targetFileIndex = -1;
+      
+      for (let i = 0; i < formData.images.length; i++) {
+        if (typeof formData.images[i] === 'string' && formData.images[i].startsWith('data:')) {
+          if (i === index) {
+            targetFileIndex = dataUrlCounter;
+            break;
+          }
+          dataUrlCounter++;
+        }
+      }
+
+      if (targetFileIndex !== -1) {
+        setImageFiles(prev => prev.filter((_, i) => i !== targetFileIndex));
       }
     }
 
@@ -334,14 +345,9 @@ const ProjectEditor = () => {
       }
 
       // 2. Send new image files
-      // We match newDataUrls with imageFiles by order
-      newDataUrls.forEach(dataUrl => {
-        // Find the file in imageFiles that matches this dataUrl
-        // Since we add them in order, we can track them
-        const fileIndex = newDataUrls.indexOf(dataUrl);
-        if (imageFiles[fileIndex]) {
-          projectData.append('images_files[]', imageFiles[fileIndex]);
-        }
+      // The imageFiles array corresponds exactly to the dataUrls in formData.images
+      imageFiles.forEach(file => {
+        projectData.append('images_files[]', file);
       });
 
       if (isEditMode) {
