@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
+import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { createEcho } from '../echo';
 import { getAuthToken } from '../api/request';
 import { useToast } from '../hooks/use-toast';
@@ -41,6 +41,7 @@ export const NotificationProvider = ({ children }) => {
       setNotifications(messages);
       setUnreadCount(messages.filter((m) => !m.read).length);
     } catch (error) {
+      console.error('Error fetching notifications:', error);
     } finally {
       if (!hasLoadedRef.current) {
         setLoading(false);
@@ -55,23 +56,28 @@ export const NotificationProvider = ({ children }) => {
     }
 
     fetchNotifications();
-    const intervalId = setInterval(() => fetchNotifications({ silent: true }), 20000);
+    // Fallback polling every 30 seconds
+    const intervalId = setInterval(() => fetchNotifications({ silent: true }), 30000);
 
-    if (typeof window !== 'undefined') {
+    // Initialize Echo if not already initialized
+    if (typeof window !== 'undefined' && !window.Echo) {
       const token = getAuthToken();
       if (token) {
-        window.Echo?.disconnect();
         window.Echo = createEcho(token);
       }
     }
 
-    const channelName = `App.Models.User.${user.id}`;
     const echo = typeof window !== 'undefined' ? window.Echo : null;
-    const channel = echo ? echo.private(channelName) : null;
+    if (!echo) return () => clearInterval(intervalId);
+
+    const channelName = `App.Models.User.${user.id}`;
+    const channel = echo.private(channelName);
 
     const handleIncoming = (payload = {}) => {
+      console.log('Incoming notification:', payload);
       const notification = payload?.notification || payload || {};
       const name = notification.name || notification.sender_name || 'a visitor';
+      
       const newNotification = {
         id: notification.id || Date.now(),
         name: notification.name || notification.sender_name || 'New Visitor',
@@ -82,7 +88,12 @@ export const NotificationProvider = ({ children }) => {
         read: false
       };
 
-      setNotifications(prev => [newNotification, ...prev]);
+      setNotifications(prev => {
+        // Avoid duplicates if already added by another listener
+        if (prev.find(n => n.id === newNotification.id)) return prev;
+        return [newNotification, ...prev];
+      });
+      
       setUnreadCount((prev) => prev + 1);
 
       toast({
@@ -91,15 +102,27 @@ export const NotificationProvider = ({ children }) => {
       });
     };
 
-    channel?.notification(handleIncoming);
+    // Listen for Laravel Notifications
+    channel.notification(handleIncoming);
 
-    channel?.listenToAll(() => {
-      fetchNotifications({ silent: true });
+    // Listen for custom MessageSent event (common in Laravel)
+    // We use a dot prefix for the event name to avoid namespace issues if the backend uses a different one
+    channel.listen('.MessageSent', (data) => {
+      console.log('MessageSent event received:', data);
+      handleIncoming(data);
     });
+
+    // Also listen for any other events by using the underlying pusher instance if available
+    // This is a more robust way to "listen to all" if that was the intention
+    if (echo.connector && echo.connector.pusher) {
+      echo.connector.pusher.connection.bind('message', (data) => {
+        console.log('Generic pusher message:', data);
+      });
+    }
 
     return () => {
       clearInterval(intervalId);
-      echo?.leave(channelName);
+      echo.leave(channelName);
     };
   }, [toast, user?.id]);
 
@@ -113,6 +136,7 @@ export const NotificationProvider = ({ children }) => {
       ));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
+      console.error('Error marking as read:', error);
     }
   };
 
@@ -127,6 +151,7 @@ export const NotificationProvider = ({ children }) => {
       }
       setNotifications(prev => prev.filter(n => n.id !== id));
     } catch (error) {
+      console.error('Error deleting notification:', error);
     }
   };
 
@@ -135,6 +160,7 @@ export const NotificationProvider = ({ children }) => {
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {
+      console.error('Error marking all as read:', error);
     }
   };
 
