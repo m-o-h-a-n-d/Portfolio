@@ -48,6 +48,7 @@ export const NotificationProvider = ({ children }) => {
     }
 
     fetchNotifications();
+    const intervalId = setInterval(fetchNotifications, 20000);
 
     if (typeof window !== 'undefined') {
       const token = getAuthToken();
@@ -82,6 +83,7 @@ export const NotificationProvider = ({ children }) => {
     });
 
     return () => {
+      clearInterval(intervalId);
       echo?.leave(channelName);
     };
   }, [toast, user?.id]);
