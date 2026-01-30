@@ -62,7 +62,9 @@ export const NotificationProvider = ({ children }) => {
     const echo = typeof window !== 'undefined' ? window.Echo : null;
     const channel = echo ? echo.private(channelName) : null;
 
-    channel?.notification((notification) => {
+    const handleIncoming = (payload = {}) => {
+      const notification = payload?.notification || payload || {};
+      const name = notification.name || notification.sender_name || 'a visitor';
       const newNotification = {
         id: notification.id || Date.now(),
         name: notification.name || notification.sender_name || 'New Visitor',
@@ -75,11 +77,17 @@ export const NotificationProvider = ({ children }) => {
 
       setNotifications(prev => [newNotification, ...prev]);
       setUnreadCount((prev) => prev + 1);
-      
+
       toast({
         title: "New Message",
-        description: `New message from ${notification.name || 'a visitor'}`,
+        description: `New message from ${name}`,
       });
+    };
+
+    channel?.notification(handleIncoming);
+
+    channel?.listenToAll(() => {
+      fetchNotifications();
     });
 
     return () => {
