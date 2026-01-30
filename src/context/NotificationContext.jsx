@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect } from 'react';
 import echo from '../echo';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from './AuthContext';
@@ -36,7 +36,6 @@ export const NotificationProvider = ({ children }) => {
       setNotifications(messages);
       setUnreadCount(messages.filter((m) => !m.read).length);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
     } finally {
       setLoading(false);
     }
@@ -87,7 +86,6 @@ const channel = echo.private(channelName);
       ));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
-      console.error('Error marking notification as read:', error);
     }
   };
 
@@ -102,7 +100,6 @@ const channel = echo.private(channelName);
       }
       setNotifications(prev => prev.filter(n => n.id !== id));
     } catch (error) {
-      console.error('Error deleting notification:', error);
     }
   };
 
@@ -111,7 +108,6 @@ const channel = echo.private(channelName);
       setNotifications(prev => prev.map(n => ({ ...n, read: true })));
       setUnreadCount(0);
     } catch (error) {
-      console.error('Error marking all as read:', error);
     }
   };
 

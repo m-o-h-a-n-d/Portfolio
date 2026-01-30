@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useNotifications } from '../../context/NotificationContext';
 import { Mail, Clock, Check, Trash2, Eye } from 'lucide-react';
@@ -74,7 +74,6 @@ const MessagesInbox = () => {
         showConfirmButton: false
       });
     } catch (error) {
-      console.error('Error deleting message:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',

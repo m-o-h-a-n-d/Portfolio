@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import { Plus, Edit2, Trash2, X, BookOpen, Briefcase, Award, GripVertical } from 'lucide-react';
@@ -52,7 +52,7 @@ const ResumeManager = () => {
   };
   const splitPeriod = (value) => {
     if (typeof value !== 'string') return [];
-    return value.split(/\s[—–-]\s|\/\s/);
+    return value.split(/\s[â€”â€“-]\s|\/\s/);
   };
   const formatYearMonth = (value) => {
     if (!value) return '';
@@ -113,7 +113,6 @@ const ResumeManager = () => {
       setLoading(true);
       // 1. Fetch the order (returns array of strings)
       const orderResponse = await apiGet(DASHBOARD_ENDPOINTS.resume.list);
-      console.log("orderResponse", orderResponse);
       const order = Array.isArray(orderResponse?.data)
         ? orderResponse.data
         : Array.isArray(orderResponse?.data?.order)
@@ -139,7 +138,6 @@ const ResumeManager = () => {
       });
 
     } catch (error) {
-      console.error('Error fetching data:', error);
     } finally {
       setLoading(false);
     }
@@ -177,7 +175,6 @@ const ResumeManager = () => {
       // Send the array of strings as requested
       await apiPut(DASHBOARD_ENDPOINTS.resume.reorder, { order: resumeOrder });
     } catch (error) {
-      console.error('Error updating order:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -273,7 +270,6 @@ const ResumeManager = () => {
       if (activeTab === 'education') {
         if (modalMode === 'add') {
           response = await apiPost(DASHBOARD_ENDPOINTS.education.store, submissionData);
-          console.log("response", response);
         } else {
           response = await apiPut(DASHBOARD_ENDPOINTS.education.update(editingItem.id), submissionData);
         }
@@ -309,7 +305,6 @@ const ResumeManager = () => {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Error saving:', error);
       setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
@@ -350,7 +345,6 @@ const ResumeManager = () => {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Error deleting:', error);
     }
   };
 

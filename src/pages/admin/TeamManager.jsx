@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
 import { Plus, Edit2, Trash2, X, Save, Image as ImageIcon, Link as LinkIcon, Search, Briefcase } from 'lucide-react';
 import Swal from '../../lib/swal';
@@ -35,7 +35,6 @@ const TeamManager = () => {
       setTeam(teamList);
       setFilteredTeam(teamList);
     } catch (error) {
-      console.error('Error fetching team members:', error);
     } finally {
       setLoading(false);
     }
@@ -144,7 +143,6 @@ const TeamManager = () => {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Error saving team member:', error);
       setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
@@ -178,7 +176,6 @@ const TeamManager = () => {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Error deleting team member:', error);
     }
   };
 

@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
 import { Plus, Edit2, Trash2, X, Save, Award, Search, ZoomIn } from 'lucide-react';
 import Swal from '../../lib/swal';
@@ -40,7 +40,6 @@ const CertificatesManager = () => {
       setCertificates(sortedList);
       setFilteredCertificates(sortedList);
     } catch (error) {
-      console.error('Error fetching certificates:', error);
     } finally {
       setLoading(false);
     }
@@ -143,7 +142,6 @@ const CertificatesManager = () => {
         showConfirmButton: false
       });
     } catch (error) {
-      console.error('Error saving certificate:', error);
       setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
@@ -180,7 +178,6 @@ const CertificatesManager = () => {
         showConfirmButton: false
       });
     } catch (error) {
-      console.error('Error deleting certificate:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -244,7 +241,6 @@ const CertificatesManager = () => {
         }
       });
     } catch (error) {
-      console.error('Error saving order:', error);
     } finally {
       setIsReordering(false);
     }

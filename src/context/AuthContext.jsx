@@ -1,4 +1,4 @@
-import { useState, createContext, useContext, useEffect } from 'react';
+﻿import { useState, createContext, useContext, useEffect } from 'react';
 import LoadingScreen from '../components/portfolio/LoadingScreen';
 import { isAuthenticated, removeAuthToken, apiFetch, apiGet, setAuthToken } from '../api/request';
 import { useNavigate } from 'react-router-dom';
@@ -31,7 +31,6 @@ export const AuthProvider = ({ children }) => {
           setUser(userData || null);
         }
       } catch (error) {
-        console.error('Failed to fetch authenticated user:', error);
         setUser(null);
       } finally {
         setLoading(false);
@@ -66,7 +65,6 @@ export const AuthProvider = ({ children }) => {
     try {
       await apiFetch(DASHBOARD_ENDPOINTS.auth.logout, 'DELETE');
     } catch (error) {
-      console.error('Logout error:', error);
     } finally {
       removeAuthToken();
       setUser(null);

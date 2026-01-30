@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
 import { 
   Plus, 
@@ -69,7 +69,6 @@ const ServicesManager = () => {
       setServices(servicesList);
       setFilteredServices(servicesList);
     } catch (error) {
-      console.error('Error fetching services:', error);
     } finally {
       setLoading(false);
     }
@@ -163,7 +162,6 @@ const ServicesManager = () => {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Error saving service:', error);
       setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
@@ -199,7 +197,6 @@ const ServicesManager = () => {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Error deleting service:', error);
     }
   };
 

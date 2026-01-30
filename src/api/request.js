@@ -1,4 +1,4 @@
-/* src/api/request.js */
+﻿/* src/api/request.js */
 import { BASE_URL } from "./endpoints";
 
 // ============================================================
@@ -121,7 +121,6 @@ export const apiFetch = async (endpoint, method = "GET", body = null) => {
   // 2. Handle Mock Mode
   if (!useRealAPI) {
     await simulateDelay();
-    console.log(`[Mock API] ${method} ${endpoint}`, body || "");
 
     // Mock Login Logic
     if (endpoint.includes("/auth/login")) {
@@ -184,7 +183,6 @@ export const apiFetch = async (endpoint, method = "GET", body = null) => {
   };
 
   try {
-    console.log(`[Real API Request] ${method} ${fullUrl}`, config);
     const response = await fetch(fullUrl, config);
 
     const contentType = response.headers.get("content-type");
@@ -218,7 +216,6 @@ export const apiFetch = async (endpoint, method = "GET", body = null) => {
 
     return data;
   } catch (error) {
-    console.error("[Real API Error]", error);
     throw error;
   }
 };

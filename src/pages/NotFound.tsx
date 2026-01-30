@@ -1,4 +1,4 @@
-import { useLocation, Link } from "react-router-dom";
+﻿import { useLocation, Link } from "react-router-dom";
 import { useEffect } from "react";
 import "./NotFound.css";
 
@@ -17,7 +17,6 @@ const NotFound = ({ code: defaultCode = "404", message: defaultMessage = "We can
   const errorMessage = state?.message || defaultMessage;
 
   useEffect(() => {
-    console.error(`${errorCode} Error: User attempted to access route:`, location.pathname);
   }, [location.pathname, errorCode]);
 
   // Split the code into digits for the 3D design

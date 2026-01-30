@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import {
@@ -65,7 +65,6 @@ const BlogsManager = () => {
       setBlogs(data);
       setFilteredBlogs(data);
     } catch (e) {
-      console.error(e);
     } finally {
       setLoading(false);
     }
@@ -155,7 +154,6 @@ const BlogsManager = () => {
         showConfirmButton: false
       });
     } catch (error) {
-      console.error('Error saving blog:', error);
       setFieldErrors(extractFieldErrors(error));
       Swal.fire('Error', 'Something went wrong', 'error');
     }
@@ -246,7 +244,7 @@ const BlogsManager = () => {
                   <td colSpan="5" className="py-16 px-6 text-center">
                     <div className="flex flex-col items-center gap-2">
                       <FileText className="w-12 h-12 text-muted-foreground/30" />
-                      <p className="text-muted-foreground">No blogs found 🚫</p>
+                      <p className="text-muted-foreground">No blogs found ðŸš«</p>
                     </div>
                   </td>
                 </tr>
@@ -338,7 +336,7 @@ const BlogsManager = () => {
               {/* Modal Header */}
               <div className="flex justify-between items-center pb-4 border-b border-border">
                 <h3 className="text-2xl font-bold text-white-2">
-                  {modalMode === 'add' ? '✨ Add New Blog' : '✏️ Edit Blog'}
+                  {modalMode === 'add' ? 'âœ¨ Add New Blog' : 'âœï¸ Edit Blog'}
                 </h3>
                 <button
                   type="button"

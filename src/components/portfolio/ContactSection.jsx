@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { useProfile } from '../../context/DataContext';
 import { Send } from 'lucide-react';
 import Swal from '../../lib/swal';
@@ -60,7 +60,6 @@ const ContactSection = () => {
         timerProgressBar: true,
       });
     } catch (error) {
-      console.error('Message send failed:', error);
       setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',

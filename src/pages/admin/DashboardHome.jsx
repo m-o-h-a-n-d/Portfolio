@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo } from 'react';
+﻿import { useState, useEffect, useMemo } from 'react';
 import { apiGet } from '../../api/request';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import { useNotifications } from '../../context/NotificationContext';
@@ -85,7 +85,6 @@ const DashboardHome = () => {
           totalServices: servicesCount
         });
       } catch (error) {
-        console.error('Error fetching stats:', error);
       } finally {
         setLoading(false);
       }

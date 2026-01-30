@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+﻿import { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { apiGet, apiPost } from '../../api/request';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
@@ -27,6 +27,7 @@ const ProjectEditor = () => {
   const [formData, setFormData] = useState({
     title: '',
     service_id: '',
+    short_desc: '',
     description: '',
     link: '',
     github: '',
@@ -72,6 +73,7 @@ const ProjectEditor = () => {
         setFormData({
           title: project.title,
           service_id: serviceId,
+          short_desc: project.short_desc || '',
           description: project.description || project.short_desc || project.desc || project.full_description || '',
           link: project.link || '',
           github: project.github || '',
@@ -105,6 +107,7 @@ const ProjectEditor = () => {
           category: project.category || project.service_name || '',
           description: project.description || project.short_desc || project.desc || '',
           full_description: project.full_description || project.desc || project.description || '',
+          short_desc: project.short_desc || project.description || project.desc || '',
           image,
           images
         };
@@ -148,7 +151,6 @@ const ProjectEditor = () => {
         }));
       }
     } catch (error) {
-      console.error('Error fetching data:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
@@ -327,7 +329,7 @@ const ProjectEditor = () => {
       
       const projectData = new FormData();
       projectData.append('title', formData.title);
-      projectData.append('short_desc', formData.description || '');
+      projectData.append('short_desc', formData.short_desc || '');
       projectData.append('desc', formData.description || '');
       projectData.append('link', formData.link || '');
       projectData.append('github', formData.github || '');
@@ -381,7 +383,6 @@ const ProjectEditor = () => {
       });
       setTimeout(() => navigate('/admin/portfolio'), 2000);
     } catch (error) {
-      console.error('Error saving project:', error);
       setFieldErrors(extractFieldErrors(error));
       Swal.fire({ icon: 'error', title: 'Error', text: 'Error saving project' });
     } finally {
@@ -587,6 +588,18 @@ const ProjectEditor = () => {
             </div>
 
             <div className="space-y-2">
+              <label className="text-light-gray/70 text-[10px] uppercase font-bold tracking-wider">Short Description</label>
+              <textarea
+                name="short_desc"
+                value={formData.short_desc}
+                onChange={handleInputChange}
+                placeholder="Short summary for cards/listing..."
+                rows={3}
+                className="form-input resize-none"
+              />
+            </div>
+
+            <div className="space-y-2 mt-6">
               <label className="text-light-gray/70 text-[10px] uppercase font-bold tracking-wider">Project Description</label>
               <textarea
                 name="description"
@@ -644,19 +657,80 @@ const ProjectEditor = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
               <div className="space-y-2">
                 <label className="text-light-gray/70 text-[10px] uppercase">Select Member</label>
-                <select
-                  onChange={(e) => e.target.value && addTeamMember(parseInt(e.target.value))}
-                  className="form-input"
-                  value=""
-                >
-                  <option value="">Choose a member...</option>
-                  {Array.isArray(team) && team
+                <Select
+                  classNamePrefix="react-select"
+                  isSearchable
+                  value={null}
+                  onChange={(option) => option?.value && addTeamMember(option.value)}
+                  options={(Array.isArray(team) ? team : [])
                     .filter(m => !formData.team_members.includes(m.id))
-                    .map(member => (
-                      <option key={member.id} value={member.id}>{member.name}</option>
-                    ))
-                  }
-                </select>
+                    .map(member => ({ value: member.id, label: member.name }))}
+                  placeholder="Choose a member..."
+                  styles={{
+                    control: (base, state) => ({
+                      ...base,
+                      backgroundColor: 'var(--bg-jet)',
+                      borderColor: state.isFocused ? 'var(--primary)' : 'var(--border)',
+                      boxShadow: state.isFocused
+                        ? '0 0 0 1px var(--primary), 0 8px 20px rgba(0, 0, 0, 0.35)'
+                        : '0 6px 16px rgba(0, 0, 0, 0.25)',
+                      borderRadius: '14px',
+                      minHeight: '44px',
+                      color: 'var(--text-white-2)',
+                      paddingLeft: '6px',
+                      transition: 'all 150ms ease'
+                    }),
+                    valueContainer: (base) => ({
+                      ...base,
+                      padding: '6px 8px'
+                    }),
+                    menu: (base) => ({
+                      ...base,
+                      backgroundColor: 'var(--bg-onyx)',
+                      border: '1px solid var(--border)',
+                      borderRadius: '14px',
+                      boxShadow: '0 18px 40px rgba(0, 0, 0, 0.45)',
+                      zIndex: 20
+                    }),
+                    option: (base, state) => ({
+                      ...base,
+                      backgroundColor: state.isSelected
+                        ? 'rgba(255, 214, 102, 0.2)'
+                        : state.isFocused
+                        ? 'rgba(255, 214, 102, 0.12)'
+                        : 'transparent',
+                      color: 'var(--text-white-2)',
+                      cursor: 'pointer',
+                      padding: '10px 12px'
+                    }),
+                    menuList: (base) => ({
+                      ...base,
+                      padding: '6px'
+                    }),
+                    singleValue: (base) => ({
+                      ...base,
+                      color: 'var(--text-white-2)'
+                    }),
+                    placeholder: (base) => ({
+                      ...base,
+                      color: 'var(--text-muted-foreground)'
+                    }),
+                    input: (base) => ({
+                      ...base,
+                      color: 'var(--text-white-2)'
+                    }),
+                    indicatorSeparator: () => ({ display: 'none' }),
+                    dropdownIndicator: (base) => ({
+                      ...base,
+                      color: 'var(--text-muted-foreground)',
+                      transition: 'transform 150ms ease'
+                    }),
+                    indicatorsContainer: (base, state) => ({
+                      ...base,
+                      transform: state.isFocused ? 'rotate(180deg)' : 'rotate(0deg)'
+                    })
+                  }}
+                />
               </div>
             </div>
 

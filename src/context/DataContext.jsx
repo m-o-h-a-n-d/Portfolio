@@ -1,4 +1,4 @@
-import { useState, useEffect, createContext, useContext } from 'react';
+﻿import { useState, useEffect, createContext, useContext } from 'react';
 import LoadingScreen from '../components/portfolio/LoadingScreen';
 import { apiGet, isAuthenticated } from '../api/request';
 import { DASHBOARD_ENDPOINTS, PORTFOLIO_ENDPOINTS } from '../api/endpoints';
@@ -75,7 +75,6 @@ export const DataProvider = ({ children }) => {
             const res = await apiGet(endpoint.url);
             results[endpoint.key] = res;
           } catch (err) {
-            console.error(`Error fetching ${endpoint.key}:`, err);
             results[endpoint.key] = { data: null };
           } finally {
             completed++;
@@ -91,7 +90,6 @@ export const DataProvider = ({ children }) => {
         try {
           await Promise.race([Promise.all(fetchPromises), timeoutPromise]);
         } catch (err) {
-          console.warn('Data fetching timed out or failed, proceeding with partial data');
         }
         
         setProgress(100);
@@ -218,7 +216,6 @@ export const DataProvider = ({ children }) => {
         setResume(reconstructedResume);
 
       } catch (err) {
-        console.error('Error fetching data:', err);
         setError(err.message);
       } finally {
         setLoading(false);

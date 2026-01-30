@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+﻿import React, { useEffect, useState } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { apiGet } from '../api/request';
 import { PORTFOLIO_ENDPOINTS } from '../api/endpoints';
@@ -20,7 +20,6 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
         const settingsItem = Array.isArray(settingsList) ? settingsList[0] : settingsList;
         setSettingsData(settingsItem || null);
       } catch (err) {
-        console.error('Error fetching SEO data:', err);
       }
     };
 
@@ -31,16 +30,22 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   const finalJobTitle = jobTitle || profileData?.title || 'Full Stack Web Developer';
   
   // Priority: Prop description > Profile 'about' data > Default fallback
-  const fallbackDescription = 'Mohanad Ahmed Shehata - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير تطبيقات الويب المتكاملة وحلول الـ Backend المتقدمة.';
+  const fallbackDescription = 'Mohanad Ahmed Shehata - Full Stack Web Developer (React.js & Laravel). Ù…ØªØ®ØµØµ ÙÙŠ ØªØ·ÙˆÙŠØ± ØªØ·Ø¨ÙŠÙ‚Ø§Øª Ø§Ù„ÙˆÙŠØ¨ Ø§Ù„Ù…ØªÙƒØ§Ù…Ù„Ø© ÙˆØ­Ù„ÙˆÙ„ Ø§Ù„Ù€ Backend Ø§Ù„Ù…ØªÙ‚Ø¯Ù…Ø©.';
   const finalDescription = (description || profileData?.about || fallbackDescription).substring(0, 155);
 
   const finalWebsiteUrl = websiteUrl || 'https://mohanadportfolio.vercel.app/';
-  
-  // Dynamic Favicon from settings
-  const finalFavicon = settingsData?.favicon || '/favicon.ico';
-  
+
+  const normalizeUrl = (url) => {
+    if (!url || typeof url !== 'string') return '';
+    if (url.startsWith('http://')) return url.replace('http://', 'https://');
+    return url;
+  };
+
+  // Dynamic Favicon from settings (force https to avoid mixed-content block)
+  const finalFavicon = normalizeUrl(settingsData?.favicon) || '/favicon.ico';
+
   // Dynamic Preview Image (can also be linked to settings if needed)
-  const finalImageUrl = imageUrl || settingsData?.logo || 'https://mohanadportfolio.vercel.app/image.png';
+  const finalImageUrl = normalizeUrl(imageUrl || settingsData?.logo) || 'https://mohanadportfolio.vercel.app/image.png';
 
   const structuredData = {
     '@context': 'https://schema.org',
@@ -61,7 +66,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       <meta name="description" content={finalDescription} />
       <meta
         name="keywords"
-        content={`${finalName}, مهند أحمد شحاتة, ${finalJobTitle}, مطور ويب, مطور مواقع متكامل, مهند مطور Laravel, Mohanad Backend Laravel, Mohanad Full Stack with Laravel and React, Full Stack Web Developer (React.js - Laravel), portfolio, React, Laravel, Web Developer, PHP, JavaScript`}
+        content={`${finalName}, Ù…Ù‡Ù†Ø¯ Ø£Ø­Ù…Ø¯ Ø´Ø­Ø§ØªØ©, ${finalJobTitle}, Ù…Ø·ÙˆØ± ÙˆÙŠØ¨, Ù…Ø·ÙˆØ± Ù…ÙˆØ§Ù‚Ø¹ Ù…ØªÙƒØ§Ù…Ù„, Ù…Ù‡Ù†Ø¯ Ù…Ø·ÙˆØ± Laravel, Mohanad Backend Laravel, Mohanad Full Stack with Laravel and React, Full Stack Web Developer (React.js - Laravel), portfolio, React, Laravel, Web Developer, PHP, JavaScript`}
       />
       <meta name="author" content={finalName} />
       <meta name="robots" content="index, follow" />

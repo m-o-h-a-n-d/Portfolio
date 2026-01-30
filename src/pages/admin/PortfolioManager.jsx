@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { apiGet, apiDelete } from '../../api/request';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
@@ -38,7 +38,6 @@ const PortfolioManager = () => {
     } catch (error) {
       const status = error?.response?.status || error?.status;
       const isNotFound = status === 404;
-      console.error('Error fetching portfolio:', error);
       if (!isNotFound) {
         Swal.fire({
           icon: 'error',
@@ -98,7 +97,6 @@ const PortfolioManager = () => {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Error deleting project:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',

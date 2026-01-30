@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { apiGet, apiPut } from '../../api/request';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import { Save, Globe, Upload, FileText } from 'lucide-react';
@@ -36,7 +36,6 @@ const SettingsManager = () => {
       setFaviconFile(null);
       setCvFile(null);
     } catch (error) {
-      console.error('Error fetching settings:', error);
     } finally {
       setLoading(false);
     }
@@ -111,7 +110,6 @@ const SettingsManager = () => {
         showConfirmButton: false
       });
     } catch (error) {
-      console.error('Error updating settings:', error);
       setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',

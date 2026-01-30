@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+﻿import { useState, useEffect } from 'react';
 import { apiGet, apiPut } from '../../api/request';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import { Save, Upload, User, Share2 } from 'lucide-react';
@@ -33,7 +33,6 @@ const ProfileManager = () => {
         }
       });
     } catch (error) {
-      console.error('Error fetching profile:', error);
     } finally {
       setLoading(false);
     }
@@ -99,7 +98,6 @@ const ProfileManager = () => {
         showConfirmButton: false,
       });
     } catch (error) {
-      console.error('Error saving profile:', error);
       setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',

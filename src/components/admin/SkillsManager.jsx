@@ -1,4 +1,4 @@
-import { useState } from 'react';
+﻿import { useState } from 'react';
 import { Plus, Edit2, Trash2 } from 'lucide-react';
 import Swal from '../../lib/swal';
 import { Button } from "../ui/button";
@@ -68,7 +68,6 @@ const SkillsManager = ({ skills = [], onUpdate }) => {
       onUpdate(updatedSkills);
       closeModal();
     } catch (error) {
-      console.error('Error saving skill:', error);
       setFieldErrors(extractFieldErrors(error));
       Swal.fire({
         icon: 'error',
@@ -94,7 +93,6 @@ const SkillsManager = ({ skills = [], onUpdate }) => {
       const updatedSkills = skills.filter(s => s.id !== id);
       onUpdate(updatedSkills);
     } catch (error) {
-      console.error('Error deleting skill:', error);
       Swal.fire({
         icon: 'error',
         title: 'Error',
