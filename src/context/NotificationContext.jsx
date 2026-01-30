@@ -1,4 +1,4 @@
-﻿import React, { createContext, useContext, useState, useEffect } from 'react';
+﻿import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { createEcho } from '../echo';
 import { getAuthToken } from '../api/request';
 import { useToast } from '../hooks/use-toast';
@@ -10,17 +10,21 @@ export const NotificationProvider = ({ children }) => {
   const [notifications, setNotifications] = useState([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
+  const hasLoadedRef = useRef(false);
   const { toast } = useToast();
   const { user } = useAuth();
 
-  const fetchNotifications = async () => {
+  const fetchNotifications = async (options = {}) => {
+    const { silent = false } = options;
     try {
       if (!user?.id) {
         setNotifications([]);
         setUnreadCount(0);
         return;
       }
-      setLoading(true);
+      if (!silent && !hasLoadedRef.current) {
+        setLoading(true);
+      }
       const { apiGet, CONTACT_US_ENDPOINTS } = await import('../api/request');
       const response = await apiGet(CONTACT_US_ENDPOINTS.list);
       const payload = response?.data?.data ?? response?.data ?? [];
@@ -38,7 +42,10 @@ export const NotificationProvider = ({ children }) => {
       setUnreadCount(messages.filter((m) => !m.read).length);
     } catch (error) {
     } finally {
-      setLoading(false);
+      if (!hasLoadedRef.current) {
+        setLoading(false);
+        hasLoadedRef.current = true;
+      }
     }
   };
 
@@ -48,7 +55,7 @@ export const NotificationProvider = ({ children }) => {
     }
 
     fetchNotifications();
-    const intervalId = setInterval(fetchNotifications, 20000);
+    const intervalId = setInterval(() => fetchNotifications({ silent: true }), 20000);
 
     if (typeof window !== 'undefined') {
       const token = getAuthToken();
@@ -87,7 +94,7 @@ export const NotificationProvider = ({ children }) => {
     channel?.notification(handleIncoming);
 
     channel?.listenToAll(() => {
-      fetchNotifications();
+      fetchNotifications({ silent: true });
     });
 
     return () => {
