@@ -51,46 +51,48 @@ export const NotificationProvider = ({ children }) => {
   };
 
   useEffect(() => {
-    if (!user?.id) {
-      return undefined;
-    }
+    if (!user?.id) return;
 
     fetchNotifications();
-    const intervalId = setInterval(() => fetchNotifications({ silent: true }), 30000);
+    // Keep polling as a solid fallback
+    const intervalId = setInterval(() => fetchNotifications({ silent: true }), 15000);
 
+    // Initialize Echo if missing
     if (typeof window !== 'undefined' && !window.Echo) {
       const token = getAuthToken();
-      if (token) {
-        window.Echo = createEcho(token);
-      }
+      if (token) window.Echo = createEcho(token);
     }
 
     const echo = typeof window !== 'undefined' ? window.Echo : null;
     if (!echo) return () => clearInterval(intervalId);
 
-    const channelName = `App.Models.User.${user.id}`;
-    const channel = echo.private(channelName);
-
     const handleIncoming = (payload = {}) => {
-      console.log('Incoming notification:', payload);
-      const notification = payload?.notification || payload || {};
+      console.log('Incoming real-time data:', payload);
+      const notification = payload?.notification || payload?.message || payload || {};
+      
+      // If it's just a "ping" to refresh, fetch data
+      if (payload?.refresh || payload?.type === 'refresh') {
+        fetchNotifications({ silent: true });
+        return;
+      }
+
       const name = notification.name || notification.sender_name || 'a visitor';
       const messageContent = notification.message || notification.subject || 'New message received';
+      const notificationId = notification.id || Date.now();
       
       const newNotification = {
-        id: notification.id || Date.now(),
-        name: notification.name || notification.sender_name || 'New Visitor',
+        id: notificationId,
+        name: name,
         email: notification.email || notification.sender_email || '',
         subject: notification.subject || '',
-        message: notification.message || 'New message received',
+        message: messageContent,
         created_at: notification.created_at || new Date().toISOString(),
         read: false
       };
 
       setNotifications(prev => {
-        if (prev.find(n => n.id === newNotification.id)) return prev;
+        if (prev.find(n => n.id === notificationId)) return prev;
         
-        // Only show toast for truly new messages
         toast({
           title: "🚀 New Message Received!",
           description: `From: ${name} - "${messageContent.substring(0, 50)}${messageContent.length > 50 ? '...' : ''}"`,
@@ -100,19 +102,30 @@ export const NotificationProvider = ({ children }) => {
         return [newNotification, ...prev];
       });
       
-      setUnreadCount((prev) => prev + 1);
+      setUnreadCount(prev => prev + 1);
     };
 
-    channel.notification(handleIncoming);
+    // 1. Private User Channel (Standard Laravel Notifications)
+    const privateChannel = `App.Models.User.${user.id}`;
+    echo.private(privateChannel)
+      .notification(handleIncoming)
+      .listen('.MessageSent', handleIncoming)
+      .listen('MessageSent', handleIncoming);
 
-    channel.listen('.MessageSent', (data) => {
-      console.log('MessageSent event received:', data);
-      handleIncoming(data);
-    });
+    // 2. Public Messages Channel (Fallback for general broadcasts)
+    echo.channel('messages')
+      .listen('.MessageSent', handleIncoming)
+      .listen('MessageSent', handleIncoming);
+
+    // 3. Global App Channel (Generic pings)
+    echo.channel('app')
+      .listen('.RefreshNotifications', () => fetchNotifications({ silent: true }));
 
     return () => {
       clearInterval(intervalId);
-      echo.leave(channelName);
+      echo.leave(privateChannel);
+      echo.leave('messages');
+      echo.leave('app');
     };
   }, [toast, user?.id]);
 
@@ -120,10 +133,7 @@ export const NotificationProvider = ({ children }) => {
     try {
       const { apiPatch, CONTACT_US_ENDPOINTS } = await import('../api/request');
       await apiPatch(CONTACT_US_ENDPOINTS.markRead(id));
-
-      setNotifications(prev => prev.map(n => 
-        n.id === id ? { ...n, read: true } : n
-      ));
+      setNotifications(prev => prev.map(n => n.id === id ? { ...n, read: true } : n));
       setUnreadCount(prev => Math.max(0, prev - 1));
     } catch (error) {
       console.error('Error marking as read:', error);
@@ -134,7 +144,6 @@ export const NotificationProvider = ({ children }) => {
     try {
       const { apiDelete, CONTACT_US_ENDPOINTS } = await import('../api/request');
       await apiDelete(CONTACT_US_ENDPOINTS.delete(id));
-
       const notificationToDelete = notifications.find(n => n.id === id);
       if (notificationToDelete && !notificationToDelete.read) {
         setUnreadCount(prev => Math.max(0, prev - 1));
@@ -156,13 +165,7 @@ export const NotificationProvider = ({ children }) => {
 
   return (
     <NotificationContext.Provider value={{ 
-      notifications, 
-      unreadCount, 
-      loading,
-      fetchNotifications,
-      markAsRead, 
-      deleteNotification,
-      markAllAsRead
+      notifications, unreadCount, loading, fetchNotifications, markAsRead, deleteNotification, markAllAsRead
     }}>
       {children}
     </NotificationContext.Provider>
@@ -171,8 +174,6 @@ export const NotificationProvider = ({ children }) => {
 
 export const useNotifications = () => {
   const context = useContext(NotificationContext);
-  if (!context) {
-    throw new Error('useNotifications must be used within a NotificationProvider');
-  }
+  if (!context) throw new Error('useNotifications must be used within a NotificationProvider');
   return context;
 };
