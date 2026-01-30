@@ -56,10 +56,8 @@ export const NotificationProvider = ({ children }) => {
     }
 
     fetchNotifications();
-    // Fallback polling every 30 seconds
     const intervalId = setInterval(() => fetchNotifications({ silent: true }), 30000);
 
-    // Initialize Echo if not already initialized
     if (typeof window !== 'undefined' && !window.Echo) {
       const token = getAuthToken();
       if (token) {
@@ -77,6 +75,7 @@ export const NotificationProvider = ({ children }) => {
       console.log('Incoming notification:', payload);
       const notification = payload?.notification || payload || {};
       const name = notification.name || notification.sender_name || 'a visitor';
+      const messageContent = notification.message || notification.subject || 'New message received';
       
       const newNotification = {
         id: notification.id || Date.now(),
@@ -89,36 +88,27 @@ export const NotificationProvider = ({ children }) => {
       };
 
       setNotifications(prev => {
-        // Avoid duplicates if already added by another listener
         if (prev.find(n => n.id === newNotification.id)) return prev;
+        
+        // Only show toast for truly new messages
+        toast({
+          title: "🚀 New Message Received!",
+          description: `From: ${name} - "${messageContent.substring(0, 50)}${messageContent.length > 50 ? '...' : ''}"`,
+          duration: 5000,
+        });
+
         return [newNotification, ...prev];
       });
       
       setUnreadCount((prev) => prev + 1);
-
-      toast({
-        title: "New Message",
-        description: `New message from ${name}`,
-      });
     };
 
-    // Listen for Laravel Notifications
     channel.notification(handleIncoming);
 
-    // Listen for custom MessageSent event (common in Laravel)
-    // We use a dot prefix for the event name to avoid namespace issues if the backend uses a different one
     channel.listen('.MessageSent', (data) => {
       console.log('MessageSent event received:', data);
       handleIncoming(data);
     });
-
-    // Also listen for any other events by using the underlying pusher instance if available
-    // This is a more robust way to "listen to all" if that was the intention
-    if (echo.connector && echo.connector.pusher) {
-      echo.connector.pusher.connection.bind('message', (data) => {
-        console.log('Generic pusher message:', data);
-      });
-    }
 
     return () => {
       clearInterval(intervalId);
