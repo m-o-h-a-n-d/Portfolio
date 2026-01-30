@@ -1,37 +1,31 @@
 import Echo from "laravel-echo";
 import Pusher from "pusher-js";
-import { getAuthToken } from "./api/request";
 
 window.Pusher = Pusher;
 
-const env = import.meta.env;
+export const createEcho = (token) => {
+  return new Echo({
+    broadcaster: "pusher",
 
-const echo = new Echo({
-  broadcaster: "pusher",
+    key: import.meta.env.VITE_PUSHER_APP_KEY,
+    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
 
-  key: env.VITE_PUSHER_APP_KEY,
-  cluster: env.VITE_PUSHER_APP_CLUSTER,
+    wsHost: import.meta.env.VITE_PUSHER_HOST,
+    wsPort: Number(import.meta.env.VITE_PUSHER_PORT || 80),
+    wssPort: Number(import.meta.env.VITE_PUSHER_PORT || 443),
 
-  // مهم في Production
-  forceTLS: true,
-  encrypted: true,
+    forceTLS: true,
+    encrypted: true,
 
-  // WebSocket settings
-  wsHost: env.VITE_PUSHER_HOST,              // ws-mt1.pusher.com
-  wsPort: Number(env.VITE_PUSHER_PORT || 80),
-  wssPort: Number(env.VITE_PUSHER_PORT || 443),
+    enabledTransports: ["ws", "wss"],
 
-  enabledTransports: ["ws", "wss"],
+    authEndpoint: `${import.meta.env.VITE_API_URL}api/broadcasting/auth`,
 
-  // Auth endpoint (خليه من env)
-  authEndpoint: `${env.VITE_API_URL}api/broadcasting/auth`,
-
-  auth: {
-    headers: {
-      Authorization: `Bearer ${getAuthToken()}`,
-      Accept: "application/json",
+    auth: {
+      headers: {
+        Authorization: `Bearer ${token}`,
+        Accept: "application/json",
+      },
     },
-  },
-});
-
-export default echo;
+  });
+};
