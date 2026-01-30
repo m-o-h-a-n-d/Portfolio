@@ -49,9 +49,10 @@ export const NotificationProvider = ({ children }) => {
 
     fetchNotifications();
 
-    if (typeof window !== 'undefined' && !window.Echo) {
+    if (typeof window !== 'undefined') {
       const token = getAuthToken();
       if (token) {
+        window.Echo?.disconnect();
         window.Echo = createEcho(token);
       }
     }
