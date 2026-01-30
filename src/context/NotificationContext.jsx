@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { createEcho } from '../echo';
 import { getAuthToken } from '../api/request';
-import { useToast } from '../hooks/use-toast';
+import { toast as sonnerToast } from 'sonner'; // Switching to Sonner for better reliability
 import { useAuth } from './AuthContext';
 
 const NotificationContext = createContext();
@@ -11,7 +11,6 @@ export const NotificationProvider = ({ children }) => {
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(false);
   const hasLoadedRef = useRef(false);
-  const { toast } = useToast();
   const { user } = useAuth();
 
   const fetchNotifications = async (options = {}) => {
@@ -54,10 +53,8 @@ export const NotificationProvider = ({ children }) => {
     if (!user?.id) return;
 
     fetchNotifications();
-    // Keep polling as a solid fallback
     const intervalId = setInterval(() => fetchNotifications({ silent: true }), 15000);
 
-    // Initialize Echo if missing
     if (typeof window !== 'undefined' && !window.Echo) {
       const token = getAuthToken();
       if (token) window.Echo = createEcho(token);
@@ -70,7 +67,6 @@ export const NotificationProvider = ({ children }) => {
       console.log('Incoming real-time data:', payload);
       const notification = payload?.notification || payload?.message || payload || {};
       
-      // If it's just a "ping" to refresh, fetch data
       if (payload?.refresh || payload?.type === 'refresh') {
         fetchNotifications({ silent: true });
         return;
@@ -93,10 +89,11 @@ export const NotificationProvider = ({ children }) => {
       setNotifications(prev => {
         if (prev.find(n => n.id === notificationId)) return prev;
         
-        toast({
-          title: "🚀 New Message Received!",
-          description: `From: ${name} - "${messageContent.substring(0, 50)}${messageContent.length > 50 ? '...' : ''}"`,
-          duration: 5000,
+        // Use Sonner for the toast
+        sonnerToast.success("🚀 New Message!", {
+          description: `From ${name}: ${messageContent.substring(0, 40)}...`,
+          duration: 6000,
+          position: 'top-right',
         });
 
         return [newNotification, ...prev];
@@ -105,29 +102,22 @@ export const NotificationProvider = ({ children }) => {
       setUnreadCount(prev => prev + 1);
     };
 
-    // 1. Private User Channel (Standard Laravel Notifications)
     const privateChannel = `App.Models.User.${user.id}`;
     echo.private(privateChannel)
       .notification(handleIncoming)
       .listen('.MessageSent', handleIncoming)
       .listen('MessageSent', handleIncoming);
 
-    // 2. Public Messages Channel (Fallback for general broadcasts)
     echo.channel('messages')
       .listen('.MessageSent', handleIncoming)
       .listen('MessageSent', handleIncoming);
-
-    // 3. Global App Channel (Generic pings)
-    echo.channel('app')
-      .listen('.RefreshNotifications', () => fetchNotifications({ silent: true }));
 
     return () => {
       clearInterval(intervalId);
       echo.leave(privateChannel);
       echo.leave('messages');
-      echo.leave('app');
     };
-  }, [toast, user?.id]);
+  }, [user?.id]);
 
   const markAsRead = async (id) => {
     try {
