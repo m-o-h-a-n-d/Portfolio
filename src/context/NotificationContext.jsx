@@ -1,5 +1,6 @@
 ﻿import React, { createContext, useContext, useState, useEffect } from 'react';
-import echo from '../echo';
+import { createEcho } from '../echo';
+import { getAuthToken } from '../api/request';
 import { useToast } from '../hooks/use-toast';
 import { useAuth } from './AuthContext';
 
@@ -48,10 +49,18 @@ export const NotificationProvider = ({ children }) => {
 
     fetchNotifications();
 
-const channelName = `App.Models.User.${user.id}`;
-const channel = echo.private(channelName);
+    if (typeof window !== 'undefined' && !window.Echo) {
+      const token = getAuthToken();
+      if (token) {
+        window.Echo = createEcho(token);
+      }
+    }
 
-    channel.notification((notification) => {
+    const channelName = `App.Models.User.${user.id}`;
+    const echo = typeof window !== 'undefined' ? window.Echo : null;
+    const channel = echo ? echo.private(channelName) : null;
+
+    channel?.notification((notification) => {
       const newNotification = {
         id: notification.id || Date.now(),
         name: notification.name || notification.sender_name || 'New Visitor',
@@ -72,7 +81,7 @@ const channel = echo.private(channelName);
     });
 
     return () => {
-      echo.leave(channelName);
+      echo?.leave(channelName);
     };
   }, [toast, user?.id]);
 
