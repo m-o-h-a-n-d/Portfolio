@@ -1,9 +1,10 @@
 ﻿import { useState, createContext, useContext, useEffect } from 'react';
 import LoadingScreen from '../components/portfolio/LoadingScreen';
-import { isAuthenticated, removeAuthToken, apiFetch, apiGet, setAuthToken } from '../api/request';
+import { isAuthenticated, removeAuthToken, apiFetch, apiGet, setAuthToken, getAuthToken } from '../api/request';
 import { useNavigate } from 'react-router-dom';
 import { DASHBOARD_ENDPOINTS } from '../api/endpoints';
 import { extractFieldErrors } from '../lib/validationErrors';
+import { createEcho } from '../echo';
 
 // Auth Context
 const AuthContext = createContext(null);
@@ -23,6 +24,11 @@ export const AuthProvider = ({ children }) => {
     const checkAuth = async () => {
       try {
         if (isAuthenticated()) {
+          const token = getAuthToken();
+          if (token) {
+            window.Echo?.disconnect();
+            window.Echo = createEcho(token);
+          }
           const response = await apiGet(DASHBOARD_ENDPOINTS.user.list);
           const userData =
             response?.data?.user ||
@@ -38,6 +44,8 @@ export const AuthProvider = ({ children }) => {
       }
     };
     checkAuth();
+
+    return () => window.Echo?.disconnect();
   }, []);
 
   const login = async (email, password) => {
@@ -51,6 +59,8 @@ export const AuthProvider = ({ children }) => {
       const userData = response?.user || response?.data?.user || response?.data;
       if (token) {
         setAuthToken(token);
+        window.Echo?.disconnect();
+        window.Echo = createEcho(token);
       }
       if (userData && (response?.success ?? true)) {
         setUser(userData);
@@ -67,6 +77,7 @@ export const AuthProvider = ({ children }) => {
       await apiFetch(DASHBOARD_ENDPOINTS.auth.logout, 'DELETE');
     } catch (error) {
     } finally {
+      window.Echo?.disconnect();
       removeAuthToken();
       setUser(null);
       navigate('/admin/login');

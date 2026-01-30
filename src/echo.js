@@ -4,23 +4,22 @@ import Pusher from "pusher-js";
 window.Pusher = Pusher;
 
 export const createEcho = (token) => {
+  const env = import.meta.env;
+
   return new Echo({
     broadcaster: "pusher",
+    key: env.VITE_PUSHER_APP_KEY,
+    cluster: env.VITE_PUSHER_APP_CLUSTER,
 
-    key: import.meta.env.VITE_PUSHER_APP_KEY,
-    cluster: import.meta.env.VITE_PUSHER_APP_CLUSTER,
-
-    wsHost: import.meta.env.VITE_PUSHER_HOST,
-    wsPort: Number(import.meta.env.VITE_PUSHER_PORT || 80),
-    wssPort: Number(import.meta.env.VITE_PUSHER_PORT || 443),
+    wsHost: env.VITE_PUSHER_HOST,
+    wsPort: Number(env.VITE_PUSHER_PORT || 80),
+    wssPort: Number(env.VITE_PUSHER_PORT || 443),
 
     forceTLS: true,
     encrypted: true,
-
     enabledTransports: ["ws", "wss"],
 
-    authEndpoint: `${import.meta.env.VITE_API_URL}api/broadcasting/auth`,
-
+    authEndpoint: `${env.VITE_API_URL}api/broadcasting/auth`,
     auth: {
       headers: {
         Authorization: `Bearer ${token}`,
