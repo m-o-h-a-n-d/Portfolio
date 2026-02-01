@@ -42,10 +42,10 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   };
 
   // Dynamic Favicon from settings (force https to avoid mixed-content block)
-  const finalFavicon = normalizeUrl(settingsData?.favicon) || '/favicon.ico';
+  const finalFavicon = normalizeUrl(settingsData?.favicon || settingsData?.site_identity?.favicon_url || settingsData?.site_identity?.favicon) || '/favicon.ico';
 
   // Dynamic Preview Image (can also be linked to settings if needed)
-  const finalImageUrl = normalizeUrl(imageUrl || settingsData?.logo) || 'https://mohanadportfolio.vercel.app/image.png';
+  const finalImageUrl = normalizeUrl(imageUrl || settingsData?.logo || settingsData?.site_identity?.logo_url || settingsData?.site_identity?.logo) || 'https://mohanadportfolio.vercel.app/image.png';
 
   const structuredData = {
     '@context': 'https://schema.org',

@@ -121,7 +121,9 @@ const ResumeSection = () => {
     </section>
   );
 
-  const cvUrl = settings?.site_identity?.cv_url || profile?.cv_url;
+  const rawCvUrl = settings?.cv || settings?.site_identity?.cv_url || profile?.cv_url;
+  const cvUrl = rawCvUrl?.startsWith('http') ? rawCvUrl : (rawCvUrl ? `/${rawCvUrl.replace(/^\//, '')}` : '#');
+  const isExternal = cvUrl.startsWith('http');
 
   return (
     <article className="animate-fade-in">
@@ -141,8 +143,10 @@ const ResumeSection = () => {
       {/* Download CV Button */}
       <section className="text-center">
         <a 
-          href={cvUrl || '#'} 
-          download
+          href={cvUrl} 
+          target="_blank"
+          rel="noopener noreferrer"
+          download={isExternal ? undefined : "CV.pdf"}
           className="download-cv-btn inline-flex"
         >
           <Download className="w-5 h-5" />
