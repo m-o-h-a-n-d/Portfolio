@@ -1,5 +1,5 @@
 import { useResume, useProfile, useSettings } from '../../context/DataContext';
-import { BookOpen, Briefcase, Download } from 'lucide-react';
+import { BookOpen, Briefcase, Eye } from 'lucide-react';
 
 const ResumeSection = () => {
   const resume = useResume();
@@ -140,17 +140,16 @@ const ResumeSection = () => {
         return null;
       })}
 
-      {/* Download CV Button */}
+      {/* View CV Button */}
       <section className="text-center">
         <a 
           href={cvUrl} 
           target="_blank"
           rel="noopener noreferrer"
-          download={isExternal ? undefined : "CV.pdf"}
           className="download-cv-btn inline-flex"
         >
-          <Download className="w-5 h-5" />
-          <span>Download CV</span>
+          <Eye className="w-5 h-5" />
+          <span>View CV</span>
         </a>
       </section>
     </article>
