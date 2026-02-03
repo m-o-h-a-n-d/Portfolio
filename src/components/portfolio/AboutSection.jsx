@@ -42,34 +42,39 @@ const AboutSection = () => {
   useEffect(() => {
     const scrollInterval = setInterval(() => {
       // Auto-scroll Certificates
-      if (certificatesRef.current) {
+      if (certificatesRef.current && certificates?.certificates?.length > 0) {
         const { scrollLeft, scrollWidth, clientWidth } = certificatesRef.current;
         const itemWidth = certificatesRef.current.querySelector('li')?.offsetWidth || 200;
         const gap = 20; // gap-[20px]
         const scrollStep = itemWidth + gap;
+        const maxScroll = scrollWidth - clientWidth;
 
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+        if (scrollLeft >= maxScroll - 10) {
           certificatesRef.current.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-          // Calculate next snap position
           const nextScroll = Math.ceil((scrollLeft + 1) / scrollStep) * scrollStep;
-          certificatesRef.current.scrollTo({ left: nextScroll, behavior: 'smooth' });
+          certificatesRef.current.scrollTo({ left: Math.min(nextScroll, maxScroll), behavior: 'smooth' });
         }
       }
 
       // Auto-scroll Team
-      if (teamRef.current) {
+      if (teamRef.current && team?.team?.length > 0) {
         const { scrollLeft, scrollWidth, clientWidth } = teamRef.current;
         const itemWidth = teamRef.current.querySelector('li')?.offsetWidth || 200;
         const gap = 30; // gap-[30px]
         const scrollStep = itemWidth + gap;
+        
+        // Calculate the maximum scroll position that shows the last item fully
+        // We want to stop when the last item is visible, not scroll past it
+        const maxScroll = scrollWidth - clientWidth;
 
-        if (scrollLeft + clientWidth >= scrollWidth - 10) {
+        if (scrollLeft >= maxScroll - 10) {
           teamRef.current.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
           // Calculate next snap position
           const nextScroll = Math.ceil((scrollLeft + 1) / scrollStep) * scrollStep;
-          teamRef.current.scrollTo({ left: nextScroll, behavior: 'smooth' });
+          // Ensure we don't scroll past the maxScroll
+          teamRef.current.scrollTo({ left: Math.min(nextScroll, maxScroll), behavior: 'smooth' });
         }
       }
     }, 5000);
@@ -240,32 +245,32 @@ const AboutSection = () => {
         document.body
       )}
 
-      {/* team */}
-      <section className="mb-4">
-        <h3 className="h3 mb-5">team</h3>
-        <div className="-mx-[15px] px-[15px]">
-            <ul 
-              ref={teamRef}
-              className="flex gap-[30px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x snap-mandatory"
-            >
-            {team?.team?.map((member) => (
-                <li key={member.id} className="min-w-[75%] md:min-w-[190px] flex-shrink-0 snap-start">
-                <a href={member.url} target="_blank" rel="noopener noreferrer" className="block group text-center">
-                    <div className="relative w-full h-[150px] md:h-[170px] overflow-hidden bg-onyx">
-                      <img 
-                      src={member.logo} 
-                      alt={member.name}
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 rounded-[14px]"
-                      />
-                    </div>
-                    <h4 className="text-white-1 font-medium text-lg mb-1">{member.name}</h4>
-                    <p className="text-orange-yellow text-sm">{member.track}</p>
-                </a>
-                </li>
-            ))}
-            </ul>
-        </div>
-      </section>
+	      {/* team */}
+	      <section className="mb-4">
+	        <h3 className="h3 mb-5">Team</h3>
+	        <div className="-mx-[15px] px-[15px]">
+	            <ul 
+	              ref={teamRef}
+	              className="flex gap-[30px] overflow-x-auto has-scrollbar pb-6 scroll-smooth snap-x snap-mandatory"
+	            >
+	            {team?.team?.map((member) => (
+	                <li key={member.id} className="min-w-[75%] md:min-w-[220px] lg:min-w-[250px] flex-shrink-0 snap-start">
+	                <a href={member.url} target="_blank" rel="noopener noreferrer" className="block group text-center">
+	                    <div className="relative w-full h-[180px] md:h-[220px] overflow-hidden bg-onyx mb-3">
+	                      <img 
+	                      src={member.logo} 
+	                      alt={member.name}
+	                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 rounded-[14px]"
+	                      />
+	                    </div>
+	                    <h4 className="text-white-1 font-medium text-lg mb-1">{member.name}</h4>
+	                    <p className="text-orange-yellow text-sm">{member.track}</p>
+	                </a>
+	                </li>
+	            ))}
+	            </ul>
+	        </div>
+	      </section>
     </article>
   );
 };
