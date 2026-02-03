@@ -44,15 +44,15 @@ const AboutSection = () => {
       // Auto-scroll Certificates
       if (certificatesRef.current && certificates?.certificates?.length > 0) {
         const { scrollLeft, scrollWidth, clientWidth } = certificatesRef.current;
-        const itemWidth = certificatesRef.current.querySelector('li')?.offsetWidth || 200;
-        const gap = 20; // gap-[20px]
-        const scrollStep = itemWidth + gap;
         const maxScroll = scrollWidth - clientWidth;
 
-        if (scrollLeft >= maxScroll - 10) {
+        if (scrollLeft >= maxScroll - 5) {
           certificatesRef.current.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-          const nextScroll = Math.ceil((scrollLeft + 1) / scrollStep) * scrollStep;
+          const itemWidth = certificatesRef.current.querySelector('li')?.offsetWidth || 200;
+          const gap = 20;
+          const scrollStep = itemWidth + gap;
+          const nextScroll = Math.floor((scrollLeft + scrollStep + 5) / scrollStep) * scrollStep;
           certificatesRef.current.scrollTo({ left: Math.min(nextScroll, maxScroll), behavior: 'smooth' });
         }
       }
@@ -60,20 +60,15 @@ const AboutSection = () => {
       // Auto-scroll Team
       if (teamRef.current && team?.team?.length > 0) {
         const { scrollLeft, scrollWidth, clientWidth } = teamRef.current;
-        const itemWidth = teamRef.current.querySelector('li')?.offsetWidth || 200;
-        const gap = 30; // gap-[30px]
-        const scrollStep = itemWidth + gap;
-        
-        // Calculate the maximum scroll position that shows the last item fully
-        // We want to stop when the last item is visible, not scroll past it
         const maxScroll = scrollWidth - clientWidth;
 
-        if (scrollLeft >= maxScroll - 10) {
+        if (scrollLeft >= maxScroll - 5) {
           teamRef.current.scrollTo({ left: 0, behavior: 'smooth' });
         } else {
-          // Calculate next snap position
-          const nextScroll = Math.ceil((scrollLeft + 1) / scrollStep) * scrollStep;
-          // Ensure we don't scroll past the maxScroll
+          const itemWidth = teamRef.current.querySelector('li')?.offsetWidth || 200;
+          const gap = 30;
+          const scrollStep = itemWidth + gap;
+          const nextScroll = Math.floor((scrollLeft + scrollStep + 5) / scrollStep) * scrollStep;
           teamRef.current.scrollTo({ left: Math.min(nextScroll, maxScroll), behavior: 'smooth' });
         }
       }
