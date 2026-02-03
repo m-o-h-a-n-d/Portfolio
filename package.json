@@ -5,11 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "node generate-sitemap.js && vite build",
-    "build:dev": "node generate-sitemap.js && vite build --mode development",
+    "build": "vite build",
+    "build:dev": "vite build --mode development",
     "lint": "eslint .",
     "preview": "vite preview",
-    "sitemap": "node generate-sitemap.js"
+    "sitemap": "echo 'Sitemap is now dynamic via Vercel Serverless Function'"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
