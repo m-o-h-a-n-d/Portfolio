@@ -68,15 +68,15 @@ const NotFound = ({
       cordCtx.clearRect(0, 0, w, h);
       cordCtx.beginPath();
       
-      // Start EXACTLY from the top-left corner of the canvas (0,0)
-      // This point will be positioned right behind the astronaut's body in CSS
+      // Start from the top-left (connected to astronaut)
       cordCtx.moveTo(0, 0); 
       
-      // Draw bezier curve towards the bottom-right of the canvas
+      // Draw a shorter, curved "cut" cord as seen in the image
+      // The curve goes down then slightly up at the end
       cordCtx.bezierCurveTo(
-        w * (0.3 + y1 * 0.1), h * (0.3 + y2 * 0.1), 
-        w * 0.6, h * 0.8, 
-        w * 0.95, h * 0.95
+        w * 0.4, h * (0.6 + y1 * 0.1), 
+        w * 0.7, h * (0.8 + y2 * 0.1), 
+        w * 0.9, h * 0.4 // Ends higher up to look like a cut tail
       );
       
       cordCtx.strokeStyle = "#f2f2f2";
@@ -89,8 +89,8 @@ const NotFound = ({
       if (y2 <= 0.2) y2Forward = true;
       if (y2 >= 0.85) y2Forward = false;
 
-      y1Forward ? (y1 += 0.002) : (y1 -= 0.002);
-      y2Forward ? (y2 += 0.0015) : (y2 -= 0.0015);
+      y1Forward ? (y1 += 0.001) : (y1 -= 0.001);
+      y2Forward ? (y2 += 0.0008) : (y2 -= 0.0008);
     };
 
     drawVisor();
