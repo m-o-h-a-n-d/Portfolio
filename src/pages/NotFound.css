@@ -154,11 +154,11 @@
 
 .space-404 .astronaut__cord {
   position: absolute;
-  top: 180px; /* Start from the leg/body area */
-  left: -350px; /* Extend to the left and down */
-  width: 400px;
-  height: 300px;
-  z-index: 1;
+  top: 150px; /* Adjusted to start from the middle of the body/backpack */
+  left: 100px; /* Start from the astronaut and extend outwards */
+  width: 600px; /* Increased width for a longer tail */
+  height: 400px; /* Increased height */
+  z-index: -1; /* Place behind the astronaut */
   pointer-events: none;
 }
 

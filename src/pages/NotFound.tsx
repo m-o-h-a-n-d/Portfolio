@@ -50,10 +50,8 @@ const NotFound = ({
 
     let y1 = 0.35;
     let y2 = 0.45;
-    let y3 = 0.7;
     let y1Forward = true;
     let y2Forward = false;
-    let y3Forward = true;
     let animationId = 0;
 
     const resize = () => {
@@ -70,25 +68,30 @@ const NotFound = ({
       cordCtx.clearRect(0, 0, w, h);
       cordCtx.beginPath();
       
-      // Start from the bottom-right corner of the canvas (where it meets the astronaut)
-      cordCtx.moveTo(w * 0.98, h * 0.7); 
-      // Draw bezier curve towards the bottom-right of the screen
-      cordCtx.bezierCurveTo(w * 0.7, y2 * h, w * 0.35, y1 * h, w * 0.05, h * 0.95);
+      // Start from the top-left (where it meets the astronaut's backpack/body)
+      // In the CSS, the cord container is positioned relative to the astronaut
+      cordCtx.moveTo(w * 0.2, h * 0.2); 
+      
+      // Draw bezier curve towards the bottom-right of the canvas
+      // This creates the long tail effect seen in the image
+      cordCtx.bezierCurveTo(
+        w * (0.4 + y1 * 0.1), h * (0.4 + y2 * 0.1), 
+        w * 0.7, h * 0.8, 
+        w * 0.95, h * 0.95
+      );
       
       cordCtx.strokeStyle = "#f2f2f2";
-      cordCtx.lineWidth = 6;
+      cordCtx.lineWidth = 8;
+      cordCtx.lineCap = "round";
       cordCtx.stroke();
 
       if (y1 <= 0.2) y1Forward = true;
       if (y1 >= 0.75) y1Forward = false;
       if (y2 <= 0.2) y2Forward = true;
       if (y2 >= 0.85) y2Forward = false;
-      if (y3 <= 0.3) y3Forward = true;
-      if (y3 >= 0.9) y3Forward = false;
 
-      y1Forward ? (y1 += 0.003) : (y1 -= 0.003);
-      y2Forward ? (y2 += 0.0025) : (y2 -= 0.0025);
-      y3Forward ? (y3 += 0.002) : (y3 -= 0.002);
+      y1Forward ? (y1 += 0.002) : (y1 -= 0.002);
+      y2Forward ? (y2 += 0.0015) : (y2 -= 0.0015);
     };
 
     drawVisor();
@@ -143,7 +146,7 @@ const NotFound = ({
         <div className="astronaut__wrist-right"></div>
 
         <div className="astronaut__cord">
-          <canvas ref={cordRef} id="cord" height="300" width="400"></canvas>
+          <canvas ref={cordRef} id="cord" height="600" width="800"></canvas>
         </div>
 
         <div className="astronaut__head">
