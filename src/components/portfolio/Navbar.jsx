@@ -26,12 +26,8 @@ const Navbar = ({ activePage, onPageChange }) => {
       <ul className="flex flex-wrap justify-center items-center px-5 md:gap-9 md:px-0">
         {pages.map((page) => (
           <li key={page}>
-            <a
-              href={`#${page.toLowerCase()}`}
-              onClick={(e) => {
-                e.preventDefault();
-                handleNavClick(page);
-              }}
+            <button
+              onClick={() => handleNavClick(page)}
               className={`
                 relative px-2 py-4 md:py-5 text-[12px] md:text-[16px] font-medium transition-colors
                 ${
@@ -42,7 +38,7 @@ const Navbar = ({ activePage, onPageChange }) => {
                 `}
               >
               {page}
-            </a>
+            </button>
           </li>
         ))}
       </ul>
