@@ -1,5 +1,6 @@
-﻿import { useLocation, Link } from "react-router-dom";
-import { useEffect } from "react";
+import { useLocation, Link } from "react-router-dom";
+import { useEffect, useRef } from "react";
+import SpaceBackground from "../components/portfolio/SpaceBackground";
 import "./NotFound.css";
 
 interface ErrorState {
@@ -7,44 +8,144 @@ interface ErrorState {
   message?: string;
 }
 
-const NotFound = ({ code: defaultCode = "404", message: defaultMessage = "We can't find the page that you're looking for :(" }) => {
+const NotFound = ({
+  code: defaultCode = "404",
+  message: defaultMessage = "We can't find the page that you're looking for :(",
+}) => {
   const location = useLocation();
-  
+
   // Try to get error details from navigation state (e.g., passed from an API catch block)
   const state = location.state as ErrorState;
-  
+
   const errorCode = state?.code?.toString() || defaultCode.toString();
   const errorMessage = state?.message || defaultMessage;
 
+  const visorRef = useRef<HTMLCanvasElement | null>(null);
+  const cordRef = useRef<HTMLCanvasElement | null>(null);
+
   useEffect(() => {
+    const visor = visorRef.current;
+    const cordCanvas = cordRef.current;
+    if (!visor || !cordCanvas) return;
+
+    const visorCtx = visor.getContext("2d");
+    const cordCtx = cordCanvas.getContext("2d");
+    if (!visorCtx || !cordCtx) return;
+
+    const drawVisor = () => {
+      visorCtx.clearRect(0, 0, visor.width, visor.height);
+      visorCtx.beginPath();
+      visorCtx.moveTo(5, 45);
+      visorCtx.bezierCurveTo(15, 64, 45, 64, 55, 45);
+      visorCtx.lineTo(55, 20);
+      visorCtx.bezierCurveTo(55, 15, 50, 10, 45, 10);
+      visorCtx.lineTo(15, 10);
+      visorCtx.bezierCurveTo(15, 10, 5, 10, 5, 20);
+      visorCtx.lineTo(5, 45);
+      visorCtx.fillStyle = "#2f3640";
+      visorCtx.strokeStyle = "#f5f6fa";
+      visorCtx.fill();
+      visorCtx.stroke();
+    };
+
+    let y1 = 0.35;
+    let y2 = 0.45;
+    let y3 = 0.7;
+    let y1Forward = true;
+    let y2Forward = false;
+    let y3Forward = true;
+    let animationId = 0;
+
+    const resize = () => {
+      const rect = cordCanvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+      cordCanvas.width = Math.round(rect.width);
+      cordCanvas.height = Math.round(rect.height);
+    };
+
+    const animate = () => {
+      animationId = window.requestAnimationFrame(animate);
+      const w = cordCanvas.width || 1;
+      const h = cordCanvas.height || 1;
+      cordCtx.clearRect(0, 0, w, h);
+      cordCtx.beginPath();
+      cordCtx.moveTo(w * 0.05, h * 0.25);
+      cordCtx.bezierCurveTo(w * 0.35, y1 * h, w * 0.7, y2 * h, w * 0.98, y3 * h);
+      cordCtx.strokeStyle = "#f2f2f2";
+      cordCtx.lineWidth = 6;
+      cordCtx.stroke();
+
+      if (y1 <= 0.2) y1Forward = true;
+      if (y1 >= 0.75) y1Forward = false;
+      if (y2 <= 0.2) y2Forward = true;
+      if (y2 >= 0.85) y2Forward = false;
+      if (y3 <= 0.3) y3Forward = true;
+      if (y3 >= 0.9) y3Forward = false;
+
+      y1Forward ? (y1 += 0.003) : (y1 -= 0.003);
+      y2Forward ? (y2 += 0.0025) : (y2 -= 0.0025);
+      y3Forward ? (y3 += 0.002) : (y3 -= 0.002);
+    };
+
+    drawVisor();
+    resize();
+    animate();
+    window.addEventListener("resize", resize);
+
+    return () => {
+      window.cancelAnimationFrame(animationId);
+      window.removeEventListener("resize", resize);
+    };
   }, [location.pathname, errorCode]);
 
-  // Split the code into digits for the 3D design
-  const firstDigit = errorCode.charAt(0) || "4";
-  const lastDigit = errorCode.length > 1 ? errorCode.charAt(errorCode.length - 1) : (errorCode.length === 1 ? "" : "4");
-
   return (
-    <div className="error-page-container">
-      <div className="room">
-        <div className="cuboid">
-          <div className="side"></div>
-          <div className="side"></div>
-          <div className="side"></div>
+    <div className="space-404">
+      <SpaceBackground />
+
+      <div className="moon"></div>
+      <div className="moon__crater moon__crater1"></div>
+      <div className="moon__crater moon__crater2"></div>
+      <div className="moon__crater moon__crater3"></div>
+
+      <div className="error">
+        <div className="error__title">{errorCode}</div>
+        <div className="error__subtitle">Oops...</div>
+        <div className="error__description">{errorMessage}</div>
+        <div className="error__actions">
+          <Link className="error__button error__button--active" to="/">
+            HOME
+          </Link>
+          <a className="error__button" href="/#contact">
+            CONTACT
+          </a>
         </div>
-        <div className="oops">
-          <h2>OOPS! {errorCode}</h2>
-          <p>{errorMessage}</p>
+      </div>
+
+      <div className="astronaut">
+        <div className="astronaut__backpack"></div>
+        <div className="astronaut__body"></div>
+        <div className="astronaut__body__chest"></div>
+        <div className="astronaut__arm-left1"></div>
+        <div className="astronaut__arm-left2"></div>
+        <div className="astronaut__arm-right1"></div>
+        <div className="astronaut__arm-right2"></div>
+        <div className="astronaut__arm-thumb-left"></div>
+        <div className="astronaut__arm-thumb-right"></div>
+        <div className="astronaut__leg-left"></div>
+        <div className="astronaut__leg-right"></div>
+        <div className="astronaut__foot-left"></div>
+        <div className="astronaut__foot-right"></div>
+        <div className="astronaut__wrist-left"></div>
+        <div className="astronaut__wrist-right"></div>
+
+        <div className="astronaut__cord">
+          <canvas ref={cordRef} id="cord" height="240" width="360"></canvas>
         </div>
-        <div className="center-line">
-          <div className="hole">
-            <div className="ladder-shadow"></div>
-            <div className="ladder"></div>
-          </div>
-          <div className="four">{firstDigit}</div>
-          <div className="four">{lastDigit}</div>
-          <div className="btn">
-            <Link to="/">BACK TO HOME</Link>
-          </div>
+
+        <div className="astronaut__head">
+          <canvas ref={visorRef} id="visor" width="60" height="60"></canvas>
+          <div className="astronaut__head-visor-flare1"></div>
+          <div className="astronaut__head-visor-flare2"></div>
         </div>
       </div>
     </div>
