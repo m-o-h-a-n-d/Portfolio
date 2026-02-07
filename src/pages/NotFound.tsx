@@ -20,33 +20,14 @@ const NotFound = ({
   const errorCode = state?.code?.toString() || defaultCode.toString();
   const errorMessage = state?.message || defaultMessage;
 
-  const visorRef = useRef<HTMLCanvasElement | null>(null);
   const cordRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
-    const visor = visorRef.current;
     const cordCanvas = cordRef.current;
-    if (!visor || !cordCanvas) return;
+    if (!cordCanvas) return;
 
-    const visorCtx = visor.getContext("2d");
     const cordCtx = cordCanvas.getContext("2d");
-    if (!visorCtx || !cordCtx) return;
-
-    const drawVisor = () => {
-      visorCtx.clearRect(0, 0, visor.width, visor.height);
-      visorCtx.beginPath();
-      visorCtx.moveTo(5, 45);
-      visorCtx.bezierCurveTo(15, 64, 45, 64, 55, 45);
-      visorCtx.lineTo(55, 20);
-      visorCtx.bezierCurveTo(55, 15, 50, 10, 45, 10);
-      visorCtx.lineTo(15, 10);
-      visorCtx.bezierCurveTo(15, 10, 5, 10, 5, 20);
-      visorCtx.lineTo(5, 45);
-      visorCtx.fillStyle = "#2f3640";
-      visorCtx.strokeStyle = "#f5f6fa";
-      visorCtx.fill();
-      visorCtx.stroke();
-    };
+    if (!cordCtx) return;
 
     let y1 = 0.35;
     let y2 = 0.45;
@@ -87,7 +68,6 @@ const NotFound = ({
       y3Forward ? (y3 += 0.002) : (y3 -= 0.002);
     };
 
-    drawVisor();
     resize();
     animate();
     window.addEventListener("resize", resize);
@@ -121,32 +101,15 @@ const NotFound = ({
         </div>
       </div>
 
-      <div className="astronaut">
-        <div className="astronaut__backpack"></div>
-        <div className="astronaut__body"></div>
-        <div className="astronaut__body__chest"></div>
-        <div className="astronaut__arm-left1"></div>
-        <div className="astronaut__arm-left2"></div>
-        <div className="astronaut__arm-right1"></div>
-        <div className="astronaut__arm-right2"></div>
-        <div className="astronaut__arm-thumb-left"></div>
-        <div className="astronaut__arm-thumb-right"></div>
-        <div className="astronaut__leg-left"></div>
-        <div className="astronaut__leg-right"></div>
-        <div className="astronaut__foot-left"></div>
-        <div className="astronaut__foot-right"></div>
-        <div className="astronaut__wrist-left"></div>
-        <div className="astronaut__wrist-right"></div>
-
+      <div className="astronaut-container">
         <div className="astronaut__cord">
           <canvas ref={cordRef} id="cord" height="240" width="360"></canvas>
         </div>
-
-        <div className="astronaut__head">
-          <canvas ref={visorRef} id="visor" width="60" height="60"></canvas>
-          <div className="astronaut__head-visor-flare1"></div>
-          <div className="astronaut__head-visor-flare2"></div>
-        </div>
+        <img 
+          src="/images/astronaut.png" 
+          alt="Astronaut" 
+          className="astronaut-image"
+        />
       </div>
     </div>
   );
