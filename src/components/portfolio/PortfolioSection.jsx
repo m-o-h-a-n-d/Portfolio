@@ -106,12 +106,12 @@ const PortfolioSection = () => {
               <a href={`/project/${project.slug || project.id}`} className="block">
                 {/* Project Image */}
                 <figure className="project-card mb-4 rounded-2xl overflow-hidden h-[200px]">
-                  <img 
-                    src={project.image} 
-                    alt={project.title}
-                    className="project-img w-full h-full object-cover"
-                    loading="lazy"
-                  />
+<img 
+	                    src={project.image} 
+	                    alt={`Project: ${project.title} - ${resolveProjectCategory(project) || project.category}`}
+	                    className="project-img w-full h-full object-cover"
+	                    loading="lazy"
+	                  />
                   <div className="overlay">
                     <div className="overlay-icon">
                       <Eye className="w-5 h-5" />

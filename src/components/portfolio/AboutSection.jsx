@@ -153,11 +153,11 @@ const AboutSection = () => {
                   {/* Certificate Image */}
                    {/* Certificate Image */}
                   <div className="relative w-full h-[140px] md:h-[160px] overflow-hidden bg-onyx">
-                    <img 
-                      src={certificate.avatar} 
-                      alt={certificate.name} 
-                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                    />
+<img 
+	                      src={certificate.avatar} 
+	                      alt={`Certificate: ${certificate.name} - Mohanad Ahmed Shehata`} 
+	                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+	                    />
                     
                     {/* Overlay on hover */}
                     <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
@@ -254,7 +254,7 @@ const AboutSection = () => {
 	                    <div className="relative w-full h-[180px] md:h-[220px] overflow-hidden bg-onyx mb-3">
 	                      <img 
 	                      src={member.logo} 
-	                      alt={member.name}
+	                      alt={`Team Member: ${member.name} - ${member.track}`}
 	                      className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300 rounded-[14px]"
 	                      />
 	                    </div>

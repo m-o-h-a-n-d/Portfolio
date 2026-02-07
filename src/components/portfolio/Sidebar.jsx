@@ -86,7 +86,7 @@ function limitWords(text, limit = 2) {
             {/* Name & Title */}
             <div className="text-left lg:text-center">
             <h1 className="text-white-2 text-[20px] md:text-[26px] font-medium tracking-tight mb-2 whitespace-nowrap">
-                {limitWords(profile.name, 2)}
+                {profile.name}
             </h1>
             <p className="bg-onyx text-white-1 text-xs font-light px-[12px] py-[4px] md:px-[18px] md:py-[5px] rounded-lg inline-block">
                 {profile.title}

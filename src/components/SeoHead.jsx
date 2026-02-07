@@ -89,6 +89,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       {/* Dynamic Favicon */}
       <link rel="icon" href={finalFavicon} />
       <link rel="apple-touch-icon" href={finalFavicon} />
+      <link rel="canonical" href={finalWebsiteUrl} />
 
       {/* JSON-LD */}
       <script
