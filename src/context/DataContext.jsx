@@ -225,6 +225,12 @@ export const DataProvider = ({ children }) => {
     fetchAllData();
   }, []);
 
+  useEffect(() => {
+    if (!loading && typeof document !== "undefined") {
+      document.dispatchEvent(new Event("prerender-ready"));
+    }
+  }, [loading]);
+
   if (loading) {
     return <LoadingScreen progress={progress} />;
   }
