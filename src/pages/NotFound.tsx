@@ -68,15 +68,14 @@ const NotFound = ({
       cordCtx.clearRect(0, 0, w, h);
       cordCtx.beginPath();
       
-      // Start from the top-left (where it meets the astronaut's backpack/body)
-      // In the CSS, the cord container is positioned relative to the astronaut
-      cordCtx.moveTo(w * 0.2, h * 0.2); 
+      // Start EXACTLY from the top-left corner of the canvas (0,0)
+      // This point will be positioned right behind the astronaut's body in CSS
+      cordCtx.moveTo(0, 0); 
       
       // Draw bezier curve towards the bottom-right of the canvas
-      // This creates the long tail effect seen in the image
       cordCtx.bezierCurveTo(
-        w * (0.4 + y1 * 0.1), h * (0.4 + y2 * 0.1), 
-        w * 0.7, h * 0.8, 
+        w * (0.3 + y1 * 0.1), h * (0.3 + y2 * 0.1), 
+        w * 0.6, h * 0.8, 
         w * 0.95, h * 0.95
       );
       
@@ -146,7 +145,7 @@ const NotFound = ({
         <div className="astronaut__wrist-right"></div>
 
         <div className="astronaut__cord">
-          <canvas ref={cordRef} id="cord" height="600" width="800"></canvas>
+          <canvas ref={cordRef} id="cord"></canvas>
         </div>
 
         <div className="astronaut__head">
