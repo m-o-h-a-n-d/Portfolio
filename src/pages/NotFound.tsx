@@ -72,11 +72,10 @@ const NotFound = ({
       cordCtx.moveTo(0, 0); 
       
       // Draw a shorter, curved "cut" cord as seen in the image
-      // The curve goes down then slightly up at the end
       cordCtx.bezierCurveTo(
         w * 0.4, h * (0.6 + y1 * 0.1), 
         w * 0.7, h * (0.8 + y2 * 0.1), 
-        w * 0.9, h * 0.4 // Ends higher up to look like a cut tail
+        w * 0.9, h * 0.4 
       );
       
       cordCtx.strokeStyle = "#f2f2f2";
@@ -121,9 +120,6 @@ const NotFound = ({
           <Link className="error__button error__button--active" to="/">
             HOME
           </Link>
-          <a className="error__button" href="/#contact">
-            CONTACT
-          </a>
         </div>
       </div>
 
