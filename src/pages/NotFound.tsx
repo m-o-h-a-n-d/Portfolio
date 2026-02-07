@@ -20,14 +20,33 @@ const NotFound = ({
   const errorCode = state?.code?.toString() || defaultCode.toString();
   const errorMessage = state?.message || defaultMessage;
 
+  const visorRef = useRef<HTMLCanvasElement | null>(null);
   const cordRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
+    const visor = visorRef.current;
     const cordCanvas = cordRef.current;
-    if (!cordCanvas) return;
+    if (!visor || !cordCanvas) return;
 
+    const visorCtx = visor.getContext("2d");
     const cordCtx = cordCanvas.getContext("2d");
-    if (!cordCtx) return;
+    if (!visorCtx || !cordCtx) return;
+
+    const drawVisor = () => {
+      visorCtx.clearRect(0, 0, visor.width, visor.height);
+      visorCtx.beginPath();
+      visorCtx.moveTo(5, 45);
+      visorCtx.bezierCurveTo(15, 64, 45, 64, 55, 45);
+      visorCtx.lineTo(55, 20);
+      visorCtx.bezierCurveTo(55, 15, 50, 10, 45, 10);
+      visorCtx.lineTo(15, 10);
+      visorCtx.bezierCurveTo(15, 10, 5, 10, 5, 20);
+      visorCtx.lineTo(5, 45);
+      visorCtx.fillStyle = "#2f3640";
+      visorCtx.strokeStyle = "#f5f6fa";
+      visorCtx.fill();
+      visorCtx.stroke();
+    };
 
     let y1 = 0.35;
     let y2 = 0.45;
@@ -50,8 +69,12 @@ const NotFound = ({
       const h = cordCanvas.height || 1;
       cordCtx.clearRect(0, 0, w, h);
       cordCtx.beginPath();
-      cordCtx.moveTo(w * 0.05, h * 0.25);
-      cordCtx.bezierCurveTo(w * 0.35, y1 * h, w * 0.7, y2 * h, w * 0.98, y3 * h);
+      
+      // Start from the bottom-right corner of the canvas (where it meets the astronaut)
+      cordCtx.moveTo(w * 0.98, h * 0.7); 
+      // Draw bezier curve towards the bottom-right of the screen
+      cordCtx.bezierCurveTo(w * 0.7, y2 * h, w * 0.35, y1 * h, w * 0.05, h * 0.95);
+      
       cordCtx.strokeStyle = "#f2f2f2";
       cordCtx.lineWidth = 6;
       cordCtx.stroke();
@@ -68,6 +91,7 @@ const NotFound = ({
       y3Forward ? (y3 += 0.002) : (y3 -= 0.002);
     };
 
+    drawVisor();
     resize();
     animate();
     window.addEventListener("resize", resize);
@@ -101,15 +125,32 @@ const NotFound = ({
         </div>
       </div>
 
-      <div className="astronaut-container">
+      <div className="astronaut">
+        <div className="astronaut__backpack"></div>
+        <div className="astronaut__body"></div>
+        <div className="astronaut__body__chest"></div>
+        <div className="astronaut__arm-left1"></div>
+        <div className="astronaut__arm-left2"></div>
+        <div className="astronaut__arm-right1"></div>
+        <div className="astronaut__arm-right2"></div>
+        <div className="astronaut__arm-thumb-left"></div>
+        <div className="astronaut__arm-thumb-right"></div>
+        <div className="astronaut__leg-left"></div>
+        <div className="astronaut__leg-right"></div>
+        <div className="astronaut__foot-left"></div>
+        <div className="astronaut__foot-right"></div>
+        <div className="astronaut__wrist-left"></div>
+        <div className="astronaut__wrist-right"></div>
+
         <div className="astronaut__cord">
-          <canvas ref={cordRef} id="cord" height="240" width="360"></canvas>
+          <canvas ref={cordRef} id="cord" height="300" width="400"></canvas>
         </div>
-        <img 
-          src="/images/astronaut.png" 
-          alt="Astronaut" 
-          className="astronaut-image"
-        />
+
+        <div className="astronaut__head">
+          <canvas ref={visorRef} id="visor" width="60" height="60"></canvas>
+          <div className="astronaut__head-visor-flare1"></div>
+          <div className="astronaut__head-visor-flare2"></div>
+        </div>
       </div>
     </div>
   );
