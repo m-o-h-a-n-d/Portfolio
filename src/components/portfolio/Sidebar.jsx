@@ -229,9 +229,9 @@ function limitWords(text, limit = 2) {
                 />
               </div>
               <div className="text-center">
-                <h3 className="text-[24px] md:text-[32px] text-white-2 font-bold mb-2 tracking-tight">
+                <h1 className="text-[24px] md:text-[32px] text-white-2 font-bold mb-2 tracking-tight">
                   {profile.name}
-                </h3>
+                </h1>
                 <p className="text-primary font-medium">{profile.title}</p>
               </div>
             </div>
