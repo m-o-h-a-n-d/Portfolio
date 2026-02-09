@@ -36,6 +36,15 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   const finalJobTitle =
     jobTitle || profileData?.title || "Full Stack Web Developer";
 
+  const finalSiteName =
+    settingsData?.site_name ||
+    settingsData?.site_identity?.site_name ||
+    "مهند أحمد";
+
+  const finalAlternateSiteName =
+    settingsData?.site_identity?.alternate_name ||
+    "Mohanad Ahmed";
+
   // ✅ نص عربي صحيح (بدون encoding)
   const fallbackDescription =
     "Mohanad Ahmed Shehata - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير تطبيقات الويب المتكاملة وبناء حلول Backend احترافية.";
@@ -72,7 +81,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
         settingsData?.site_identity?.logo
     ) || "https://mohanadahmed.me/image.png";
 
-  const structuredData = {
+  const personStructuredData = {
     "@context": "https://schema.org",
     "@type": "Person",
     name: finalName,
@@ -80,6 +89,14 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
     url: finalWebsiteUrl,
     image: finalImageUrl,
     description: finalDescription,
+  };
+
+  const websiteStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    name: finalSiteName,
+    alternateName: finalAlternateSiteName,
+    url: finalWebsiteUrl,
   };
 
   return (
@@ -114,6 +131,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       <meta property="og:image:height" content="630" />
       <meta property="og:url" content={finalWebsiteUrl} />
       <meta property="og:type" content="website" />
+      <meta property="og:site_name" content={finalSiteName} />
 
       {/* Twitter */}
       <meta
@@ -145,7 +163,13 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{
-          __html: JSON.stringify(structuredData),
+          __html: JSON.stringify(personStructuredData),
+        }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(websiteStructuredData),
         }}
       />
     </Helmet>
