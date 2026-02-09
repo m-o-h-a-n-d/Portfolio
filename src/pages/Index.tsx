@@ -8,8 +8,8 @@ const Index = () => {
       <SeoHead
         name="Mohanad Ahmed Shehata (مهند أحمد شحاتة)"
         jobTitle="Full Stack Web Developer"
-        websiteUrl="https://mohanadportfolio.vercel.app/"
-        imageUrl="https://mohanadportfolio.vercel.app/image.png"
+        websiteUrl="https://mohanadahmed.me/"
+        imageUrl="https://mohanadahmed.me/image.png"
       />
       <SpaceBackground />
       <PortfolioLayout />
