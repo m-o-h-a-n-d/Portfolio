@@ -1,9 +1,8 @@
-﻿import React, { useEffect, useState } from 'react';
-import { Helmet } from 'react-helmet-async';
-import { apiGet } from '../api/request';
-import { PORTFOLIO_ENDPOINTS } from '../api/endpoints';
+﻿import React, { useEffect, useState } from "react";
+import { Helmet } from "react-helmet-async";
+import { apiGet } from "../api/request";
+import { PORTFOLIO_ENDPOINTS } from "../api/endpoints";
 
-// Optimized SEO Component for Mohanad Ahmed Portfolio
 const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   const [profileData, setProfileData] = useState(null);
   const [settingsData, setSettingsData] = useState(null);
@@ -13,43 +12,69 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       try {
         const [profileRes, settingsRes] = await Promise.all([
           apiGet(PORTFOLIO_ENDPOINTS.profile.get),
-          apiGet(PORTFOLIO_ENDPOINTS.settings.get)
+          apiGet(PORTFOLIO_ENDPOINTS.settings.get),
         ]);
+
         setProfileData(profileRes?.data || profileRes || null);
-        const settingsList = settingsRes?.data?.settings || settingsRes?.data || [];
-        const settingsItem = Array.isArray(settingsList) ? settingsList[0] : settingsList;
+
+        const settingsList =
+          settingsRes?.data?.settings || settingsRes?.data || [];
+        const settingsItem = Array.isArray(settingsList)
+          ? settingsList[0]
+          : settingsList;
+
         setSettingsData(settingsItem || null);
-      } catch (err) {
-      }
+      } catch (err) {}
     };
 
     fetchSeoData();
   }, []);
 
-  const finalName = name || profileData?.name || 'Mohanad Ahmed Shehata';
-  const finalJobTitle = jobTitle || profileData?.title || 'Full Stack Web Developer';
-  
-  // Priority: Prop description > Profile 'about' data > Default fallback
-  const fallbackDescription = 'Mohanad Ahmed Shehata - Full Stack Web Developer (React.js & Laravel). Ù…ØªØ®ØµØµ ÙÙŠ ØªØ·ÙˆÙŠØ± ØªØ·Ø¨ÙŠÙ‚Ø§Øª Ø§Ù„ÙˆÙŠØ¨ Ø§Ù„Ù…ØªÙƒØ§Ù…Ù„Ø© ÙˆØ­Ù„ÙˆÙ„ Ø§Ù„Ù€ Backend Ø§Ù„Ù…ØªÙ‚Ø¯Ù…Ø©.';
-  const finalDescription = (description || profileData?.about || fallbackDescription).substring(0, 155);
+  const finalName =
+    name || profileData?.name || "Mohanad Ahmed Shehata";
 
-  const finalWebsiteUrl = websiteUrl || 'https://mohanadportfolio.vercel.app/';
+  const finalJobTitle =
+    jobTitle || profileData?.title || "Full Stack Web Developer";
+
+  // ✅ نص عربي صحيح (بدون encoding)
+  const fallbackDescription =
+    "Mohanad Ahmed Shehata - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير تطبيقات الويب المتكاملة وبناء حلول Backend احترافية.";
+
+  const finalDescription = (
+    description ||
+    profileData?.about ||
+    fallbackDescription
+  ).substring(0, 155);
+
+  // ✅ الدومين الأساسي
+  const finalWebsiteUrl =
+    websiteUrl || "https://mohanadahmed.me/";
 
   const normalizeUrl = (url) => {
-    if (!url || typeof url !== 'string') return '';
-    if (url.startsWith('http://')) return url.replace('http://', 'https://');
+    if (!url || typeof url !== "string") return "";
+    if (url.startsWith("http://"))
+      return url.replace("http://", "https://");
     return url;
   };
 
-  // Dynamic Favicon from settings (force https to avoid mixed-content block)
-  const finalFavicon = normalizeUrl(settingsData?.favicon || settingsData?.site_identity?.favicon_url || settingsData?.site_identity?.favicon) || '/favicon.ico';
+  const finalFavicon =
+    normalizeUrl(
+      settingsData?.favicon ||
+        settingsData?.site_identity?.favicon_url ||
+        settingsData?.site_identity?.favicon
+    ) || "/favicon.ico";
 
-  // Dynamic Preview Image (can also be linked to settings if needed)
-  const finalImageUrl = normalizeUrl(imageUrl || settingsData?.logo || settingsData?.site_identity?.logo_url || settingsData?.site_identity?.logo) || 'https://mohanadportfolio.vercel.app/image.png';
+  const finalImageUrl =
+    normalizeUrl(
+      imageUrl ||
+        settingsData?.logo ||
+        settingsData?.site_identity?.logo_url ||
+        settingsData?.site_identity?.logo
+    ) || "https://mohanadahmed.me/image.png";
 
   const structuredData = {
-    '@context': 'https://schema.org',
-    '@type': 'Person',
+    "@context": "https://schema.org",
+    "@type": "Person",
     name: finalName,
     jobTitle: finalJobTitle,
     url: finalWebsiteUrl,
@@ -61,18 +86,28 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
     <Helmet>
       {/* Basic Meta */}
       <meta charSet="UTF-8" />
-      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+      />
+
       <title>{`${finalName} - ${finalJobTitle}`}</title>
+
       <meta name="description" content={finalDescription} />
+
       <meta
         name="keywords"
-        content={`${finalName}, Ù…Ù‡Ù†Ø¯ Ø£Ø­Ù…Ø¯ Ø´Ø­Ø§ØªØ©, ${finalJobTitle}, Ù…Ø·ÙˆØ± ÙˆÙŠØ¨, Ù…Ø·ÙˆØ± Ù…ÙˆØ§Ù‚Ø¹ Ù…ØªÙƒØ§Ù…Ù„, Ù…Ù‡Ù†Ø¯ Ù…Ø·ÙˆØ± Laravel, Mohanad Backend Laravel, Mohanad Full Stack with Laravel and React, Full Stack Web Developer (React.js - Laravel), portfolio, React, Laravel, Web Developer, PHP, JavaScript`}
+        content={`${finalName}, مهند أحمد شحاته, ${finalJobTitle}, مطور ويب, مطور مواقع, مطور Laravel, مطور React, Full Stack Developer, Laravel, React, PHP, JavaScript`}
       />
+
       <meta name="author" content={finalName} />
       <meta name="robots" content="index, follow" />
 
-      {/* Open Graph / Facebook / WhatsApp */}
-      <meta property="og:title" content={`${finalName} - ${finalJobTitle}`} />
+      {/* Open Graph */}
+      <meta
+        property="og:title"
+        content={`${finalName} - ${finalJobTitle}`}
+      />
       <meta property="og:description" content={finalDescription} />
       <meta property="og:image" content={finalImageUrl} />
       <meta property="og:image:width" content="1200" />
@@ -81,14 +116,29 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       <meta property="og:type" content="website" />
 
       {/* Twitter */}
-      <meta name="twitter:card" content="summary_large_image" />
-      <meta name="twitter:title" content={`${finalName} - ${finalJobTitle}`} />
-      <meta name="twitter:description" content={finalDescription} />
-      <meta name="twitter:image" content={finalImageUrl} />
+      <meta
+        name="twitter:card"
+        content="summary_large_image"
+      />
+      <meta
+        name="twitter:title"
+        content={`${finalName} - ${finalJobTitle}`}
+      />
+      <meta
+        name="twitter:description"
+        content={finalDescription}
+      />
+      <meta
+        name="twitter:image"
+        content={finalImageUrl}
+      />
 
-      {/* Dynamic Favicon */}
+      {/* Icons + Canonical */}
       <link rel="icon" href={finalFavicon} />
-      <link rel="apple-touch-icon" href={finalFavicon} />
+      <link
+        rel="apple-touch-icon"
+        href={finalFavicon}
+      />
       <link rel="canonical" href={finalWebsiteUrl} />
 
       {/* JSON-LD */}
