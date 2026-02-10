@@ -5,7 +5,7 @@ import { BASE_URL } from "./endpoints";
 // CONFIGURATION
 // ============================================================
 // Toggle this flag to switch between mock and real API
-export const MOCK_MODE = false;
+export const MOCK_MODE = true;
 
 // ============================================================
 // CONTACT US ENDPOINTS (REAL API TESTING)
@@ -70,39 +70,39 @@ export const isAuthenticated = () => !!getAuthToken();
  * Add endpoint strings or regex patterns to this array.
  */
 const FORCE_REAL_API_ENDPOINTS = [
-  CONTACT_US_ENDPOINTS.list,
-  "/admin/contact-us/read",
-  "/admin/contact-us/delete",
-  CONTACT_US_ENDPOINTS.store, 
-  "/auth/login",
-  "/auth/forgot-password",
-  "/auth/verify-otp",
-  "/auth/reset-password",
-  "/admin/auth/logout",
-  "/user",
-  "/service",
-  "/portfolio",
-  "/setting",
-  "/team",
-  "/certificate",
-  "/blog",
-  "/resume",
-  "/skill",
-  "/experience",
-  "/education",
-  "/admin/user",
-  "/admin/user/update",
-  "/admin/education",
-  "/admin/experience",
-  "/admin/skill",
-  "/admin/blog",
-  "/admin/certification",
-  "/admin/portfolio",
-  "/admin/setting",
-  "/admin/team",
-  "/admin/service",
-  "/admin/resume",
-  "/admin/contact-us"
+  // CONTACT_US_ENDPOINTS.list,
+  // "/admin/contact-us/read",
+  // "/admin/contact-us/delete",
+  // CONTACT_US_ENDPOINTS.store, 
+  // "/auth/login",
+  // "/auth/forgot-password",
+  // "/auth/verify-otp",
+  // "/auth/reset-password",
+  // "/admin/auth/logout",
+  // "/user",
+  // "/service",
+  // "/portfolio",
+  // "/setting",
+  // "/team",
+  // "/certificate",
+  // "/blog",
+  // "/resume",
+  // "/skill",
+  // "/experience",
+  // "/education",
+  // "/admin/user",
+  // "/admin/user/update",
+  // "/admin/education",
+  // "/admin/experience",
+  // "/admin/skill",
+  // "/admin/blog",
+  // "/admin/certification",
+  // "/admin/portfolio",
+  // "/admin/setting",
+  // "/admin/team",
+  // "/admin/service",
+  // "/admin/resume",
+  // "/admin/contact-us"
 
 ];
 
