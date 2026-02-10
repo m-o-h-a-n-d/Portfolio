@@ -40,17 +40,29 @@ import settingsData from "./mockData/settings.json";
 // Mock data mapping
 const mockDataMap = {
   "/user": profileData,
+  "/user/data": profileData,
+  "/admin/user": profileData,
   "/education": educationData,
+  "/admin/education": educationData,
   "/experience": experienceData,
+  "/admin/experience": experienceData,
   "/skill": skillsData,
+  "/admin/skill": skillsData,
   "/resume": resumeOrderData,
+  "/admin/resume": resumeOrderData,
   "/portfolio": portfolioData,
+  "/admin/portfolio": portfolioData,
   "/blog": blogData,
+  "/admin/blog": blogData,
   "/messages": messagesData,
   "/service": servicesData,
+  "/admin/service": servicesData,
   "/certificate": certificatesData,
+  "/admin/certification": certificatesData,
   "/team": teamData,
-  "/setting": settingsData
+  "/admin/team": teamData,
+  "/setting": settingsData,
+  "/admin/setting": settingsData
 };
 
 // ============================================================

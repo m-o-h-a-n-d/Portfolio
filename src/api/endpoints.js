@@ -1,6 +1,6 @@
 /* src/api/endpoints.js */
 
-export const BASE_URL = "https://portfoliomo.up.railway.app/api";
+export const BASE_URL = "https://portfolio.test/api";
 
 
 // ==========================================
