@@ -5,7 +5,7 @@ import { BASE_URL } from "./endpoints";
 // CONFIGURATION
 // ============================================================
 // Toggle this flag to switch between mock and real API
-export const MOCK_MODE = true;
+export const MOCK_MODE = false;
 
 // ============================================================
 // CONTACT US ENDPOINTS (REAL API TESTING)
