@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
-import { apiGet, apiPut } from '../../api/request';
+import { apiGet, apiPost } from '../../api/request';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import { Save, Globe, Upload, FileText } from 'lucide-react';
 import Swal from '../../lib/swal';
@@ -101,7 +101,8 @@ const SettingsManager = () => {
       if (logoFile) formPayload.append('logo', logoFile);
       if (faviconFile) formPayload.append('favicon', faviconFile);
       if (cvFile) formPayload.append('cv', cvFile);
-      await apiPut(DASHBOARD_ENDPOINTS.settings.update, formPayload);
+      formPayload.append('_method', 'PUT');
+      await apiPost(DASHBOARD_ENDPOINTS.settings.update, formPayload);
       Swal.fire({
         icon: 'success',
         title: 'Success',

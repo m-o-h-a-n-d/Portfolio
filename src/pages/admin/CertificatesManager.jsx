@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
-import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
+import { apiGet, apiPost, apiDelete } from '../../api/request';
 import { Plus, Edit2, Trash2, X, Save, Award, Search, ZoomIn } from 'lucide-react';
 import Swal from '../../lib/swal';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
@@ -120,18 +120,13 @@ const CertificatesManager = () => {
         formPayload.append('image', formData.imageFile);
       }
 
-      const response = modalMode === 'add'
-        ? await apiPost(DASHBOARD_ENDPOINTS.certification.store, formPayload)
-        : await apiPut(DASHBOARD_ENDPOINTS.certification.update(editingItem.id), formPayload);
-      
-      const responseList = response?.data?.certifications;
-      if (Array.isArray(responseList)) {
-        const sortedList = [...responseList].sort((a, b) => (a.order || 0) - (b.order || 0));
-        setCertificates(sortedList);
-        setFilteredCertificates(sortedList);
-      } else {
-        await fetchCertificates();
-      }
+      await (modalMode === 'add'
+        ? apiPost(DASHBOARD_ENDPOINTS.certification.store, formPayload)
+        : (() => {
+            formPayload.append('_method', 'PUT');
+            return apiPost(DASHBOARD_ENDPOINTS.certification.update(editingItem.id), formPayload);
+          })());
+      await fetchCertificates();
 
       closeModal();
       Swal.fire({
@@ -222,7 +217,8 @@ const CertificatesManager = () => {
         certificates.map((certificate) => {
           const formPayload = new FormData();
           formPayload.append('order', String(certificate.order ?? 0));
-          return apiPut(DASHBOARD_ENDPOINTS.certification.update(certificate.id), formPayload);
+          formPayload.append('_method', 'PUT');
+          return apiPost(DASHBOARD_ENDPOINTS.certification.update(certificate.id), formPayload);
         })
       );
       

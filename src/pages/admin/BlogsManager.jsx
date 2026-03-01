@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
-import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
+import { apiGet, apiPost, apiDelete } from '../../api/request';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import {
   Plus,
@@ -134,17 +134,13 @@ const BlogsManager = () => {
         formPayload.append('image', formData.imageFile);
       }
 
-      const response = modalMode === 'add'
-        ? await apiPost(DASHBOARD_ENDPOINTS.blog.store, formPayload)
-        : await apiPut(DASHBOARD_ENDPOINTS.blog.update(editingItem.id), formPayload);
-      
-      const responseList = response?.data?.blogs;
-      if (Array.isArray(responseList)) {
-        setBlogs(responseList);
-        setFilteredBlogs(responseList);
-      } else {
-        await fetchBlogs();
-      }
+      await (modalMode === 'add'
+        ? apiPost(DASHBOARD_ENDPOINTS.blog.store, formPayload)
+        : (() => {
+            formPayload.append('_method', 'PUT');
+            return apiPost(DASHBOARD_ENDPOINTS.blog.update(editingItem.id), formPayload);
+          })());
+      await fetchBlogs();
 
       closeModal();
       Swal.fire({

@@ -27,6 +27,11 @@ const serviceIcons = {
   hardware: Cpu
 };
 
+const limitText = (text, limit = 40) => {
+  if (!text) return '';
+  return text.length > limit ? `${text.slice(0, limit).trim()}...` : text;
+};
+
 
 const AboutSection = () => {
   const profile = useProfile();
@@ -88,10 +93,10 @@ const AboutSection = () => {
       <section className="text-light-gray text-[18px] font-light leading-relaxed mb-9 text-left relative">
         <div className={`transition-all duration-500 overflow-hidden ${!isExpanded ? 'max-h-[150px]' : 'max-h-[2000px]'}`}>
           {typeof profile.about === 'string' ? (
-            <p className="mb-4 text-left ">{profile.about}</p>
+            <p className="mb-4 text-left whitespace-pre-line">{profile.about}</p>
           ) : Array.isArray(profile.about) ? (
             profile.about.map((paragraph, index) => (
-              <p key={index} className="mb-4 text-left ">{paragraph}</p>
+              <p key={index} className="mb-4 text-left whitespace-pre-line">{paragraph}</p>
             ))
           ) : null}
         </div>
@@ -169,7 +174,12 @@ const AboutSection = () => {
                   
                   {/* Certificate Title */}
                   <div className="p-[15px] md:p-[20px]">
-                    <h4 className="h4 text-white-2 truncate text-left text-sm">{certificate.name}</h4>
+                    <h4
+                      className="h4 text-white-2 text-left text-sm line-clamp-2 min-h-[40px]"
+                      title={certificate.name}
+                    >
+                      {limitText(certificate.name)}
+                    </h4>
                     <time className="text-light-gray/70 text-xs font-medium block mt-2 text-left">
                       {new Date(certificate.date).toLocaleDateString('en-GB', { 
                         month: 'short', 

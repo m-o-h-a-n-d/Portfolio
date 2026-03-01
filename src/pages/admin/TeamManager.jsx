@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
-import { apiGet, apiPost, apiPut, apiDelete } from '../../api/request';
+import { apiGet, apiPost, apiDelete } from '../../api/request';
 import { Plus, Edit2, Trash2, X, Save, Image as ImageIcon, Link as LinkIcon, Search, Briefcase } from 'lucide-react';
 import Swal from '../../lib/swal';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
@@ -13,6 +13,8 @@ const TeamManager = () => {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalMode, setModalMode] = useState('add');
   const [editingItem, setEditingItem] = useState(null);
+  const [saving, setSaving] = useState(false);
+  const [logoCacheKey, setLogoCacheKey] = useState(Date.now());
   const [fieldErrors, setFieldErrors] = useState({});
   const [formData, setFormData] = useState({
     name: '',
@@ -25,6 +27,20 @@ const TeamManager = () => {
   useEffect(() => {
     fetchTeam();
   }, []);
+
+  useEffect(() => {
+    const query = searchQuery.trim().toLowerCase();
+    if (!query) {
+      setFilteredTeam(team);
+      return;
+    }
+    setFilteredTeam(
+      team.filter((member) =>
+        member.name.toLowerCase().includes(query) ||
+        (member.track && member.track.toLowerCase().includes(query))
+      )
+    );
+  }, [team, searchQuery]);
 
   const fetchTeam = async () => {
     try {
@@ -73,13 +89,7 @@ const TeamManager = () => {
   };
 
   const handleSearch = (e) => {
-    const query = e.target.value.toLowerCase();
-    setSearchQuery(query);
-    const filtered = team.filter(member => 
-      member.name.toLowerCase().includes(query) || 
-      (member.track && member.track.toLowerCase().includes(query))
-    );
-    setFilteredTeam(filtered);
+    setSearchQuery(e.target.value);
   };
 
   const handleImageUpload = (e) => {
@@ -93,6 +103,7 @@ const TeamManager = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
+      setSaving(true);
       setFieldErrors({});
       if (modalMode === 'add' && !formData.logoFile) {
         setFieldErrors({ logo: 'Member photo is required.' });
@@ -109,37 +120,45 @@ const TeamManager = () => {
 
       const response = modalMode === 'add'
         ? await apiPost(DASHBOARD_ENDPOINTS.team.store, formPayload)
-        : await apiPut(DASHBOARD_ENDPOINTS.team.update(editingItem.id), formPayload);
-      
-      // Use returned data for real-time update
-      const savedMember = response.member || response.data || {
-        id: editingItem?.id || Date.now(),
-        name: formData.name,
-        track: formData.track,
-        url: formData.url || '#',
-        logo: formData.logoPreview
-      };
+        : await (() => {
+            formPayload.append('_method', 'PUT');
+            return apiPost(DASHBOARD_ENDPOINTS.team.update(editingItem.id), formPayload);
+          })();
+      if (!response) return;
 
-      if (modalMode === 'add') {
-        setTeam(prev => {
-          const updated = [...prev, savedMember];
-          setFilteredTeam(updated); // Force immediate render
-          return updated;
-        });
+      const responseTeamList = response?.data?.teams || response?.teams;
+      if (Array.isArray(responseTeamList)) {
+        setTeam(responseTeamList);
       } else {
-        setTeam(prev => {
-          const updated = prev.map(c => c.id === (editingItem?.id || savedMember.id) ? savedMember : c);
-          setFilteredTeam(updated); // Force immediate render
-          return updated;
-        });
+        const savedMember =
+          response?.data?.team ||
+          response?.team ||
+          response?.data?.member ||
+          response?.member ||
+          null;
+
+        if (savedMember && typeof savedMember === 'object') {
+          if (modalMode === 'add') {
+            setTeam((prev) => [...prev, savedMember]);
+          } else {
+            setTeam((prev) =>
+              prev.map((member) =>
+                member.id === editingItem?.id ? { ...member, ...savedMember } : member
+              )
+            );
+          }
+        } else {
+          await fetchTeam();
+        }
       }
+      setLogoCacheKey(Date.now());
 
       closeModal();
       Swal.fire({
         icon: 'success',
         title: 'Success!',
         text: `Team member ${modalMode === 'add' ? 'added' : 'updated'} successfully!`,
-        timer: 2000,
+        timer: 1200,
         showConfirmButton: false,
       });
     } catch (error) {
@@ -149,6 +168,8 @@ const TeamManager = () => {
         title: 'Error',
         text: 'Error saving team member',
       });
+    } finally {
+      setSaving(false);
     }
   };
 
@@ -220,7 +241,11 @@ const TeamManager = () => {
             style={{ background: 'var(--bg-gradient-jet)' }}
           >
             <div className="w-24 h-24 rounded-xl bg-onyx border border-border flex items-center justify-center overflow-hidden">
-              <img src={member.logo} alt={member.name} className="w-full h-full object-cover transition-all" />
+              <img
+                src={member.logo ? `${member.logo}${member.logo.includes('?') ? '&' : '?'}v=${logoCacheKey}` : ''}
+                alt={member.name}
+                className="w-full h-full object-cover transition-all"
+              />
             </div>
             <div className="text-center">
               <h3 className="text-foreground font-medium">{member.name}</h3>
@@ -302,9 +327,9 @@ const TeamManager = () => {
 
               <div className="flex gap-4 mt-6">
                 <button type="button" onClick={closeModal} className="flex-1 px-4 py-3 rounded-xl bg-onyx text-muted-foreground">Cancel</button>
-                <button type="submit" className="form-btn !w-auto flex-1">
+                <button type="submit" disabled={saving} className="form-btn !w-auto flex-1 disabled:opacity-70 disabled:cursor-not-allowed">
                   <Save className="w-5 h-5" />
-                  <span>{modalMode === 'add' ? 'Add' : 'Save'}</span>
+                  <span>{saving ? 'Saving...' : modalMode === 'add' ? 'Add' : 'Save'}</span>
                 </button>
               </div>
             </form>

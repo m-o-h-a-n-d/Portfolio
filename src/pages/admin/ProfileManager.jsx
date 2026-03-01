@@ -1,5 +1,5 @@
 ﻿import { useState, useEffect } from 'react';
-import { apiGet, apiPut } from '../../api/request';
+import { apiGet, apiPost } from '../../api/request';
 import { DASHBOARD_ENDPOINTS } from '../../api/endpoints';
 import { Save, Upload, User, Share2 } from 'lucide-react';
 import Swal from '../../lib/swal';
@@ -89,7 +89,8 @@ const ProfileManager = () => {
       Object.entries(socialLinks).forEach(([key, value]) => {
         formData.append(`social_links[${key}]`, value || '');
       });
-      await apiPut(DASHBOARD_ENDPOINTS.user.update, formData);
+      formData.append('_method', 'PUT');
+      await apiPost(DASHBOARD_ENDPOINTS.user.update, formData);
       Swal.fire({
         icon: 'success',
         title: 'Success!',
