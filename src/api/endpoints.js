@@ -1,6 +1,6 @@
 /* src/api/endpoints.js */
 
-export const BASE_URL = "https://mohanad.cu.ma/api";
+export const BASE_URL = "https://api.mohanadahmed.me/api";
 
 
 // ==========================================
