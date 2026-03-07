@@ -16,12 +16,8 @@ const PortfolioLayout = () => {
   const navigate = useNavigate();
   const [activePage, setActivePage] = useState('about');
   const [direction, setDirection] = useState(0);
-  const [touchStart, setTouchStart] = useState(null);
-  const [touchEnd, setTouchEnd] = useState(null);
+  const [isDragging, setIsDragging] = useState(false);
   const contentRef = useRef(null);
-
-  // Minimum swipe distance (in pixels)
-  const minSwipeDistance = 50;
 
   const pages = ['about', 'resume', 'portfolio', 'blog', 'contact'];
   const pageIndex = pages.indexOf(activePage);
@@ -41,30 +37,6 @@ const PortfolioLayout = () => {
 
     setDirection(swipeDirection);
     setActivePage(page);
-  };
-
-  const onTouchStart = (e) => {
-    setTouchEnd(null);
-    setTouchStart(e.targetTouches[0].clientX);
-  };
-
-  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
-
-  const onTouchEnd = () => {
-    if (!touchStart || !touchEnd) return;
-    const distance = touchStart - touchEnd;
-    const isLeftSwipe = distance > minSwipeDistance;
-    const isRightSwipe = distance < -minSwipeDistance;
-
-    if (isLeftSwipe || isRightSwipe) {
-      if (isLeftSwipe && pageIndex < pages.length - 1) {
-        // Swipe Left -> Next Page
-        handlePageChange(pages[pageIndex + 1], 1);
-      } else if (isRightSwipe && pageIndex > 0) {
-        // Swipe Right -> Previous Page
-        handlePageChange(pages[pageIndex - 1], -1);
-      }
-    }
   };
 
   const renderPage = () => {
@@ -103,6 +75,19 @@ const PortfolioLayout = () => {
     }),
   };
 
+  const handleDragEnd = (event, info) => {
+    const swipeThreshold = 50;
+    const swipe = info.offset.x;
+
+    if (swipe < -swipeThreshold && pageIndex < pages.length - 1) {
+      // Swiped left -> next page
+      handlePageChange(pages[pageIndex + 1], 1);
+    } else if (swipe > swipeThreshold && pageIndex > 0) {
+      // Swiped right -> previous page
+      handlePageChange(pages[pageIndex - 1], -1);
+    }
+  };
+
   return (
     <main className="m-[15px_12px_75px] md:my-[60px] md:mb-[100px] min-w-[259px]">
         <div className="max-w-[1200px] mx-auto xl:flex xl:items-stretch xl:gap-[25px]">
@@ -115,16 +100,13 @@ const PortfolioLayout = () => {
           {/* Main Content Area */}
           <div 
             ref={contentRef}
-            className="flex-1 min-w-0 bg-card border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative overflow-hidden touch-pan-y"
-            onTouchStart={onTouchStart}
-            onTouchMove={onTouchMove}
-            onTouchEnd={onTouchEnd}
+            className="flex-1 min-w-0 bg-card border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative overflow-hidden"
           >
             
             {/* Navbar */}
             <Navbar activePage={activePage} onPageChange={handlePageChange} />
 
-            {/* Content Pages with Smooth Animation */}
+            {/* Content Pages with Flexible Drag Animation */}
             <div className="mt-4 md:mt-0 relative">
               <AnimatePresence initial={false} custom={direction} mode="wait">
                 <motion.div
@@ -138,6 +120,13 @@ const PortfolioLayout = () => {
                     x: { type: "spring", stiffness: 300, damping: 30 },
                     opacity: { duration: 0.2 },
                   }}
+                  drag="x"
+                  dragElastic={1}
+                  dragMomentum={true}
+                  onDragEnd={handleDragEnd}
+                  onDragStart={() => setIsDragging(true)}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
                 >
                   {renderPage()}
                 </motion.div>

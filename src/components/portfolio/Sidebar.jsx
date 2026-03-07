@@ -25,17 +25,11 @@ const Sidebar = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const profile = useProfile();
 
-  // Initialize sidebar state on first load
+  // Initialize sidebar state on first load - no animation
   useEffect(() => {
+    setIsExpanded(false);
     setIsInitialized(true);
   }, []);
-
-  // Ensure sidebar is collapsed on mobile when component mounts or screen resizes
-  useEffect(() => {
-    if (isMobile && isInitialized) {
-      setIsExpanded(false);
-    }
-  }, [isMobile, isInitialized]);
 
   if (!profile) return null;
 
@@ -71,7 +65,7 @@ function limitWords(text, limit = 2) {
         */
         ${isExpanded && isMobile ? 'max-h-[800px]' : isMobile ? 'max-h-[112px]' : 'md:max-h-[180px]'} 
         lg:max-h-max lg:h-auto
-        ${!isInitialized ? 'transition-none' : 'transition-all duration-500 ease-in-out'}
+        transition-all duration-500 ease-in-out
       `}
     >
       
