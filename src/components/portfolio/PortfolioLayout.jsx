@@ -20,6 +20,40 @@ const PortfolioLayout = () => {
   const navigate = useNavigate();
   const [activePage, setActivePage] = useState('about');
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [touchStart, setTouchStart] = useState(null);
+  const [touchEnd, setTouchEnd] = useState(null);
+
+  // Minimum swipe distance (in pixels)
+  const minSwipeDistance = 50;
+
+  const pages = ['about', 'resume', 'portfolio', 'blog', 'contact'];
+
+  const onTouchStart = (e) => {
+    setTouchEnd(null);
+    setTouchStart(e.targetTouches[0].clientX);
+  };
+
+  const onTouchMove = (e) => setTouchEnd(e.targetTouches[0].clientX);
+
+  const onTouchEnd = () => {
+    if (!touchStart || !touchEnd) return;
+    const distance = touchStart - touchEnd;
+    const isLeftSwipe = distance > minSwipeDistance;
+    const isRightSwipe = distance < -minSwipeDistance;
+
+    if (isLeftSwipe || isRightSwipe) {
+      const currentIndex = pages.indexOf(activePage);
+      if (currentIndex === -1) return;
+
+      if (isLeftSwipe && currentIndex < pages.length - 1) {
+        // Swipe Left -> Next Page
+        handlePageChange(pages[currentIndex + 1]);
+      } else if (isRightSwipe && currentIndex > 0) {
+        // Swipe Right -> Previous Page
+        handlePageChange(pages[currentIndex - 1]);
+      }
+    }
+  };
 
   useEffect(() => {
     if (location.pathname.startsWith('/project/')) {
@@ -71,7 +105,12 @@ const PortfolioLayout = () => {
   };
 
   return (
-    <main className="m-[15px_12px_75px] md:my-[60px] md:mb-[100px] min-w-[259px]">
+    <main 
+      className="m-[15px_12px_75px] md:my-[60px] md:mb-[100px] min-w-[259px] touch-pan-y"
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
         <div className="max-w-[1200px] mx-auto xl:flex xl:items-stretch xl:gap-[25px]">
           
           {/* Sidebar Area */}
