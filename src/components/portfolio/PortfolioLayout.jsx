@@ -10,10 +10,12 @@ import ContactSection from './ContactSection';
 import LoadingScreen from './LoadingScreen';
 import ProjectDetails from './ProjectDetails';
 import { useLocation, useNavigate } from 'react-router-dom';
+import { useIsMobile } from '../../hooks/use-mobile';
 
 const PortfolioLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
+  const isMobile = useIsMobile();
   const [activePage, setActivePage] = useState('about');
   const [direction, setDirection] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
@@ -76,6 +78,8 @@ const PortfolioLayout = () => {
   };
 
   const handleDragEnd = (event, info) => {
+    if (!isMobile) return; // Only allow drag on mobile
+    
     const swipeThreshold = 50;
     const swipe = info.offset.x;
 
@@ -106,7 +110,7 @@ const PortfolioLayout = () => {
             {/* Navbar */}
             <Navbar activePage={activePage} onPageChange={handlePageChange} />
 
-            {/* Content Pages with Flexible Drag Animation */}
+            {/* Content Pages with Flexible Drag Animation (Mobile Only) */}
             <div className="mt-4 md:mt-0 relative">
               <AnimatePresence initial={false} custom={direction} mode="wait">
                 <motion.div
@@ -120,13 +124,13 @@ const PortfolioLayout = () => {
                     x: { type: "spring", stiffness: 300, damping: 30 },
                     opacity: { duration: 0.2 },
                   }}
-                  drag="x"
-                  dragElastic={1}
-                  dragMomentum={true}
+                  drag={isMobile ? "x" : false}
+                  dragElastic={isMobile ? 1 : 0}
+                  dragMomentum={isMobile}
                   onDragEnd={handleDragEnd}
-                  onDragStart={() => setIsDragging(true)}
-                  dragConstraints={{ left: 0, right: 0 }}
-                  style={{ cursor: isDragging ? 'grabbing' : 'grab' }}
+                  onDragStart={() => isMobile && setIsDragging(true)}
+                  dragConstraints={isMobile ? { left: 0, right: 0 } : {}}
+                  style={{ cursor: isMobile && isDragging ? 'grabbing' : isMobile ? 'grab' : 'default' }}
                 >
                   {renderPage()}
                 </motion.div>

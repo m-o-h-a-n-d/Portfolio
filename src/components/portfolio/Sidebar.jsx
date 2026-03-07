@@ -25,11 +25,13 @@ const Sidebar = () => {
   const [isInitialized, setIsInitialized] = useState(false);
   const profile = useProfile();
 
-  // Initialize sidebar state on first load - no animation
+  // Initialize sidebar state on first load - no animation (mobile only)
   useEffect(() => {
-    setIsExpanded(false);
+    if (isMobile) {
+      setIsExpanded(false);
+    }
     setIsInitialized(true);
-  }, []);
+  }, [isMobile]);
 
   if (!profile) return null;
 
@@ -58,14 +60,15 @@ function limitWords(text, limit = 2) {
         bg-card/80 backdrop-blur-md border border-border rounded-[20px] shadow-portfolio-1 z-10 
         p-[15px] md:p-[30px] lg:p-[40px]
         overflow-hidden relative
+        ${!isMobile ? 'lg:overflow-visible' : ''}
         lg:sticky lg:top-[60px]
         /* التحكم في الارتفاع:
            - في الموبايل: مغلق (112px) أو مفتوح (max-h كبير)
            - في الديسك توب (lg): دائماً مفتوح (h-auto)
         */
-        ${isExpanded && isMobile ? 'max-h-[800px]' : isMobile ? 'max-h-[112px]' : 'md:max-h-[180px]'} 
+        ${isExpanded && isMobile ? 'max-h-[800px]' : isMobile ? 'max-h-[112px]' : 'max-h-none'} 
         lg:max-h-max lg:h-auto
-        transition-all duration-500 ease-in-out
+        ${isMobile ? 'transition-all duration-500 ease-in-out' : ''}
       `}
     >
       
@@ -105,6 +108,7 @@ function limitWords(text, limit = 2) {
         </div>
 
         {/* Toggle Button (Hidden on Large Screens) */}
+        {isMobile && (
         <button 
           onClick={() => setIsExpanded(!isExpanded)}
           className={`
@@ -124,13 +128,14 @@ function limitWords(text, limit = 2) {
             className={`w-4 h-4 md:w-5 md:h-5 transition-transform duration-300 text-primary ${isExpanded ? 'rotate-180' : ''}`} 
           />
         </button>
+        )}
 
       </div>
 
       {/* Info Section (Collapsible Content) */}
       <div className={`
-         mt-6 lg:mt-8 transition-opacity duration-500
-         ${isExpanded ? 'opacity-100' : 'opacity-0 lg:opacity-100'}
+         mt-6 lg:mt-8 ${isMobile ? 'transition-opacity duration-500' : ''}
+         ${isExpanded ? 'opacity-100' : isMobile ? 'opacity-0 lg:opacity-100' : 'opacity-100'}
       `}>
         
         <div className="separator my-6 bg-border h-[1px]" />
