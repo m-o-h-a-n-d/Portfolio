@@ -27,11 +27,9 @@ const Sidebar = () => {
 
   // Initialize sidebar state on first load - no animation (mobile only)
   useEffect(() => {
-    if (isMobile) {
-      setIsExpanded(false);
-    }
+    setIsExpanded(false);
     setIsInitialized(true);
-  }, [isMobile]);
+  }, []);
 
   if (!profile) return null;
 
