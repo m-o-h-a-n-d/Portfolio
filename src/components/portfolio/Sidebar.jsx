@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { createPortal } from 'react-dom';
 import { useProfile } from '../../context/DataContext';
+import { useIsMobile } from '../../hooks/use-mobile';
 import { 
   Mail, 
   Phone, 
@@ -18,9 +19,17 @@ import {
 
 const Sidebar = () => {
   // حالة التحكم في الفتح والإغلاق
+  const isMobile = useIsMobile();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
   const profile = useProfile();
+
+  // Ensure sidebar is collapsed on mobile when component mounts or screen resizes
+  useEffect(() => {
+    if (isMobile) {
+      setIsExpanded(false);
+    }
+  }, [isMobile]);
 
   if (!profile) return null;
 
@@ -54,7 +63,7 @@ function limitWords(text, limit = 2) {
            - في الموبايل: مغلق (112px) أو مفتوح (max-h كبير)
            - في الديسك توب (lg): دائماً مفتوح (h-auto)
         */
-        ${isExpanded ? 'max-h-[800px]' : 'max-h-[112px] md:max-h-[180px]'} 
+        ${isExpanded && isMobile ? 'max-h-[800px]' : isMobile ? 'max-h-[112px]' : 'md:max-h-[180px]'} 
         lg:max-h-max lg:h-auto
       `}
     >
