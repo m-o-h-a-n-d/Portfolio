@@ -22,14 +22,20 @@ const Sidebar = () => {
   const isMobile = useIsMobile();
   const [isExpanded, setIsExpanded] = useState(false);
   const [isAvatarModalOpen, setIsAvatarModalOpen] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
   const profile = useProfile();
+
+  // Initialize sidebar state on first load
+  useEffect(() => {
+    setIsInitialized(true);
+  }, []);
 
   // Ensure sidebar is collapsed on mobile when component mounts or screen resizes
   useEffect(() => {
-    if (isMobile) {
+    if (isMobile && isInitialized) {
       setIsExpanded(false);
     }
-  }, [isMobile]);
+  }, [isMobile, isInitialized]);
 
   if (!profile) return null;
 
@@ -57,7 +63,7 @@ function limitWords(text, limit = 2) {
       className={`
         bg-card/80 backdrop-blur-md border border-border rounded-[20px] shadow-portfolio-1 z-10 
         p-[15px] md:p-[30px] lg:p-[40px]
-        overflow-hidden transition-all duration-500 ease-in-out relative
+        overflow-hidden relative
         lg:sticky lg:top-[60px]
         /* التحكم في الارتفاع:
            - في الموبايل: مغلق (112px) أو مفتوح (max-h كبير)
@@ -65,6 +71,7 @@ function limitWords(text, limit = 2) {
         */
         ${isExpanded && isMobile ? 'max-h-[800px]' : isMobile ? 'max-h-[112px]' : 'md:max-h-[180px]'} 
         lg:max-h-max lg:h-auto
+        ${!isInitialized ? 'transition-none' : 'transition-all duration-500 ease-in-out'}
       `}
     >
       

@@ -1,9 +1,5 @@
-
-
-
-
-import { useState, useEffect } from 'react';
-// Removed redundant DataProvider import
+import { useState, useEffect, useRef } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import Sidebar from './Sidebar';
 import Navbar from './Navbar';
 import AboutSection from './AboutSection';
@@ -19,14 +15,33 @@ const PortfolioLayout = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const [activePage, setActivePage] = useState('about');
-  const [isTransitioning, setIsTransitioning] = useState(false);
+  const [direction, setDirection] = useState(0);
   const [touchStart, setTouchStart] = useState(null);
   const [touchEnd, setTouchEnd] = useState(null);
+  const contentRef = useRef(null);
 
   // Minimum swipe distance (in pixels)
   const minSwipeDistance = 50;
 
   const pages = ['about', 'resume', 'portfolio', 'blog', 'contact'];
+  const pageIndex = pages.indexOf(activePage);
+
+  useEffect(() => {
+    if (location.pathname.startsWith('/project/')) {
+      setActivePage('project-details');
+    }
+  }, [location]);
+
+  const handlePageChange = (page, swipeDirection = 0) => {
+    if (page === activePage) return;
+    
+    if (page !== 'project-details' && location.pathname !== '/') {
+      navigate('/');
+    }
+
+    setDirection(swipeDirection);
+    setActivePage(page);
+  };
 
   const onTouchStart = (e) => {
     setTouchEnd(null);
@@ -42,50 +57,17 @@ const PortfolioLayout = () => {
     const isRightSwipe = distance < -minSwipeDistance;
 
     if (isLeftSwipe || isRightSwipe) {
-      const currentIndex = pages.indexOf(activePage);
-      if (currentIndex === -1) return;
-
-      if (isLeftSwipe && currentIndex < pages.length - 1) {
+      if (isLeftSwipe && pageIndex < pages.length - 1) {
         // Swipe Left -> Next Page
-        handlePageChange(pages[currentIndex + 1]);
-      } else if (isRightSwipe && currentIndex > 0) {
+        handlePageChange(pages[pageIndex + 1], 1);
+      } else if (isRightSwipe && pageIndex > 0) {
         // Swipe Right -> Previous Page
-        handlePageChange(pages[currentIndex - 1]);
+        handlePageChange(pages[pageIndex - 1], -1);
       }
     }
   };
 
-  useEffect(() => {
-    if (location.pathname.startsWith('/project/')) {
-      setActivePage('project-details');
-    }
-  }, [location]);
-
-  const handlePageChange = (page) => {
-    if (page === activePage) return;
-    
-    if (page !== 'project-details' && location.pathname !== '/') {
-      navigate('/');
-    }
-
-    setIsTransitioning(true);
-    
-    // Simulate a short loading time for the transition effect
-    setTimeout(() => {
-      setActivePage(page);
-      setIsTransitioning(false);
-    }, 400);
-  };
-
   const renderPage = () => {
-    if (isTransitioning) {
-      return (
-        <div className="flex items-center justify-center w-full h-[400px]">
-          <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-        </div>
-      );
-    }
-
     switch (activePage) {
       case 'about':
         return <AboutSection />;
@@ -104,6 +86,23 @@ const PortfolioLayout = () => {
     }
   };
 
+  const slideVariants = {
+    enter: (dir) => ({
+      x: dir > 0 ? 1000 : -1000,
+      opacity: 0,
+    }),
+    center: {
+      zIndex: 1,
+      x: 0,
+      opacity: 1,
+    },
+    exit: (dir) => ({
+      zIndex: 0,
+      x: dir < 0 ? 1000 : -1000,
+      opacity: 0,
+    }),
+  };
+
   return (
     <main className="m-[15px_12px_75px] md:my-[60px] md:mb-[100px] min-w-[259px]">
         <div className="max-w-[1200px] mx-auto xl:flex xl:items-stretch xl:gap-[25px]">
@@ -115,7 +114,8 @@ const PortfolioLayout = () => {
 
           {/* Main Content Area */}
           <div 
-            className="flex-1 min-w-0 bg-card border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative touch-pan-y"
+            ref={contentRef}
+            className="flex-1 min-w-0 bg-card border border-border rounded-[20px] p-[15px] md:p-[30px] shadow-portfolio-1 relative overflow-hidden touch-pan-y"
             onTouchStart={onTouchStart}
             onTouchMove={onTouchMove}
             onTouchEnd={onTouchEnd}
@@ -124,9 +124,24 @@ const PortfolioLayout = () => {
             {/* Navbar */}
             <Navbar activePage={activePage} onPageChange={handlePageChange} />
 
-            {/* Content Pages */}
-            <div className="mt-4 md:mt-0">
-               {renderPage()}
+            {/* Content Pages with Smooth Animation */}
+            <div className="mt-4 md:mt-0 relative">
+              <AnimatePresence initial={false} custom={direction} mode="wait">
+                <motion.div
+                  key={activePage}
+                  custom={direction}
+                  variants={slideVariants}
+                  initial="enter"
+                  animate="center"
+                  exit="exit"
+                  transition={{
+                    x: { type: "spring", stiffness: 300, damping: 30 },
+                    opacity: { duration: 0.2 },
+                  }}
+                >
+                  {renderPage()}
+                </motion.div>
+              </AnimatePresence>
             </div>
             
           </div>
@@ -136,9 +151,3 @@ const PortfolioLayout = () => {
 };
 
 export default PortfolioLayout;
-
-
-
-
-
-
