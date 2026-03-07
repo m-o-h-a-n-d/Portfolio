@@ -7,7 +7,6 @@ import ResumeSection from './ResumeSection';
 import PortfolioSection from './PortfolioSection';
 import BlogSection from './BlogSection';
 import ContactSection from './ContactSection';
-import LoadingScreen from './LoadingScreen';
 import ProjectDetails from './ProjectDetails';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '../../hooks/use-mobile';
@@ -19,6 +18,7 @@ const PortfolioLayout = () => {
   const [activePage, setActivePage] = useState('about');
   const [direction, setDirection] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const contentRef = useRef(null);
 
   const pages = ['about', 'resume', 'portfolio', 'blog', 'contact'];
@@ -37,8 +37,16 @@ const PortfolioLayout = () => {
       navigate('/');
     }
 
-    setDirection(swipeDirection);
-    setActivePage(page);
+    if (!isMobile) {
+      setIsLoading(true);
+      setTimeout(() => {
+        setActivePage(page);
+        setIsLoading(false);
+      }, 300); // Small delay for the loading effect
+    } else {
+      setDirection(swipeDirection);
+      setActivePage(page);
+    }
   };
 
   const renderPage = () => {
@@ -110,36 +118,48 @@ const PortfolioLayout = () => {
             {/* Navbar */}
             <Navbar activePage={activePage} onPageChange={handlePageChange} />
 
-            {/* Content Pages with Flexible Drag Animation (Mobile Only) */}
-            <div className="mt-4 md:mt-0 relative">
+            {/* Content Pages */}
+            <div className="mt-4 md:mt-0 relative min-h-[400px]">
               <AnimatePresence initial={false} custom={direction} mode="wait">
-                <motion.div
-                  key={activePage}
-                  custom={direction}
-                  variants={slideVariants}
-                  initial="enter"
-                  animate="center"
-                  exit="exit"
-                  transition={{
-                    x: { type: "spring", stiffness: 300, damping: 30 },
-                    opacity: { duration: 0.2 },
-                  }}
-                  drag={isMobile ? "x" : false}
-                  dragElastic={isMobile ? 1 : 0}
-                  dragMomentum={isMobile}
-                  onDragEnd={handleDragEnd}
-                  onDragStart={() => isMobile && setIsDragging(true)}
-                  dragConstraints={isMobile ? { left: 0, right: 0 } : {}}
-                  style={{ cursor: isMobile && isDragging ? 'grabbing' : isMobile ? 'grab' : 'default' }}
-                >
-                  {renderPage()}
-                </motion.div>
+                {isLoading ? (
+                  <motion.div
+                    key="loader"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    className="absolute inset-0 flex items-center justify-center z-50 bg-card/50 backdrop-blur-sm"
+                  >
+                    <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key={activePage}
+                    custom={direction}
+                    variants={isMobile ? slideVariants : {}}
+                    initial={isMobile ? "enter" : { opacity: 0 }}
+                    animate={isMobile ? "center" : { opacity: 1 }}
+                    exit={isMobile ? "exit" : { opacity: 0 }}
+                    transition={isMobile ? {
+                      x: { type: "spring", stiffness: 300, damping: 30 },
+                      opacity: { duration: 0.2 },
+                    } : { duration: 0.2 }}
+                    drag={isMobile ? "x" : false}
+                    dragElastic={isMobile ? 1 : 0}
+                    dragMomentum={isMobile}
+                    onDragEnd={handleDragEnd}
+                    onDragStart={() => isMobile && setIsDragging(true)}
+                    dragConstraints={isMobile ? { left: 0, right: 0 } : {}}
+                    style={{ cursor: isMobile && isDragging ? 'grabbing' : isMobile ? 'grab' : 'default' }}
+                  >
+                    {renderPage()}
+                  </motion.div>
+                )}
               </AnimatePresence>
             </div>
             
           </div>
         </div>
-    </main>
+  </main>
   );
 };
 
