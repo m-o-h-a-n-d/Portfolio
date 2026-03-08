@@ -6,6 +6,7 @@ const API_URL = 'https://api.mohanadahmed.me/api/portfolio/ ';
 const fetchProjects = () => {
   return new Promise((resolve, reject) => {
     https.get(API_URL, (res) => {
+      
       let data = '';
       res.on('data', (chunk) => {
         data += chunk;
