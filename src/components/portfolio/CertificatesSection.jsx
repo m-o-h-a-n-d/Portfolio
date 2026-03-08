@@ -17,7 +17,7 @@ const CertificatesSection = ({ onBack }) => {
   const certificates = certificatesData.certificates || [];
 
   return (
-    <article className="animate-fade-in">
+    <article className="animate-fade-in pt-16 md:pt-20">
       <header className="flex justify-between items-center mb-8 gap-4">
         <button 
           onClick={onBack}
