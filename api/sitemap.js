@@ -1,7 +1,7 @@
 import https from 'https';
 
 const BASE_URL = 'https://mohanadahmed.me';
-const API_URL = 'https://portfolio.test/api/portfolio/';
+const API_URL = 'https://api.mohanadahmed.me/api/portfolio/';
 
 const fetchProjects = () => {
   return new Promise((resolve, reject) => {
