@@ -4,6 +4,7 @@ import { Swiper, SwiperSlide } from 'swiper/react';
 import { Autoplay, Navigation, Pagination, EffectFade } from 'swiper/modules';
 import { ExternalLink, Github, ArrowLeft, Share2, Users, Code, Calendar, Zap } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
+import { Helmet } from 'react-helmet-async';
 
 // Import Swiper styles
 import 'swiper/css';
@@ -80,8 +81,46 @@ const ProjectDetails = () => {
   };
 
   const projectImages = project.images || [project.image];
+  const pageTitle = `${project.title} | Mohanad Ahmed Shehata`;
+  const pageDescription = (project.short_desc || project.description || `Explore ${project.title} project details, technologies, and team members.`).slice(0, 155);
+  const canonicalUrl = `https://mohanadahmed.me/project/${encodeURIComponent(String(project.slug || project.id))}`;
+  const ogImage = project.image_cover || project.image || projectImages[0] || 'https://mohanadahmed.me/image.png';
+  const teamNames = projectTeam.map((member) => member.name).filter(Boolean);
+  const projectStructuredData = {
+    '@context': 'https://schema.org',
+    '@type': 'CreativeWork',
+    name: project.title,
+    description: pageDescription,
+    url: canonicalUrl,
+    image: ogImage,
+    contributor: teamNames.map((name) => ({ '@type': 'Person', name })),
+  };
 
   return (
+    <>
+    <Helmet>
+      <title>{pageTitle}</title>
+      <meta name="description" content={pageDescription} />
+      <meta name="robots" content="index, follow" />
+      <link rel="canonical" href={canonicalUrl} />
+
+      <meta property="og:type" content="article" />
+      <meta property="og:title" content={pageTitle} />
+      <meta property="og:description" content={pageDescription} />
+      <meta property="og:url" content={canonicalUrl} />
+      <meta property="og:image" content={ogImage} />
+
+      <meta name="twitter:card" content="summary_large_image" />
+      <meta name="twitter:title" content={pageTitle} />
+      <meta name="twitter:description" content={pageDescription} />
+      <meta name="twitter:image" content={ogImage} />
+
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(projectStructuredData) }}
+      />
+    </Helmet>
+
     <article className="animate-fade-in pt-16 md:pt-20">
       {/* Header */}
       <header className="flex justify-between items-center mb-8 gap-4">
@@ -185,16 +224,21 @@ const ProjectDetails = () => {
                   {projectTeam.map((member) => (
                     <li key={member.id} className="min-w-[75%] md:min-w-[190px] flex-shrink-0 snap-start">
                       <a href={member.url} target="_blank" rel="noopener noreferrer" className="block group text-center">
-                        <div className="relative w-full h-[150px] md:h-[170px] overflow-hidden bg-onyx mb-3 rounded-[14px]">
-                          <img 
-                            src={member.logo} 
-                            alt={member.name}
-                            className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
-                          />
-                          <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
-                        </div>
-                        <h4 className="text-white-1 font-medium text-lg mb-1">{member.name}</h4>
-                        <p className="text-orange-yellow text-sm">{member.track}</p>
+                        <figure>
+                          <div className="relative w-full h-[150px] md:h-[170px] overflow-hidden bg-onyx mb-3 rounded-[14px]">
+                            <img
+                              src={member.logo}
+                              alt={`${member.name}${member.track ? ` - ${member.track}` : ''}`}
+                              className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                              loading="lazy"
+                            />
+                            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors" />
+                          </div>
+                          <figcaption>
+                            <h4 className="text-white-1 font-medium text-lg mb-1">{member.name}</h4>
+                            <p className="text-orange-yellow text-sm">{member.track}</p>
+                          </figcaption>
+                        </figure>
                       </a>
                     </li>
                   ))}
@@ -311,6 +355,7 @@ const ProjectDetails = () => {
         </section>
       )}
     </article>
+    </>
   );
 };
 
