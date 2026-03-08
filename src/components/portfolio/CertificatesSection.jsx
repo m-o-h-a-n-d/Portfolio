@@ -26,7 +26,7 @@ const CertificatesSection = ({ onBack }) => {
           <ArrowLeft className="w-5 h-5" />
           <span className="hidden sm:inline">Back</span>
         </button>
-        <h2 className="h2 article-title !mb-0 text-center flex-1">All Certificates</h2>
+        <h2 className="h2 article-title !mb-0 text-center flex-1">Certifications</h2>
         <div className="w-10 sm:w-[60px]"></div> {/* Spacer to center title */}
       </header>
 
