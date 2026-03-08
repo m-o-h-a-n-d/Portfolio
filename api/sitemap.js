@@ -1,17 +1,21 @@
 import https from 'https';
 
 const BASE_URL = 'https://mohanadahmed.me';
-const API_URL = 'https://api.mohanadahmed.me/api/portfolio/ ';
+const API_URL = 'https://api.mohanadahmed.me/api/portfolio/';
 
 const fetchProjects = () => {
   return new Promise((resolve, reject) => {
     https.get(API_URL, (res) => {
-      
       let data = '';
       res.on('data', (chunk) => {
         data += chunk;
       });
       res.on('end', () => {
+        if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
+          reject(new Error(`API request failed with status ${res.statusCode}`));
+          return;
+        }
+
         try {
           const jsonData = JSON.parse(data);
           const projects = jsonData.data?.projects || jsonData.data || jsonData.projects || (Array.isArray(jsonData) ? jsonData : []);
