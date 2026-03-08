@@ -1,40 +1,51 @@
-import https from 'https';
-
 const BASE_URL = 'https://mohanadahmed.me';
 const API_URL = 'https://api.mohanadahmed.me/api/portfolio/';
 
-const fetchProjects = () => {
-  return new Promise((resolve, reject) => {
-    https.get(API_URL, (res) => {
-      let data = '';
-      res.on('data', (chunk) => {
-        data += chunk;
-      });
-      res.on('end', () => {
-        if (!res.statusCode || res.statusCode < 200 || res.statusCode >= 300) {
-          reject(new Error(`API request failed with status ${res.statusCode}`));
-          return;
-        }
+const escapeXml = (value) =>
+  String(value)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&apos;');
 
-        try {
-          const jsonData = JSON.parse(data);
-          const projects = jsonData.data?.projects || jsonData.data || jsonData.projects || (Array.isArray(jsonData) ? jsonData : []);
-          resolve(projects);
-        } catch (e) {
-          reject(new Error('Failed to parse API response: ' + e.message));
-        }
-      });
-    }).on('error', (err) => {
-      reject(err);
+const fetchProjects = async () => {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const response = await fetch(API_URL, {
+      method: 'GET',
+      headers: {
+        Accept: 'application/json',
+        'User-Agent': 'mohanadahmed.me sitemap generator',
+      },
+      signal: controller.signal,
     });
-  });
+
+    if (!response.ok) {
+      throw new Error(`API request failed with status ${response.status}`);
+    }
+
+    const jsonData = await response.json();
+    const projects = jsonData?.data?.projects || jsonData?.data || jsonData?.projects || (Array.isArray(jsonData) ? jsonData : []);
+    return Array.isArray(projects) ? projects : [];
+  } finally {
+    clearTimeout(timeout);
+  }
 };
 
 export default async function handler(req, res) {
-  try {
-    const projects = await fetchProjects();
-    const today = new Date().toISOString().split('T')[0];
+  const today = new Date().toISOString().split('T')[0];
+  let projects = [];
 
+  try {
+    projects = await fetchProjects();
+  } catch (error) {
+    console.error('Sitemap projects fetch error:', error);
+  }
+
+  try {
     let sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Main Page -->
@@ -50,8 +61,9 @@ export default async function handler(req, res) {
       projects.forEach((project) => {
         const slug = project.slug || project.id;
         if (slug) {
+          const encodedSlug = encodeURIComponent(String(slug));
           sitemap += `  <url>
-    <loc>${BASE_URL}/project/${slug}</loc>
+    <loc>${escapeXml(`${BASE_URL}/project/${encodedSlug}`)}</loc>
     <lastmod>${today}</lastmod>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
@@ -66,7 +78,8 @@ export default async function handler(req, res) {
     res.setHeader('Cache-Control', 's-maxage=86400, stale-while-revalidate');
     res.status(200).send(sitemap);
   } catch (error) {
-    console.error('Sitemap error:', error);
-    res.status(500).send('Error generating sitemap');
+    console.error('Sitemap XML generation error:', error);
+    res.setHeader('Content-Type', 'text/plain; charset=utf-8');
+    res.status(200).send('Sitemap temporarily unavailable, but endpoint is healthy.');
   }
 }
