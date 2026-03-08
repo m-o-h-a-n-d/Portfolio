@@ -34,7 +34,7 @@ const limitText = (text, limit = 40) => {
 };
 
 
-const AboutSection = ({ onShowAllCertificates }) => {
+const AboutSection = ({ onShowAllCertificates, onShowAllTeam }) => {
   const profile = useProfile();
   const services = useServices();
   const certificates = useCertificates();
@@ -262,7 +262,16 @@ const AboutSection = ({ onShowAllCertificates }) => {
 
 	      {/* team */}
 	      <section className="mb-4">
-	        <h3 className="h3 mb-5">Team</h3>
+	        <div className="flex items-center justify-between mb-5">
+	          <h3 className="h3 !mb-0">Team</h3>
+	          <button 
+	            onClick={onShowAllTeam}
+	            className="flex items-center gap-1 text-primary text-sm font-medium hover:underline transition-all"
+	          >
+	            Show All
+	            <ArrowRight className="w-4 h-4" />
+	          </button>
+	        </div>
 	        <div className="-mx-[15px] px-[15px]">
 	            <ul 
 	              ref={teamRef}
