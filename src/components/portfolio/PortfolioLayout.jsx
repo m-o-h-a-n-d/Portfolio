@@ -8,6 +8,7 @@ import PortfolioSection from './PortfolioSection';
 import BlogSection from './BlogSection';
 import ContactSection from './ContactSection';
 import ProjectDetails from './ProjectDetails';
+import CertificatesSection from './CertificatesSection';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useIsMobile } from '../../hooks/use-mobile';
 
@@ -21,7 +22,7 @@ const PortfolioLayout = () => {
   const [isLoading, setIsLoading] = useState(false);
   const contentRef = useRef(null);
 
-  const pages = ['about', 'resume', 'portfolio', 'blog', 'contact'];
+  const pages = ['about', 'resume', 'portfolio', 'blog', 'contact', 'certificates'];
   const pageIndex = pages.indexOf(activePage);
 
   useEffect(() => {
@@ -52,7 +53,7 @@ const PortfolioLayout = () => {
   const renderPage = () => {
     switch (activePage) {
       case 'about':
-        return <AboutSection />;
+        return <AboutSection onShowAllCertificates={() => handlePageChange('certificates')} />;
       case 'resume':
         return <ResumeSection />;
       case 'portfolio':
@@ -63,6 +64,8 @@ const PortfolioLayout = () => {
         return <ContactSection />;
       case 'project-details':
         return <ProjectDetails />;
+      case 'certificates':
+        return <CertificatesSection onBack={() => handlePageChange('about')} />;
       default:
         return <AboutSection />;
     }
