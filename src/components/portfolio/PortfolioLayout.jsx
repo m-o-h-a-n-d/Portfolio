@@ -52,9 +52,14 @@ const PortfolioLayout = () => {
   };
 
   const renderPage = () => {
+    const aboutProps = {
+      onShowAllCertificates: () => handlePageChange('certificates'),
+      onShowAllTeam: () => handlePageChange('team')
+    };
+
     switch (activePage) {
       case 'about':
-        return <AboutSection onShowAllCertificates={() => handlePageChange('certificates')} />;
+        return <AboutSection {...aboutProps} />;
       case 'resume':
         return <ResumeSection />;
       case 'portfolio':
@@ -65,15 +70,12 @@ const PortfolioLayout = () => {
         return <ContactSection />;
       case 'project-details':
         return <ProjectDetails />;
-case 'certificates':
+      case 'certificates':
         return <CertificatesSection onBack={() => handlePageChange('about')} />;
       case 'team':
         return <TeamSection onBack={() => handlePageChange('about')} />;
       default:
-        return <AboutSection 
-          onShowAllCertificates={() => handlePageChange('certificates')} 
-          onShowAllTeam={() => handlePageChange('team')}
-        />;
+        return <AboutSection {...aboutProps} />;
     }
   };
 
