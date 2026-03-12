@@ -33,7 +33,7 @@ const iconList = [
   { name: 'Monitor', icon: Monitor, class: 'frontend' },
   { name: 'Server', icon: Server, class: 'backend' },
   { name: 'Wifi', icon: Wifi, class: 'iot' },
-  { name: 'Layout', icon: Layout, class: 'uiux' },
+  { name: 'Layout', icon: Layout, class: 'ui&ux' },
   { name: 'Code', icon: Code, class: 'code' },
   { name: 'Smartphone', icon: Smartphone, class: 'mobile' },
   { name: 'Database', icon: Database, class: 'database' },
