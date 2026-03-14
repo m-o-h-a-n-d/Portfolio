@@ -1,4 +1,4 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
 import { apiGet } from "../api/request";
 import { PORTFOLIO_ENDPOINTS } from "../api/endpoints";
@@ -31,7 +31,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   }, []);
 
   const finalName =
-    name || profileData?.name || "Mohanad Ahmed Shehata";
+    name || profileData?.name || "MOSOLVING";
 
   const finalJobTitle =
     jobTitle || profileData?.title || "Full Stack Web Developer";
@@ -39,15 +39,15 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   const finalSiteName =
     settingsData?.site_name ||
     settingsData?.site_identity?.site_name ||
-    "مهند أحمد";
+    "MOSOLVING";
 
   const finalAlternateSiteName =
     settingsData?.site_identity?.alternate_name ||
-    "Mohanad Ahmed";
+    "MOSOLVING";
 
   // ✅ نص عربي صحيح (بدون encoding)
   const fallbackDescription =
-    "Mohanad Ahmed Shehata - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير تطبيقات الويب المتكاملة وبناء حلول Backend احترافية.";
+    "MOSOLVING - Mohanad Ahmed - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير تطبيقات الويب المتكاملة وبناء حلول Backend احترافية.";
 
   const finalDescription = (
     description ||
