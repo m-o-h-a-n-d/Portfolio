@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { Helmet } from "react-helmet-async";
-import { apiGet } from "../api/request";
-import { PORTFOLIO_ENDPOINTS } from "../api/endpoints";
+import { apiGet, isAuthenticated } from "../api/request";
+import { PORTFOLIO_ENDPOINTS, DASHBOARD_ENDPOINTS } from "../api/endpoints";
 
 const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   const [profileData, setProfileData] = useState(null);
@@ -10,12 +10,17 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   useEffect(() => {
     const fetchSeoData = async () => {
       try {
+        // Check if we are in admin/dashboard area or if user is authenticated
+        const isAuthed = isAuthenticated();
+        const profileEndpoint = isAuthed ? DASHBOARD_ENDPOINTS.user.list : PORTFOLIO_ENDPOINTS.profile.get;
+        const settingsEndpoint = isAuthed ? DASHBOARD_ENDPOINTS.settings.list : PORTFOLIO_ENDPOINTS.settings.get;
+
         const [profileRes, settingsRes] = await Promise.all([
-          apiGet(PORTFOLIO_ENDPOINTS.profile.get),
-          apiGet(PORTFOLIO_ENDPOINTS.settings.get),
+          apiGet(profileEndpoint),
+          apiGet(settingsEndpoint),
         ]);
 
-        setProfileData(profileRes?.data || profileRes || null);
+        setProfileData(profileRes?.data?.user || profileRes?.user || profileRes?.data || profileRes || null);
 
         const settingsList =
           settingsRes?.data?.settings || settingsRes?.data || [];
