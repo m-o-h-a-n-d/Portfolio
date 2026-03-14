@@ -31,7 +31,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   }, []);
 
   const finalName =
-    name || profileData?.name || "MOSOLVING";
+    name || profileData?.name || "Mohanad Ahmed Shehata";
 
   const finalJobTitle =
     jobTitle || profileData?.title || "Full Stack Web Developer";
@@ -39,15 +39,15 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   const finalSiteName =
     settingsData?.site_name ||
     settingsData?.site_identity?.site_name ||
-    "MOSOLVING";
+    "Mohanad Ahmed";
 
   const finalAlternateSiteName =
     settingsData?.site_identity?.alternate_name ||
-    "MOSOLVING";
+    "Mohanad Ahmed";
 
   // ✅ نص عربي صحيح (بدون encoding)
   const fallbackDescription =
-    "MOSOLVING - Mohanad Ahmed - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير تطبيقات الويب المتكاملة وبناء حلول Backend احترافية.";
+    "Mohanad Ahmed Shehata - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير تطبيقات الويب المتكاملة وبناء حلول Backend احترافية.";
 
   const finalDescription = (
     description ||
