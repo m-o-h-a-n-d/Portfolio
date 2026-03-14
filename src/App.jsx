@@ -27,6 +27,7 @@ import ServicesManager from "./pages/admin/ServicesManager";
 import ForgetPassword from "./pages/admin/ForgetPassword";
 import OTPVerification from "./pages/admin/OTPVerification";
 import ResetPassword from "./pages/admin/ResetPassword";
+import SeoHead from "./components/SeoHead";
 
 const queryClient = new QueryClient();
 
@@ -40,43 +41,45 @@ const App = () => (
         <DataProvider>
           <AuthProvider>
             <NotificationProvider>
+            {/* ✅ SeoHead is now at the root level to ensure Favicon & SEO work on ALL pages */}
+            <SeoHead />
             <Routes>
             {/* Public Portfolio */}
             <Route path="/" element={<Index />} />
             <Route path="/project/:slug" element={<Index />} />
             
-	            {/* Admin Auth */}
-	            <Route path="/login" element={<Navigate to="/admin/login" replace />} />
-	            <Route path="/admin/login" element={<LoginPage />} />
-	            <Route path="/admin/forget-password" element={<ForgetPassword />} />
-	            <Route path="/admin/otp-verification" element={<OTPVerification />} />
-	            <Route path="/admin/reset-password" element={<ResetPassword />} />
-            
-            {/* Admin Dashboard (Protected) */}
-            <Route path="/admin" element={
-              <PrivateRoute>
-                <DashboardLayout />
-              </PrivateRoute>
-            }>
-              <Route index element={<DashboardHome />} />
-              <Route path="profile" element={<ProfileManager />} />
-              <Route path="resume" element={<ResumeManager />} />
-              <Route path="portfolio" element={<PortfolioManager />} />
-              <Route path="portfolio/add" element={<ProjectEditor />} />
-              <Route path="portfolio/edit/:id" element={<ProjectEditor />} />
-              <Route path="messages" element={<MessagesInbox />} />
-              <Route path="settings" element={<SettingsManager />} />
-              <Route path="blogs" element={<BlogsManager />} />
-              <Route path="team" element={<TeamManager />} />
-              <Route path="certificates" element={<CertificatesManager />} />
-              <Route path="services" element={<ServicesManager />} />
-            </Route>
-            
-            {/* Error Pages */}
-            <Route path="/error/500" element={<NotFound code="500" message="Internal Server Error. Something went wrong on our end." />} />
-            <Route path="/error/403" element={<NotFound code="403" message="Access Denied. You don't have permission to view this page." />} />
-            <Route path="*" element={<NotFound />} />
-              </Routes>
+		            {/* Admin Auth */}
+		            <Route path="/login" element={<Navigate to="/admin/login" replace />} />
+		            <Route path="/admin/login" element={<LoginPage />} />
+		            <Route path="/admin/forget-password" element={<ForgetPassword />} />
+		            <Route path="/admin/otp-verification" element={<OTPVerification />} />
+		            <Route path="/admin/reset-password" element={<ResetPassword />} />
+	            
+	            {/* Admin Dashboard (Protected) */}
+	            <Route path="/admin" element={
+	              <PrivateRoute>
+	                <DashboardLayout />
+	              </PrivateRoute>
+	            }>
+	              <Route index element={<DashboardHome />} />
+	              <Route path="profile" element={<ProfileManager />} />
+	              <Route path="resume" element={<ResumeManager />} />
+	              <Route path="portfolio" element={<PortfolioManager />} />
+	              <Route path="portfolio/add" element={<ProjectEditor />} />
+	              <Route path="portfolio/edit/:id" element={<ProjectEditor />} />
+	              <Route path="messages" element={<MessagesInbox />} />
+	              <Route path="settings" element={<SettingsManager />} />
+	              <Route path="blogs" element={<BlogsManager />} />
+	              <Route path="team" element={<TeamManager />} />
+	              <Route path="certificates" element={<CertificatesManager />} />
+	              <Route path="services" element={<ServicesManager />} />
+	            </Route>
+	            
+	            {/* Error Pages */}
+	            <Route path="/error/500" element={<NotFound code="500" message="Internal Server Error. Something went wrong on our end." />} />
+	            <Route path="/error/403" element={<NotFound code="403" message="Access Denied. You don't have permission to view this page." />} />
+	            <Route path="*" element={<NotFound />} />
+	              </Routes>
             </NotificationProvider>
           </AuthProvider>
         </DataProvider>
