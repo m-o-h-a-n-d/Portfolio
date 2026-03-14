@@ -30,24 +30,25 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
     fetchSeoData();
   }, []);
 
+  // ✅ نستخدم company_name من الإعدادات كأولوية لاسم الموقع في البحث
+  const finalSiteName =
+    settingsData?.site_identity?.company_name ||
+    settingsData?.site_name ||
+    "Mohanad Ahmed";
+
   const finalName =
-    name || profileData?.name || "Mohanad Ahmed Shehata";
+    name || profileData?.name || finalSiteName;
 
   const finalJobTitle =
     jobTitle || profileData?.title || "Full Stack Web Developer";
 
-  const finalSiteName =
-    settingsData?.site_name ||
-    settingsData?.site_identity?.site_name ||
-    "Mohanad Ahmed";
-
   const finalAlternateSiteName =
     settingsData?.site_identity?.alternate_name ||
-    "Mohanad Ahmed";
+    finalSiteName;
 
   // ✅ نص عربي صحيح (بدون encoding)
   const fallbackDescription =
-    "Mohanad Ahmed Shehata - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير تطبيقات الويب المتكاملة وبناء حلول Backend احترافية.";
+    `${finalName} - Full Stack Web Developer (React.js & Laravel). متخصص في تطوير تطبيقات الويب المتكاملة وبناء حلول Backend احترافية.`;
 
   const finalDescription = (
     description ||
@@ -108,13 +109,14 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
         content="width=device-width, initial-scale=1.0"
       />
 
-      <title>{`${finalName} - ${finalJobTitle}`}</title>
+      {/* ✅ الآن سيظهر اسم الشركة/الموقع من الإعدادات في عنوان البحث */}
+      <title>{`${finalSiteName} - ${finalJobTitle}`}</title>
 
       <meta name="description" content={finalDescription} />
 
       <meta
         name="keywords"
-        content={`${finalName}, مهند أحمد شحاته, ${finalJobTitle}, مطور ويب, مطور مواقع, مطور Laravel, مطور React, Full Stack Developer, Laravel, React, PHP, JavaScript`}
+        content={`${finalName}, ${finalSiteName}, ${finalJobTitle}, مطور ويب, مطور مواقع, مطور Laravel, مطور React, Full Stack Developer, Laravel, React, PHP, JavaScript`}
       />
 
       <meta name="author" content={finalName} />
@@ -123,7 +125,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       {/* Open Graph */}
       <meta
         property="og:title"
-        content={`${finalName} - ${finalJobTitle}`}
+        content={`${finalSiteName} - ${finalJobTitle}`}
       />
       <meta property="og:description" content={finalDescription} />
       <meta property="og:image" content={finalImageUrl} />
@@ -140,7 +142,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       />
       <meta
         name="twitter:title"
-        content={`${finalName} - ${finalJobTitle}`}
+        content={`${finalSiteName} - ${finalJobTitle}`}
       />
       <meta
         name="twitter:description"
