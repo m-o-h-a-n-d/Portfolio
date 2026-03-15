@@ -96,7 +96,7 @@ function limitWords(text, limit = 2) {
 
             {/* Name & Title */}
             <div className="text-left lg:text-center">
-            <h1 className="text-white-2 text-[20px] md:text-[26px] font-medium tracking-tight mb-2 whitespace-nowrap">
+            <h1 className="text-white-2 text-[20px] md:text-[26px] font-medium tracking-tight mb-2 whitespace-nowrap block">
                 {limitWords(profile.name, 2)}
             </h1>
             <p className="bg-onyx text-white-1 text-xs font-light px-[12px] py-[4px] md:px-[18px] md:py-[5px] rounded-lg inline-block">
@@ -242,9 +242,9 @@ function limitWords(text, limit = 2) {
                 />
               </div>
               <div className="text-center">
-                <h1 className="text-[24px] md:text-[32px] text-white-2 font-bold mb-2 tracking-tight">
+                <h2 className="text-[24px] md:text-[32px] text-white-2 font-bold mb-2 tracking-tight">
                   {profile.name}
-                </h1>
+                </h2>
                 <p className="text-primary font-medium">{profile.title}</p>
               </div>
             </div>

@@ -118,6 +118,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       <title>{`${finalSiteName} - ${finalJobTitle}`}</title>
 
       <meta name="description" content={finalDescription} />
+      <meta name="abstract" content={finalDescription} />
 
       <meta
         name="keywords"
