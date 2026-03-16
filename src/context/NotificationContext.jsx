@@ -16,7 +16,8 @@ export const NotificationProvider = ({ children }) => {
   const fetchNotifications = async (options = {}) => {
     const { silent = false } = options;
     try {
-      if (!user?.id) {
+      // Only fetch if user is authenticated and has a valid ID
+      if (!user?.id || !isAuthenticated()) {
         setNotifications([]);
         setUnreadCount(0);
         return;
@@ -40,7 +41,10 @@ export const NotificationProvider = ({ children }) => {
       setNotifications(messages);
       setUnreadCount(messages.filter((m) => !m.read).length);
     } catch (error) {
-      console.error('Error fetching notifications:', error);
+      // Silently handle 404 or 401 errors to avoid console clutter
+      if (error.status !== 404 && error.status !== 401) {
+        console.error('Error fetching notifications:', error);
+      }
     } finally {
       if (!hasLoadedRef.current) {
         setLoading(false);
