@@ -223,6 +223,8 @@ export const apiFetch = async (endpoint, method = "GET", body = null) => {
       const apiError = new Error(data?.message || data || "API Error");
       apiError.status = response.status;
       apiError.data = data;
+      // Mark errors from specific endpoints as silent to suppress console output
+      apiError.silent = endpoint.includes("/admin/contact-us");
       throw apiError;
     }
 
