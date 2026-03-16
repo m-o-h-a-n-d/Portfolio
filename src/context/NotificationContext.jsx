@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useRef } from 'react';
 import { createEcho } from '../echo';
-import { getAuthToken } from '../api/request';
+import { getAuthToken, isAuthenticated } from '../api/request';
 import { toast as sonnerToast } from 'sonner'; // Switching to Sonner for better reliability
 import { useAuth } from './AuthContext';
 
