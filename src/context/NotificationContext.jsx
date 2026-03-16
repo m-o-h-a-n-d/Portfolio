@@ -25,21 +25,29 @@ export const NotificationProvider = ({ children }) => {
       if (!silent && !hasLoadedRef.current) {
         setLoading(true);
       }
-      const { apiGet, CONTACT_US_ENDPOINTS } = await import('../api/request');
-      const response = await apiGet(CONTACT_US_ENDPOINTS.list);
-      const payload = response?.data?.data ?? response?.data ?? [];
-      const rawMessages = Array.isArray(payload) ? payload : payload ? [payload] : [];
-      const messages = rawMessages.map((item) => ({
-        id: item.id || Date.now(),
-        name: item.name || item.sender_name || 'New Visitor',
-        email: item.email || item.sender_email || '',
-        subject: item.subject || '',
-        message: item.message || 'New message received',
-        created_at: item.created_at || item.date || new Date().toISOString(),
-        read: item.read ?? false
-      }));
-      setNotifications(messages);
-      setUnreadCount(messages.filter((m) => !m.read).length);
+      // TODO: Enable this when the API endpoint is ready
+      // const { apiGet, CONTACT_US_ENDPOINTS } = await import('../api/request');
+      // const response = await apiGet(CONTACT_US_ENDPOINTS.list);
+      
+      // For now, return empty notifications to avoid 404 errors
+      const response = { data: { data: [] } };
+      // const payload = response?.data?.data ?? response?.data ?? [];
+      // const rawMessages = Array.isArray(payload) ? payload : payload ? [payload] : [];
+      // const messages = rawMessages.map((item) => ({
+      //   id: item.id || Date.now(),
+      //   name: item.name || item.sender_name || 'New Visitor',
+      //   email: item.email || item.sender_email || '',
+      //   subject: item.subject || '',
+      //   message: item.message || 'New message received',
+      //   created_at: item.created_at || item.date || new Date().toISOString(),
+      //   read: item.read ?? false
+      // }));
+      // setNotifications(messages);
+      // setUnreadCount(messages.filter((m) => !m.read).length);
+      
+      // Temporarily set empty notifications
+      setNotifications([]);
+      setUnreadCount(0);
     } catch (error) {
       // Silently handle 404 or 401 errors to avoid console clutter
       if (error.status !== 404 && error.status !== 401) {
