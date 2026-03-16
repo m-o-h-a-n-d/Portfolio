@@ -42,7 +42,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
     "Mohanad Ahmed";
 
   const finalName =
-    name || profileData?.name || finalSiteName;
+    name || profileData?.name || "Mohanad Ahmed";
 
   const finalJobTitle =
     jobTitle || profileData?.title || "Full Stack Web Developer";
@@ -114,8 +114,8 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
         content="width=device-width, initial-scale=1.0"
       />
 
-      {/* ✅ الآن سيظهر اسم الشركة/الموقع من الإعدادات في عنوان البحث */}
-      <title>{`${finalSiteName} - ${finalJobTitle}`}</title>
+      {/* ✅ الآن سيظهر اسم المستخدم مع Full Stack Web Developer */}
+      <title>{`${finalName} - ${finalJobTitle}`}</title>
 
       <meta name="description" content={finalDescription} />
       <meta name="abstract" content={finalDescription} />
@@ -131,7 +131,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       {/* Open Graph */}
       <meta
         property="og:title"
-        content={`${finalSiteName} - ${finalJobTitle}`}
+        content={`${finalName} - ${finalJobTitle}`}
       />
       <meta property="og:description" content={finalDescription} />
       <meta property="og:image" content={finalImageUrl} />
@@ -148,7 +148,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       />
       <meta
         name="twitter:title"
-        content={`${finalSiteName} - ${finalJobTitle}`}
+        content={`${finalName} - ${finalJobTitle}`}
       />
       <meta
         name="twitter:description"
