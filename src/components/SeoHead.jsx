@@ -36,10 +36,13 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   }, []);
 
   // ✅ نستخدم company_name من الإعدادات كأولوية لاسم الموقع في البحث
+  // Try multiple paths to find company_name from API response
   const finalSiteName =
     settingsData?.site_identity?.company_name ||
+    settingsData?.company_name ||
     settingsData?.site_name ||
-    "Mohanad Ahmed";
+    settingsData?.name ||
+    "MOSOLVING"; // Default to MOSOLVING
 
   const finalName =
     name || profileData?.name || "Mohanad Ahmed";
@@ -49,6 +52,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
 
   const finalAlternateSiteName =
     settingsData?.site_identity?.alternate_name ||
+    settingsData?.alternate_name ||
     finalSiteName;
 
   // ✅ نص عربي صحيح (بدون encoding)
@@ -95,6 +99,10 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
     url: finalWebsiteUrl,
     image: finalImageUrl,
     description: finalDescription,
+    worksFor: {
+      "@type": "Organization",
+      name: finalSiteName
+    }
   };
 
   const websiteStructuredData = {
@@ -103,6 +111,12 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
     name: finalSiteName,
     alternateName: finalAlternateSiteName,
     url: finalWebsiteUrl,
+    description: finalDescription,
+    potentialAction: {
+      "@type": "SearchAction",
+      target: `${finalWebsiteUrl}?s={search_term_string}`,
+      "query-input": "required name=search_term_string"
+    }
   };
 
   return (
@@ -140,6 +154,10 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       <meta property="og:url" content={finalWebsiteUrl} />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content={finalSiteName} />
+      
+      {/* Additional meta tags for better site name recognition */}
+      <meta name="application-name" content={finalSiteName} />
+      <meta name="apple-mobile-web-app-title" content={finalSiteName} />
 
       {/* Twitter */}
       <meta
@@ -157,6 +175,10 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       <meta
         name="twitter:image"
         content={finalImageUrl}
+      />
+      <meta
+        name="twitter:creator"
+        content={finalName}
       />
 
       {/* Icons + Canonical */}
