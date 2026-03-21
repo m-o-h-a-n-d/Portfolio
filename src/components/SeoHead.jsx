@@ -129,8 +129,8 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
         content="width=device-width, initial-scale=1.0"
       />
 
-      {/* ✅ الآن سيظهر اسم المستخدم مع اسم الشركة في العنوان */}
-      <title>{`${finalName} - ${finalJobTitle} | ${finalSiteName}`}</title>
+      {/* ✅ الآن سيظهر اسم المستخدم مع Full Stack Web Developer */}
+      <title>{`${finalName} - ${finalJobTitle}`}</title>
 
       <meta name="description" content={finalDescription} />
       <meta name="abstract" content={finalDescription} />
