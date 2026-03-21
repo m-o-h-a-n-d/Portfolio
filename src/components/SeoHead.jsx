@@ -38,6 +38,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
   // ✅ نستخدم company_name من الإعدادات كأولوية لاسم الموقع في البحث
   // Try multiple paths to find company_name from API response
   const finalSiteName =
+    settingsData?.company ||
     settingsData?.site_identity?.company_name ||
     settingsData?.company_name ||
     settingsData?.site_name ||
@@ -128,8 +129,8 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
         content="width=device-width, initial-scale=1.0"
       />
 
-      {/* ✅ الآن سيظهر اسم المستخدم مع Full Stack Web Developer */}
-      <title>{`${finalName} - ${finalJobTitle}`}</title>
+      {/* ✅ الآن سيظهر اسم المستخدم مع اسم الشركة في العنوان */}
+      <title>{`${finalName} - ${finalJobTitle} | ${finalSiteName}`}</title>
 
       <meta name="description" content={finalDescription} />
       <meta name="abstract" content={finalDescription} />
