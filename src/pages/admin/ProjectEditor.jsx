@@ -163,7 +163,17 @@ const ProjectEditor = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData(prev => {
+      const updated = { ...prev, [name]: value };
+      
+      // If status is being turned off, clear the links
+      if (name === 'status' && !value) {
+        updated.link = '';
+        updated.github = '';
+      }
+      
+      return updated;
+    });
   };
 
   const handleDrag = (e) => {
@@ -449,7 +459,16 @@ const ProjectEditor = () => {
               </div>
               <button
                 type="button"
-                onClick={() => setFormData(prev => ({ ...prev, status: !prev.status }))}
+                onClick={() => setFormData(prev => {
+                  const newStatus = !prev.status;
+                  return {
+                    ...prev,
+                    status: newStatus,
+                    // Clear links if status is turned off
+                    link: newStatus ? prev.link : '',
+                    github: newStatus ? prev.github : ''
+                  };
+                })}
                 className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none ${
                   formData.status ? 'bg-primary' : 'bg-onyx border border-border'
                 }`}
@@ -522,37 +541,39 @@ const ProjectEditor = () => {
             </div>
           </div>
 
-          {/* Links Section */}
-          <div className="bg-card border border-border rounded-[20px] p-6 space-y-4" style={{ background: 'var(--bg-gradient-jet)' }}>
-            <div className="flex items-center gap-2 mb-2">
-              <LinkIcon className="w-5 h-5 text-primary" />
-              <h3 className="h3 text-white-2">Project Links</h3>
-            </div>
-            <div className="space-y-4">
-              <div>
-                <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">Live Project URL</label>
-                <input
-                  type="url"
-                  name="link"
-                  value={formData.link}
-                  onChange={handleInputChange}
-                  placeholder="https://example.com"
-                  className="form-input"
-                />
+          {/* Links Section - Hidden when status is Off */}
+          {formData.status && (
+            <div className="bg-card border border-border rounded-[20px] p-6 space-y-4" style={{ background: 'var(--bg-gradient-jet)' }}>
+              <div className="flex items-center gap-2 mb-2">
+                <LinkIcon className="w-5 h-5 text-primary" />
+                <h3 className="h3 text-white-2">Project Links</h3>
               </div>
-              <div>
-                <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">GitHub Repository</label>
-                <input
-                  type="url"
-                  name="github"
-                  value={formData.github}
-                  onChange={handleInputChange}
-                  placeholder="https://github.com/username/repo"
-                  className="form-input"
-                />
+              <div className="space-y-4">
+                <div>
+                  <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">Live Project URL</label>
+                  <input
+                    type="url"
+                    name="link"
+                    value={formData.link}
+                    onChange={handleInputChange}
+                    placeholder="https://example.com"
+                    className="form-input"
+                  />
+                </div>
+                <div>
+                  <label className="text-light-gray/70 text-[10px] uppercase mb-1 block">GitHub Repository</label>
+                  <input
+                    type="url"
+                    name="github"
+                    value={formData.github}
+                    onChange={handleInputChange}
+                    placeholder="https://github.com/username/repo"
+                    className="form-input"
+                  />
+                </div>
               </div>
             </div>
-          </div>
+          )}
         </div>
 
         {/* Right Column: Details + Tech + Team */}
