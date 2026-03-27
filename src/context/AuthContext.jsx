@@ -55,14 +55,14 @@ export const AuthProvider = ({ children }) => {
         response?.access_token ||
         response?.data?.token ||
         response?.data?.access_token;
-      const userData = response?.user || response?.data?.user || response?.data;
+      const userData = response?.user || response?.data?.user;
       if (token) {
         setAuthToken(token);
         if (window.Echo) window.Echo.disconnect();
         window.Echo = createEcho(token);
       }
-      if (userData && (response?.success ?? true)) {
-        setUser(userData);
+      if (token && (response?.success ?? true)) {
+        if (userData) setUser(userData);
         return { success: true };
       }
       return { success: false, message: response?.message || 'Login failed' };
