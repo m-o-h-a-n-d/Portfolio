@@ -90,7 +90,7 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
         settingsData?.logo ||
         settingsData?.site_identity?.logo_url ||
         settingsData?.site_identity?.logo
-    ) || "https://mohanadahmed.me/image.png";
+    ) || "https://mohanadahmed.me/Mo.webp";
 
   const personStructuredData = {
     "@context": "https://schema.org",
@@ -150,8 +150,11 @@ const SeoHead = ({ name, jobTitle, websiteUrl, imageUrl, description }) => {
       />
       <meta property="og:description" content={finalDescription} />
       <meta property="og:image" content={finalImageUrl} />
+      <meta property="og:image:secure_url" content={finalImageUrl} />
+      <meta property="og:image:type" content="image/webp" />
       <meta property="og:image:width" content="1200" />
       <meta property="og:image:height" content="630" />
+      <meta property="og:image:alt" content={`${finalName} - ${finalJobTitle}`} />
       <meta property="og:url" content={finalWebsiteUrl} />
       <meta property="og:type" content="website" />
       <meta property="og:site_name" content={finalSiteName} />
