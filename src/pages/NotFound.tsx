@@ -88,8 +88,16 @@ const NotFound = ({
       if (y2 <= 0.2) y2Forward = true;
       if (y2 >= 0.85) y2Forward = false;
 
-      y1Forward ? (y1 += 0.001) : (y1 -= 0.001);
-      y2Forward ? (y2 += 0.0008) : (y2 -= 0.0008);
+      if (y1Forward) {
+        y1 += 0.001;
+      } else {
+        y1 -= 0.001;
+      }
+      if (y2Forward) {
+        y2 += 0.0008;
+      } else {
+        y2 -= 0.0008;
+      }
     };
 
     drawVisor();
