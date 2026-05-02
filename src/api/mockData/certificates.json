@@ -1,11 +1,19 @@
 {
   "certificates": [
     {
-      "id": 1,
-      "name": "Digitopia Competition (Software & AI)",
-      "avatar": "/certificates/digitopia.png",
-      "text": "Achieved the 2nd Phase in Software & AI track at the Ministry of Communications and Information Technology competition (First Edition).",
-      "date": "2025-01-01",
+      "id": 13,
+      "name": "Digital Egypt Pioneers Program - React Frontend Web Developer",
+      "avatar": "/certificates/DEPI.jpg",
+      "text": "Completed the Digital Egypt Pioneers Program (DEPI) as a React Frontend Web Developer. This intensive training program ran from June to December 2025 and covered core learning outcomes in modern React development, component architecture, state management, and responsive web design. Sponsored by Ministry of Communications and Information Technology of Egypt.",
+      "date": "2025-12-31",
+      "order": 1
+    },
+    {
+      "id": 14,
+      "name": "Digital Egypt Pioneers - Business English Track (Round 3)",
+      "avatar": "/certificates/depi_english.png",
+      "text": "Successfully completed the Business English Track (Round 3) of the Digital Egyptian Pioneers Program offered by OTO Courses. Training ran from June to December 2025 and focused on professional communication skills and business vocabulary for tech professionals. Led by MCIT technology development consultants.",
+      "date": "2025-12-31",
       "order": 2
     },
     {
@@ -14,15 +22,55 @@
       "avatar": "/certificates/we.jpeg",
       "text": "Successfully completed a 200-hour intensive training course provided by WE (Telecom Egypt), covering modern web technologies.",
       "date": "2024-11-18",
-      "order": 1
+      "order": 3
     },
     {
-      "id": 3,
-      "name": "IEEE Appreciation Certificate",
-      "avatar": "/certificates/ieee.jpeg",
-      "text": "Recognized for dedication, commitment, and valuable contribution to the IEEE IAET Student Branch.",
-      "date": "2025-10-02",
-      "order": 3
+      "id": 11,
+      "name": "Transact SQL queries using SQL server",
+      "avatar": "/certificates/tsql.png",
+      "text": "Successfully completed the Transact SQL queries using SQL server course from Mahara-Tech Platform. Course time: 8 Hours, 2 Minutes.",
+      "date": "2026-04-08",
+      "order": 4
+    },
+    {
+      "id": 7,
+      "name": "Mastering Object-Oriented Programming (OOP) using C++",
+      "avatar": "/certificates/oop_cpp.png",
+      "text": "Successfully completed the Mastering Object-Oriented Programming (OOP) using C++ course from Mahara-Tech Platform. Course time: 3 Hours.",
+      "date": "2026-02-28",
+      "order": 5
+    },
+    {
+      "id": 10,
+      "name": "SQL (Basic)",
+      "avatar": "/certificates/sql_basic.png",
+      "text": "Successfully passed the HackerRank SQL (Basic) certification test. Earned on: 08 Mar, 2026.",
+      "date": "2026-03-08",
+      "order": 6
+    },
+    {
+      "id": 9,
+      "name": "SQL (Intermediate)",
+      "avatar": "/certificates/sql_intermediate.png",
+      "text": "Successfully passed the HackerRank SQL (Intermediate) certification test. Earned on: 08 Mar, 2026.",
+      "date": "2026-03-08",
+      "order": 7
+    },
+    {
+      "id": 8,
+      "name": "Introduction to SQL",
+      "avatar": "/certificates/sql_intro.png",
+      "text": "Successfully completed the Introduction to SQL course from DataCamp. Length: 30 mins - 1 HR. Completed on FEB 28, 2026.",
+      "date": "2026-02-28",
+      "order": 8
+    },
+    {
+      "id": 12,
+      "name": "Problem Solving (Basic)",
+      "avatar": "/certificates/problem_solving.png",
+      "text": "Successfully passed the HackerRank Problem Solving (Basic) certification test. Earned on: 18 Apr, 2026.",
+      "date": "2026-04-18",
+      "order": 9
     },
     {
       "id": 4,
@@ -30,7 +78,23 @@
       "avatar": "/certificates/iaet.jpeg",
       "text": "Awarded for achieving the 1st Rank in the First Year, Electronics and Communications Engineering Department at IAET.",
       "date": "2024-06-01",
-      "order": 4
+      "order": 10
+    },
+    {
+      "id": 1,
+      "name": "Digitopia Competition (Software & AI)",
+      "avatar": "/certificates/digitopia.png",
+      "text": "Achieved the 2nd Phase in Software & AI track at the Ministry of Communications and Information Technology competition (First Edition).",
+      "date": "2025-01-01",
+      "order": 11
+    },
+    {
+      "id": 3,
+      "name": "IEEE Appreciation Certificate",
+      "avatar": "/certificates/ieee.jpeg",
+      "text": "Recognized for dedication, commitment, and valuable contribution to the IEEE IAET Student Branch.",
+      "date": "2025-10-02",
+      "order": 12
     },
     {
       "id": 5,
@@ -38,7 +102,7 @@
       "avatar": "/certificates/ieee2.jpeg",
       "text": "Volunteered in the Technical Committee at IEEE IAET, completing all tasks in the 2024 season with dedication.",
       "date": "2024-12-01",
-      "order": 5
+      "order": 13
     },
     {
       "id": 6,
@@ -46,7 +110,7 @@
       "avatar": "/certificates/efe.png",
       "text": "Completed the Offline Career Directions Program held by EFE Egypt, focusing on soft skills and career planning.",
       "date": "2024-09-24",
-      "order": 6
+      "order": 14
     }
   ]
 }

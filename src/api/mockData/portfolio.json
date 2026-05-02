@@ -1,22 +1,8 @@
 {
   "projects": [
+   
     {
       "id": 1,
-      "slug": "parking-system",
-      "title": "Parking System",
-      "category": "Backend Development",
-      "image": "/images/parkingmo.webp",
-      "images": ["/images/parkingmo.webp", "/images/iot.webp"],
-      "description": "Backend system to manage parking lots efficiently with real-time monitoring and automated ticketing.",
-      "full_description": "A comprehensive backend solution designed to streamline parking lot operations. It features real-time occupancy tracking, automated ticketing, and an administrative dashboard for monitoring. Built with scalability in mind to handle high traffic and multiple locations.",
-      "link": "https://parkingmo.up.railway.app/",
-      "github": "https://github.com/m-o-h-a-n-d/parking-system",
-      "technologies": ["Laravel", "MySQL", "Redis", "Docker"],
-      "team_members": [1],
-      "status": 1
-    },
-    {
-      "id": 2,
       "slug": "newmo",
       "title": "NewMO",
       "category": "Backend Development",
@@ -31,7 +17,7 @@
       "status": 1
     },
     {
-      "id": 3,
+      "id": 2,
       "slug": "egycare",
       "title": "Egycare",
       "category": "Front-end Development",
@@ -46,7 +32,7 @@
       "status": 1
     },
     {
-      "id": 4,
+      "id": 3,
       "slug": "systemmo",
       "title": "SystemMO",
       "category": "Front-end Development",
@@ -61,7 +47,7 @@
       "status": 1
     },
     {
-      "id": 5,
+      "id": 4,
       "slug": "smart-parking-iot",
       "title": "Parking System",
       "category": "IoT Solutions",
@@ -76,7 +62,7 @@
       "status": 1
     },
     {
-      "id": 6,
+      "id": 5,
       "slug": "meterika",
       "title": "Meterika",
       "category": "Backend Development",
@@ -91,7 +77,7 @@
       "status": 1
     },
     {
-      "id": 7,
+      "id": 6,
       "slug": "education-platform",
       "title": "Education Platform",
       "category": "Front-end Development",
@@ -106,7 +92,7 @@
       "status": 1
     },
     {
-      "id": 8,
+      "id": 7,
       "slug": "education-platform-v2",
       "title": "Education Platform",
       "category": "Front-end Development",

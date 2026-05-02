@@ -17,12 +17,7 @@
       "title": "IoT Solutions",
       "description": "Integrating IoT devices with software systems to create smart and connected applications.",
       "icon": "iot"
-    },
-    {
-      "id": 4,
-      "title": "UI & UX Design",
-      "description": "Designing intuitive and engaging user interfaces with seamless user experiences for web and mobile applications.",
-      "icon": "uiux"
     }
+   
   ]
 }

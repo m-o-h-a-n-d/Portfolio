@@ -28,5 +28,50 @@
     "id": "skill_006",
     "name": "Database & MySQL",
     "percentage": 90
+  },
+  {
+    "id": "skill_007",
+    "name": "Problem Solving",
+    "percentage": 85
+  },
+  {
+    "id": "skill_008",
+    "name": "C++",
+    "percentage": 80
+  },
+  {
+    "id": "skill_009",
+    "name": "Docker",
+    "percentage": 75
+  },
+  {
+    "id": "skill_010",
+    "name": "Clean Architecture",
+    "percentage": 85
+  },
+  {
+    "id": "skill_011",
+    "name": "Design Patterns",
+    "percentage": 80
+  },
+  {
+    "id": "skill_012",
+    "name": "SQL",
+    "percentage": 90
+  },
+  {
+    "id": "skill_013",
+    "name": "Database Design",
+    "percentage": 85
+  },
+  {
+    "id": "skill_014",
+    "name": "React",
+    "percentage": 95
+  },
+  {
+    "id": "skill_015",
+    "name": "Full Stack Development",
+    "percentage": 90
   }
 ]
