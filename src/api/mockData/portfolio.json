@@ -10,7 +10,7 @@
       "images": ["/images/newmo.webp"],
       "description": "Modern SaaS platform for team collaboration and project management with robust backend APIs.",
       "full_description": "NewMO is a SaaS platform that empowers teams to collaborate effectively. It includes task management, real-time chat, and file sharing capabilities. The backend is built with a microservices architecture to ensure high availability and performance.",
-      "link": "https://newmo.wuaze.com/",
+      "link": "https://newmo.free.nf/",
       "github": "",
       "technologies": ["Node.js", "Express", "MongoDB", "Socket.io"],
       "team_members": [1],
