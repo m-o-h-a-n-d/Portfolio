@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
+  <!-- Homepage -->
+  <url>
+    <loc>https://mohanadahmed.me/</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>1.0</priority>
+    <image:image>
+      <image:loc>https://mohanadahmed.me/Mo.webp</image:loc>
+      <image:title>Mohanad Ahmed - Full Stack Web Developer</image:title>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://mohanadahmed.me/project/student-management-system</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://rkjqusyqlchjjgbiynjd.supabase.co/storage/v1/object/public/portfolio/uploads/projects/836f7389-77f5-4df9-b9e8-f5095e14815d1787561134.png</image:loc>
+      <image:title>Student Management  System</image:title>
+      <image:caption>Student Management System With PHP Native</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://mohanadahmed.me/project/handball-management-system</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://rkjqusyqlchjjgbiynjd.supabase.co/storage/v1/object/public/portfolio/uploads/projects/6113e215-55ac-47ae-8b75-cf05499ce2cc1787225083.jpeg</image:loc>
+      <image:title>Handball Management System</image:title>
+      <image:caption>A comprehensive sports tournament management platform built with Laravel, featuring automated Round-Robin fixture scheduling, real-time live match updates powered by WebSockets (Laravel Reverb), and dynamic group standings calculation.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://mohanadahmed.me/project/education-platform</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://rkjqusyqlchjjgbiynjd.supabase.co/storage/v1/object/public/portfolio/uploads/projects/faa27b0b-f30e-43c9-9f8d-4e6d53ea55dd1784227546.png</image:loc>
+      <image:title>Education Platform</image:title>
+      <image:caption>Interactive learning platform with responsive design and rich educational content.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://mohanadahmed.me/project/parking-system</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://rkjqusyqlchjjgbiynjd.supabase.co/storage/v1/object/public/portfolio/uploads/projects/104a09d6-4e9c-4eee-ba19-fc4dba8d092b1784227325.webp</image:loc>
+      <image:title>Parking System</image:title>
+      <image:caption>Backend system to manage parking lots efficiently with real-time monitoring and automated ticketing.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://mohanadahmed.me/project/newmo</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://rkjqusyqlchjjgbiynjd.supabase.co/storage/v1/object/public/portfolio/uploads/projects/080ea665-c3cd-4dcc-86cf-c93eddf19cc51784227412.png</image:loc>
+      <image:title>NewMO</image:title>
+      <image:caption>Modern SaaS platform for team collaboration and project management with robust backend APIs.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://mohanadahmed.me/project/egycarepro</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://rkjqusyqlchjjgbiynjd.supabase.co/storage/v1/object/public/portfolio/uploads/projects/2d48235a-77b5-4058-9604-081f1da4456e1784227434.webp</image:loc>
+      <image:title>Egycarepro</image:title>
+      <image:caption>Healthcare platform with intuitive UI, patient management features, and responsive design</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://mohanadahmed.me/project/systemmo</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://rkjqusyqlchjjgbiynjd.supabase.co/storage/v1/object/public/portfolio/uploads/projects/3bf34ab1-e50d-47b0-8263-af247178cba21784227451.webp</image:loc>
+      <image:title>SystemMO</image:title>
+      <image:caption>Interactive frontend dashboard for monitoring data and system metrics in real-time.</image:caption>
+    </image:image>
+  </url>
+  <url>
+    <loc>https://mohanadahmed.me/project/meterika</loc>
+    <lastmod>2026-08-31</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://rkjqusyqlchjjgbiynjd.supabase.co/storage/v1/object/public/portfolio/uploads/projects/05e00ed7-cb15-4adf-bcb7-a1b0125ca9b71784227467.webp</image:loc>
+      <image:title>Meterika</image:title>
+      <image:caption>Analytics platform with backend support for data processing, reporting, and visualization.</image:caption>
+    </image:image>
+  </url>
+</urlset>

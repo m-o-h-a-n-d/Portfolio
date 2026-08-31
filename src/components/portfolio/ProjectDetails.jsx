@@ -81,39 +81,85 @@ const ProjectDetails = () => {
   };
 
   const projectImages = project.images || [project.image];
-  const pageTitle = `${project.title} | Mohanad Ahmed Shehata`;
-  const pageDescription = (project.short_desc || project.description || `Explore ${project.title} project details, technologies, and team members.`).slice(0, 155);
+  const pageTitle = `${project.title} | Mohanad Ahmed`;
+  const pageDescription = (project.short_desc || project.description || `Explore ${project.title} project details, technologies, and team members.`).slice(0, 160);
   const canonicalUrl = `https://mohanadahmed.me/project/${encodeURIComponent(String(project.slug || project.id))}`;
-  const ogImage = project.image_cover || project.image || projectImages[0] || 'https://mohanadahmed.me/image.png';
+  const ogImage = project.image_cover || project.image || projectImages[0] || 'https://mohanadahmed.me/Mo.webp';
   const teamNames = projectTeam.map((member) => member.name).filter(Boolean);
+  const techKeywords = Array.isArray(project.technologies) ? project.technologies.join(', ') : '';
+
   const projectStructuredData = {
     '@context': 'https://schema.org',
-    '@type': 'CreativeWork',
-    name: project.title,
-    description: pageDescription,
-    url: canonicalUrl,
-    image: ogImage,
-    contributor: teamNames.map((name) => ({ '@type': 'Person', name })),
+    '@graph': [
+      {
+        '@type': 'SoftwareSourceCode',
+        '@id': `${canonicalUrl}#software`,
+        name: project.title,
+        description: pageDescription,
+        url: canonicalUrl,
+        image: ogImage,
+        programmingLanguage: project.technologies || [],
+        codeRepository: project.github || undefined,
+        author: {
+          '@type': 'Person',
+          name: 'Mohanad Ahmed',
+          url: 'https://mohanadahmed.me/'
+        },
+        contributor: teamNames.map((name) => ({ '@type': 'Person', name })),
+      },
+      {
+        '@type': 'BreadcrumbList',
+        '@id': `${canonicalUrl}#breadcrumb`,
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: 'https://mohanadahmed.me/'
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Projects',
+            item: 'https://mohanadahmed.me/#portfolio'
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: project.title,
+            item: canonicalUrl
+          }
+        ]
+      }
+    ]
   };
 
   return (
     <>
     <Helmet>
       <title>{pageTitle}</title>
+      <meta name="title" content={pageTitle} />
       <meta name="description" content={pageDescription} />
-      <meta name="robots" content="index, follow" />
+      <meta name="keywords" content={`${project.title}, ${techKeywords}, Mohanad Ahmed, Portfolio, Project, Web Application`} />
+      <meta name="robots" content="index, follow, max-image-preview:large, max-snippet:-1, max-video-preview:-1" />
       <link rel="canonical" href={canonicalUrl} />
 
+      {/* Open Graph */}
       <meta property="og:type" content="article" />
       <meta property="og:title" content={pageTitle} />
       <meta property="og:description" content={pageDescription} />
       <meta property="og:url" content={canonicalUrl} />
       <meta property="og:image" content={ogImage} />
+      <meta property="og:image:alt" content={project.title} />
+      <meta property="og:site_name" content="Mohanad Ahmed Portfolio" />
 
+      {/* Twitter */}
       <meta name="twitter:card" content="summary_large_image" />
       <meta name="twitter:title" content={pageTitle} />
       <meta name="twitter:description" content={pageDescription} />
       <meta name="twitter:image" content={ogImage} />
+      <meta name="twitter:image:alt" content={project.title} />
+      <meta name="twitter:creator" content="@MohanadAhmed" />
 
       <script
         type="application/ld+json"
@@ -131,7 +177,7 @@ const ProjectDetails = () => {
           <ArrowLeft className="w-5 h-5" />
           <span className="hidden sm:inline">Back</span>
         </a>
-        <h2 className="h2 article-title !mb-0 text-center flex-1">{project.title}</h2>
+        <h1 className="h2 article-title !mb-0 text-center flex-1">{project.title}</h1>
         <button 
           onClick={handleShare}
           className="icon-box !w-10 !h-10 hover:bg-primary hover:text-black transition-all flex-shrink-0"
@@ -164,7 +210,7 @@ const ProjectDetails = () => {
               <SwiperSlide key={index}>
                 <img 
                   src={img} 
-                  alt={`${project.title} - ${index + 1}`} 
+                  alt={`${project.title} - screenshot ${index + 1}`} 
                   className="w-full h-full object-cover"
                   loading={index === 0 ? "eager" : "lazy"}
                 />
